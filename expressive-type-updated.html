@@ -101,6 +101,33 @@
         .color-swatch.active {
             border-color: #82CDFF;
         }
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 32px;
+        }
+        .export-btn {
+            flex: 1;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
+            border-radius: 6px;
+            padding: 10px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .export-btn:hover {
+            background: #82CDFF;
+            color: #001550;
+        }
+        .export-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         #canvas-container { flex: 1; }
     </style>
 </head>
@@ -177,6 +204,11 @@
                 <input type="text" class="slider-value" id="speedValue" value="0.5">
                 <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
             </div>
+        </div>
+
+        <div class="export-buttons">
+            <button class="export-btn" id="exportPNG">PNG</button>
+            <button class="export-btn" id="exportMP4">MP4</button>
         </div>
     </div>
     
@@ -550,6 +582,64 @@
                 state.fgColor = swatch.dataset.color;
                 build();
             });
+        });
+
+        // Export PNG
+        document.getElementById('exportPNG').addEventListener('click', () => {
+            renderer.render(scene, camera);
+            const dataURL = renderer.domElement.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'expressive-type-' + Date.now() + '.png';
+            link.href = dataURL;
+            link.click();
+        });
+
+        // Export MP4
+        let isRecording = false;
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        document.getElementById('exportMP4').addEventListener('click', async () => {
+            const btn = document.getElementById('exportMP4');
+
+            if (!isRecording) {
+                // Start recording
+                recordedChunks = [];
+                const stream = renderer.domElement.captureStream(60);
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp9',
+                    videoBitsPerSecond: 8000000
+                });
+
+                mediaRecorder.ondataavailable = e => {
+                    if (e.data.size > 0) {
+                        recordedChunks.push(e.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'expressive-type-' + Date.now() + '.webm';
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                btn.textContent = 'Stop';
+                btn.style.background = '#82CDFF';
+                btn.style.color = '#001550';
+            } else {
+                // Stop recording
+                mediaRecorder.stop();
+                isRecording = false;
+                btn.textContent = 'MP4';
+                btn.style.background = '';
+                btn.style.color = '';
+            }
         });
 
         // Load custom font then initialize
