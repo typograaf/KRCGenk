@@ -234,28 +234,8 @@
             const r = Math.min(state.radius, s/2 - 5);
             
             // Create the text band around the perimeter (this calculates depth)
-            const depth = createTextBand(s, s, r);
-            
-            // Create top and bottom rounded rect faces
-            const shape = createRoundedRectShape(s, s, r);
-            
-            // Top face
-            const topGeom = new THREE.ShapeGeometry(shape);
-            const topMat = new THREE.MeshStandardMaterial({
-                color: 0x7dd3fc,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.3
-            });
-            const topMesh = new THREE.Mesh(topGeom, topMat);
-            topMesh.position.z = depth / 2;
-            group.add(topMesh);
-            
-            // Bottom face
-            const botMesh = new THREE.Mesh(topGeom.clone(), topMat.clone());
-            botMesh.position.z = -depth / 2;
-            group.add(botMesh);
-            
+            createTextBand(s, s, r);
+
             updateRotation();
         }
         
@@ -436,22 +416,7 @@
 
             const bandMeshInside = new THREE.Mesh(geomInside, matInside);
             group.add(bandMeshInside);
-            
-            // Add edge lines
-            const edgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a5f });
-            
-            // Top edge
-            const topEdgeGeom = new THREE.BufferGeometry().setFromPoints(
-                points.map(p => new THREE.Vector3(p.x, p.y, halfD))
-            );
-            group.add(new THREE.LineLoop(topEdgeGeom, edgeMat));
-            
-            // Bottom edge
-            const botEdgeGeom = new THREE.BufferGeometry().setFromPoints(
-                points.map(p => new THREE.Vector3(p.x, p.y, -halfD))
-            );
-            group.add(new THREE.LineLoop(botEdgeGeom, edgeMat));
-            
+
             return depth;
         }
         
