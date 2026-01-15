@@ -405,17 +405,36 @@
             const bandMeshOutside = new THREE.Mesh(geom, matOutside);
             group.add(bandMeshOutside);
 
-            // Create inside face (back) - same geometry, renders back faces
+            // Create inside face (back) - needs flipped UVs to scroll same direction
             const textureInside = texture.clone();
             textureInside.needsUpdate = true;
             currentTextureInside = textureInside;
+
+            // Create geometry with flipped UV coordinates for inside face
+            const uvsInside = [];
+            cumLength = 0;
+            for (let i = 0; i < points.length; i++) {
+                if (i > 0) {
+                    cumLength += points[i].distanceTo(points[i-1]);
+                }
+                // Flip U coordinate so inside scrolls same visual direction as outside
+                const u = Math.max(0, Math.min(1, cumLength / totalLength));
+                uvsInside.push(u, 1);  // top
+                uvsInside.push(u, 0);  // bottom
+            }
+
+            const geomInside = new THREE.BufferGeometry();
+            geomInside.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geomInside.setAttribute('uv', new THREE.Float32BufferAttribute(uvsInside, 2));
+            geomInside.setIndex(indices);
+            geomInside.computeVertexNormals();
 
             const matInside = new THREE.MeshBasicMaterial({
                 map: textureInside,
                 side: THREE.BackSide
             });
 
-            const bandMeshInside = new THREE.Mesh(geom.clone(), matInside);
+            const bandMeshInside = new THREE.Mesh(geomInside, matInside);
             group.add(bandMeshInside);
             
             // Add edge lines
