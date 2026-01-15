@@ -149,6 +149,7 @@
         let scene, camera, renderer, group;
         let textureOffset = 0;
         let currentTexture = null;
+        let currentTextureInside = null;
         
         const state = {
             text: 'RACING FORZA  ',
@@ -350,8 +351,8 @@
             texture.wrapT = THREE.ClampToEdgeWrapping;
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             texture.needsUpdate = true;
-            
-            // Store texture reference for animation
+
+            // Store texture reference for animation (outside face)
             currentTexture = texture;
             
             // Build band geometry
@@ -395,13 +396,27 @@
             geom.setIndex(indices);
             geom.computeVertexNormals();
             
-            const mat = new THREE.MeshBasicMaterial({
+            // Create outside face (front) - normal rendering
+            const matOutside = new THREE.MeshBasicMaterial({
                 map: texture,
-                side: THREE.DoubleSide
+                side: THREE.FrontSide
             });
-            
-            const bandMesh = new THREE.Mesh(geom, mat);
-            group.add(bandMesh);
+
+            const bandMeshOutside = new THREE.Mesh(geom, matOutside);
+            group.add(bandMeshOutside);
+
+            // Create inside face (back) - same geometry, renders back faces
+            const textureInside = texture.clone();
+            textureInside.needsUpdate = true;
+            currentTextureInside = textureInside;
+
+            const matInside = new THREE.MeshBasicMaterial({
+                map: textureInside,
+                side: THREE.BackSide
+            });
+
+            const bandMeshInside = new THREE.Mesh(geom.clone(), matInside);
+            group.add(bandMeshInside);
             
             // Add edge lines
             const edgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a5f });
@@ -429,13 +444,18 @@
         
         function animate() {
             requestAnimationFrame(animate);
-            
-            // Animate texture offset
-            if (currentTexture && state.speed > 0) {
+
+            // Animate texture offset for both outside and inside faces
+            if (state.speed > 0) {
                 textureOffset += state.speed * 0.001;
-                currentTexture.offset.x = textureOffset;
+                if (currentTexture) {
+                    currentTexture.offset.x = textureOffset;
+                }
+                if (currentTextureInside) {
+                    currentTextureInside.offset.x = textureOffset;
+                }
             }
-            
+
             renderer.render(scene, camera);
         }
         
