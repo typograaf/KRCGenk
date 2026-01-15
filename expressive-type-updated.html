@@ -12,29 +12,21 @@
             font-style: normal;
         }
         
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #0a1628;
-            color: #e8f0f8;
+            font-family: Helvetica, Arial, sans-serif;
+            background: #001550;
+            color: #82CDFF;
             min-height: 100vh;
             display: flex;
             overflow: hidden;
         }
         .control-panel {
             width: 300px;
-            background: #111d32;
-            border-right: 1px solid #1e3a5f;
+            background: #001550;
+            border-right: 1px solid #003CC4;
             padding: 24px;
             overflow-y: auto;
-        }
-        .panel-title {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 32px;
         }
         .control-group { margin-bottom: 24px; }
         .control-label {
@@ -42,27 +34,27 @@
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 1.2px;
-            color: #6b7c93;
+            color: #82CDFF;
             margin-bottom: 10px;
             display: block;
         }
         .text-input {
             width: 100%;
-            background: #0a1628;
-            border: 1px solid #1e3a5f;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
             border-radius: 6px;
             padding: 12px 14px;
-            color: #e8f0f8;
+            color: #FFFFFF;
             font-family: inherit;
             font-size: 14px;
         }
-        .text-input:focus { outline: none; border-color: #c4f135; }
+        .text-input:focus { outline: none; border-color: #82CDFF; }
         .slider-container { position: relative; }
         .slider {
             width: 100%;
             height: 6px;
             -webkit-appearance: none;
-            background: #0a1628;
+            background: #003CC4;
             border-radius: 3px;
             cursor: pointer;
         }
@@ -70,7 +62,7 @@
             -webkit-appearance: none;
             width: 18px;
             height: 18px;
-            background: #c4f135;
+            background: #82CDFF;
             border-radius: 50%;
             cursor: pointer;
         }
@@ -79,7 +71,16 @@
             right: 0;
             top: -20px;
             font-size: 11px;
-            color: #6b7c93;
+            color: #82CDFF;
+            background: transparent;
+            border: none;
+            text-align: right;
+            width: 50px;
+            cursor: text;
+        }
+        .slider-value:focus {
+            outline: none;
+            color: #FFFFFF;
         }
         .color-swatches {
             display: flex;
@@ -95,18 +96,16 @@
             transition: border-color 0.2s;
         }
         .color-swatch:hover {
-            border-color: #c4f135;
+            border-color: #82CDFF;
         }
         .color-swatch.active {
-            border-color: #c4f135;
+            border-color: #82CDFF;
         }
         #canvas-container { flex: 1; }
     </style>
 </head>
 <body>
     <div class="control-panel">
-        <div class="panel-title">Expressive Type</div>
-        
         <div class="control-group">
             <label class="control-label">Text</label>
             <input type="text" class="text-input" id="textInput" value="RACING FORZA  ">
@@ -135,23 +134,23 @@
         <div class="control-group">
             <label class="control-label">Shape Size</label>
             <div class="slider-container">
-                <span class="slider-value" id="sizeValue">280</span>
+                <input type="text" class="slider-value" id="sizeValue" value="280">
                 <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Corner Radius</label>
             <div class="slider-container">
-                <span class="slider-value" id="radiusValue">60</span>
+                <input type="text" class="slider-value" id="radiusValue" value="60">
                 <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Rotation X</label>
             <div class="slider-container">
-                <span class="slider-value" id="rotXValue">-45°</span>
+                <input type="text" class="slider-value" id="rotXValue" value="-45°">
                 <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-45">
             </div>
         </div>
@@ -159,7 +158,7 @@
         <div class="control-group">
             <label class="control-label">Rotation Y</label>
             <div class="slider-container">
-                <span class="slider-value" id="rotYValue">0°</span>
+                <input type="text" class="slider-value" id="rotYValue" value="0°">
                 <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="0">
             </div>
         </div>
@@ -167,15 +166,15 @@
         <div class="control-group">
             <label class="control-label">Rotation Z</label>
             <div class="slider-container">
-                <span class="slider-value" id="rotZValue">-45°</span>
+                <input type="text" class="slider-value" id="rotZValue" value="-45°">
                 <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="-45">
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Animation Speed</label>
             <div class="slider-container">
-                <span class="slider-value" id="speedValue">0.5</span>
+                <input type="text" class="slider-value" id="speedValue" value="0.5">
                 <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
             </div>
         </div>
@@ -500,12 +499,30 @@
         ];
         
         sliders.forEach(([id, valId, key, suf]) => {
-            document.getElementById(id).addEventListener('input', e => {
+            const slider = document.getElementById(id);
+            const valueInput = document.getElementById(valId);
+
+            // Slider input updates value display
+            slider.addEventListener('input', e => {
                 state[key] = parseFloat(e.target.value);
-                document.getElementById(valId).textContent = e.target.value + suf;
+                valueInput.value = e.target.value + suf;
                 if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
                 else if (key !== 'speed') build();
-                // Speed changes don't need rebuild, just affect animation
+            });
+
+            // Value input updates slider and state
+            valueInput.addEventListener('input', e => {
+                const numValue = parseFloat(e.target.value.replace(suf, ''));
+                if (!isNaN(numValue)) {
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    const clampedValue = Math.max(min, Math.min(max, numValue));
+                    state[key] = clampedValue;
+                    slider.value = clampedValue;
+                    valueInput.value = clampedValue + suf;
+                    if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
+                    else if (key !== 'speed') build();
+                }
             });
         });
         
