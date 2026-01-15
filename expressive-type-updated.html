@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expressive Type</title>
+    <style>
+        @font-face {
+            font-family: 'Genk';
+            src: url(data:font/otf;base64,T1RUTwALAIAAAwAwQ0ZGIPwCByUAAARwAAANn0dERUYADwAeAAASEAAAABRHU1VCqSq2HwAAEiQAAABQT1MvMmc9YSsAAAHMAAAAYGNtYXACEgGsAAAD5AAAAGxoZWFkLKJ7mgAAAMQAAAA2aGhlYQeDAqsAAAGoAAAAJGhtdHgm4QLQAAAA/AAAAKxtYXhwACtQAAAAALwAAAAGbmFtZSCbPPEAAAIsAAABtnBvc3T/nwAyAAAEUAAAACAAAFAAACsAAAABAAAAAQAARFOtZF8PPPUAAwPoAAAAAOWOnGYAAAAA5Y6cZgAJ/+gCZQICAAAABwACAAAAAAAAAPoALwAjAAAA3AARANwAEQDcABEA3AARAJwAEQCcABEA3AARANwAEQBuABEA3AARANwAEQCSABEBSgARANwAEQDcABEA3AARAN0AEQDcABEA3AARALYACQDcABEA3AARAUoAEQDcABEA3AARANwAEQDcABEA3AARAHkACQDcABEA3AARANwAEQDcABEA3AARANwAEQDcABEA3AARASQACQH4ABEBSgARAnYAEQABAAACWAAAArwCdgAJAAkCZQABAAAAAAAAAAAAAAAAAAAAKwAEAOcBkAAFAAgCigJYAAAASwKKAlgAAAFeADIA+gAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAABVS1dOAMAAIACgAfQAAAK8AlgAGAAAAAEAAAAAAfQB9AAAACAAAgAAAAgAZgADAAEECQABACQAAAADAAEECQACAA4AJAADAAEECQADAEgAMgADAAEECQAEADQAegADAAEECQAFAD4ArgADAAEECQAGADIA7AADAAEECQAQABQBHgADAAEECQARAB4BMgBnAGUAbgBrADIANgAwADEAMQA1ACAAUgBvAHUAbgBkAGUAZABSAGUAZwB1AGwAYQByADEALgAwADAAMAA7AFUASwBXAE4AOwBnAGUAbgBrADIANgAwADEAMQA1AC0AUgBlAGcAdQBsAGEAcgBSAG8AdQBuAGQAZQBkAGcAZQBuAGsAMgA2ADAAMQAxADUAIABSAGUAZwB1AGwAYQByACAAUgBvAHUAbgBkAGUAZABWAGUAcgBzAGkAbwBuACAAMQAuADAAMAAwADsARwBsAHkAcABoAHMAIAAzAC4ANQAgACgAMwA1ADAAOQApAGcAZQBu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) format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #0a1628;
+            color: #e8f0f8;
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        .control-panel {
+            width: 300px;
+            background: #111d32;
+            border-right: 1px solid #1e3a5f;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .panel-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 32px;
+        }
+        .control-group { margin-bottom: 24px; }
+        .control-label {
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #6b7c93;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .text-input {
+            width: 100%;
+            background: #0a1628;
+            border: 1px solid #1e3a5f;
+            border-radius: 6px;
+            padding: 12px 14px;
+            color: #e8f0f8;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .text-input:focus { outline: none; border-color: #c4f135; }
+        .slider-container { position: relative; }
+        .slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #0a1628;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #c4f135;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -20px;
+            font-size: 11px;
+            color: #6b7c93;
+        }
+        #canvas-container { flex: 1; }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <div class="panel-title">Expressive Type</div>
+        
+        <div class="control-group">
+            <label class="control-label">Text</label>
+            <input type="text" class="text-input" id="textInput" value="RACING FORZA  ">
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Shape Size</label>
+            <div class="slider-container">
+                <span class="slider-value" id="sizeValue">280</span>
+                <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Corner Radius</label>
+            <div class="slider-container">
+                <span class="slider-value" id="radiusValue">60</span>
+                <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Rotation X</label>
+            <div class="slider-container">
+                <span class="slider-value" id="rotXValue">-25°</span>
+                <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-25">
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Rotation Y</label>
+            <div class="slider-container">
+                <span class="slider-value" id="rotYValue">30°</span>
+                <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="30">
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Rotation Z</label>
+            <div class="slider-container">
+                <span class="slider-value" id="rotZValue">0°</span>
+                <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="0">
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <label class="control-label">Animation Speed</label>
+            <div class="slider-container">
+                <span class="slider-value" id="speedValue">0.5</span>
+                <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
+            </div>
+        </div>
+    </div>
+    
+    <div id="canvas-container"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, group;
+        let textureOffset = 0;
+        let currentTexture = null;
+        
+        const state = {
+            text: 'RACING FORZA  ',
+            size: 280,
+            radius: 60,
+            rotX: -25,
+            rotY: 30,
+            rotZ: 0,
+            speed: 0.5
+        };
+        
+        function init() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x7dd3fc);
+            
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 2000);
+            camera.position.set(0, 0, 800);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+            const dir = new THREE.DirectionalLight(0xffffff, 0.5);
+            dir.position.set(1, 1, 1);
+            scene.add(dir);
+            
+            group = new THREE.Group();
+            scene.add(group);
+            
+            // Wait for font to load before building
+            document.fonts.ready.then(() => {
+                build();
+            });
+            
+            // Mouse drag
+            let drag = false, prev = {x:0, y:0};
+            renderer.domElement.onmousedown = e => { drag = true; prev = {x: e.clientX, y: e.clientY}; };
+            document.onmousemove = e => {
+                if (!drag) return;
+                state.rotY += (e.clientX - prev.x) * 0.5;
+                state.rotX = Math.max(-90, Math.min(90, state.rotX - (e.clientY - prev.y) * 0.3));
+                document.getElementById('rotXSlider').value = state.rotX;
+                document.getElementById('rotYSlider').value = state.rotY;
+                document.getElementById('rotXValue').textContent = Math.round(state.rotX) + '°';
+                document.getElementById('rotYValue').textContent = Math.round(state.rotY) + '°';
+                updateRotation();
+                prev = {x: e.clientX, y: e.clientY};
+            };
+            document.onmouseup = () => drag = false;
+            
+            window.onresize = () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            };
+            
+            animate();
+        }
+        
+        function clearGroup() {
+            while (group.children.length) {
+                const c = group.children[0];
+                group.remove(c);
+                c.traverse(obj => {
+                    if (obj.geometry) obj.geometry.dispose();
+                    if (obj.material) {
+                        if (obj.material.map) obj.material.map.dispose();
+                        obj.material.dispose();
+                    }
+                });
+            }
+        }
+        
+        function build() {
+            clearGroup();
+            
+            const s = state.size;
+            const r = Math.min(state.radius, s/2 - 5);
+            
+            // Create the text band around the perimeter (this calculates depth)
+            const depth = createTextBand(s, s, r);
+            
+            // Create top and bottom rounded rect faces
+            const shape = createRoundedRectShape(s, s, r);
+            
+            // Top face
+            const topGeom = new THREE.ShapeGeometry(shape);
+            const topMat = new THREE.MeshStandardMaterial({ color: 0x7dd3fc, side: THREE.DoubleSide });
+            const topMesh = new THREE.Mesh(topGeom, topMat);
+            topMesh.position.z = depth / 2;
+            group.add(topMesh);
+            
+            // Bottom face
+            const botMesh = new THREE.Mesh(topGeom.clone(), topMat.clone());
+            botMesh.position.z = -depth / 2;
+            group.add(botMesh);
+            
+            updateRotation();
+        }
+        
+        function createRoundedRectShape(w, h, r) {
+            const shape = new THREE.Shape();
+            const hw = w/2, hh = h/2;
+            
+            shape.moveTo(-hw + r, -hh);
+            shape.lineTo(hw - r, -hh);
+            shape.quadraticCurveTo(hw, -hh, hw, -hh + r);
+            shape.lineTo(hw, hh - r);
+            shape.quadraticCurveTo(hw, hh, hw - r, hh);
+            shape.lineTo(-hw + r, hh);
+            shape.quadraticCurveTo(-hw, hh, -hw, hh - r);
+            shape.lineTo(-hw, -hh + r);
+            shape.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
+            
+            return shape;
+        }
+        
+        function createTextBand(w, h, r) {
+            const hw = w/2, hh = h/2;
+            
+            // Get path points around the rounded rectangle
+            const path = new THREE.Path();
+            path.moveTo(-hw + r, hh);
+            path.lineTo(hw - r, hh);
+            path.quadraticCurveTo(hw, hh, hw, hh - r);
+            path.lineTo(hw, -hh + r);
+            path.quadraticCurveTo(hw, -hh, hw - r, -hh);
+            path.lineTo(-hw + r, -hh);
+            path.quadraticCurveTo(-hw, -hh, -hw, -hh + r);
+            path.lineTo(-hw, hh - r);
+            path.quadraticCurveTo(-hw, hh, -hw + r, hh);
+            
+            const points = path.getPoints(100);
+            
+            // Calculate perimeter length (including closing segment back to start)
+            let perimeter = 0;
+            for (let i = 1; i < points.length; i++) {
+                perimeter += points[i].distanceTo(points[i-1]);
+            }
+            // Add closing segment
+            perimeter += points[points.length - 1].distanceTo(points[0]);
+            
+            // Create canvas with text - measure first to calculate depth
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const text = state.text.trim() + ' '; // Add single space at end
+            
+            // Use a reference font size to measure text aspect ratio
+            const refFontSize = 100;
+            const fontFamily = 'Genk, Arial Black, sans-serif';
+            ctx.font = `${refFontSize}px ${fontFamily}`;
+            const textWidth = ctx.measureText(text).width;
+            
+            // Calculate depth so text fits exactly once around perimeter
+            const textAspect = textWidth / refFontSize;
+            const depth = perimeter / textAspect;
+            
+            // Now create the actual canvas at proper resolution
+            const scale = 6;
+            const fontSize = depth * scale * 0.75;
+            
+            // Canvas width should match the text width at this font size
+            ctx.font = `${fontSize}px ${fontFamily}`;
+            const metrics = ctx.measureText(text);
+            const actualTextWidth = metrics.width;
+            
+            // Use depth * scale but with reduced factor (0.5 instead of 1.0) to reduce padding
+            canvas.width = Math.ceil(actualTextWidth);
+            canvas.height = Math.ceil(depth * scale * 0.5);
+            
+            // Draw background
+            ctx.fillStyle = '#7dd3fc';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw text - calculate proper vertical position using font metrics
+            ctx.font = `${fontSize}px ${fontFamily}`;
+            ctx.fillStyle = '#1e3a5f';
+            ctx.textBaseline = 'alphabetic';
+            
+            // Position text so it's visually centered
+            // Use actualBoundingBoxAscent to find the baseline position
+            const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+            const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+            const yPos = canvas.height / 2 + ascent / 2 - descent / 2;
+            
+            ctx.fillText(text, 0, yPos);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            texture.needsUpdate = true;
+            
+            // Store texture reference for animation
+            currentTexture = texture;
+            
+            // Build band geometry
+            const halfD = depth / 2;
+            
+            const vertices = [];
+            const uvs = [];
+            const indices = [];
+            
+            let cumLength = 0;
+            const totalLength = perimeter;
+            
+            for (let i = 0; i < points.length; i++) {
+                const p = points[i];
+                
+                // Calculate UV x based on distance along perimeter
+                if (i > 0) {
+                    cumLength += points[i].distanceTo(points[i-1]);
+                }
+                // U maps 0-1 across the full perimeter, clamped to valid range
+                const u = Math.max(0, Math.min(1, 1 - (cumLength / totalLength)));
+                
+                // Two vertices per point (top and bottom of band)
+                vertices.push(p.x, p.y, halfD);   // top
+                vertices.push(p.x, p.y, -halfD);  // bottom
+                
+                uvs.push(u, 1);  // top
+                uvs.push(u, 0);  // bottom
+                
+                // Create faces (two triangles per segment)
+                if (i > 0) {
+                    const base = (i - 1) * 2;
+                    indices.push(base, base + 3, base + 1);
+                    indices.push(base, base + 2, base + 3);
+                }
+            }
+            
+            const geom = new THREE.BufferGeometry();
+            geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geom.setIndex(indices);
+            geom.computeVertexNormals();
+            
+            const mat = new THREE.MeshBasicMaterial({
+                map: texture,
+                side: THREE.DoubleSide
+            });
+            
+            const bandMesh = new THREE.Mesh(geom, mat);
+            group.add(bandMesh);
+            
+            // Add edge lines
+            const edgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a5f });
+            
+            // Top edge
+            const topEdgeGeom = new THREE.BufferGeometry().setFromPoints(
+                points.map(p => new THREE.Vector3(p.x, p.y, halfD))
+            );
+            group.add(new THREE.LineLoop(topEdgeGeom, edgeMat));
+            
+            // Bottom edge
+            const botEdgeGeom = new THREE.BufferGeometry().setFromPoints(
+                points.map(p => new THREE.Vector3(p.x, p.y, -halfD))
+            );
+            group.add(new THREE.LineLoop(botEdgeGeom, edgeMat));
+            
+            return depth;
+        }
+        
+        function updateRotation() {
+            group.rotation.x = THREE.MathUtils.degToRad(state.rotX);
+            group.rotation.y = THREE.MathUtils.degToRad(state.rotY);
+            group.rotation.z = THREE.MathUtils.degToRad(state.rotZ);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Animate texture offset
+            if (currentTexture && state.speed > 0) {
+                textureOffset += state.speed * 0.001;
+                currentTexture.offset.x = textureOffset;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        // Sliders
+        const sliders = [
+            ['sizeSlider', 'sizeValue', 'size', ''],
+            ['radiusSlider', 'radiusValue', 'radius', ''],
+            ['rotXSlider', 'rotXValue', 'rotX', '°'],
+            ['rotYSlider', 'rotYValue', 'rotY', '°'],
+            ['rotZSlider', 'rotZValue', 'rotZ', '°'],
+            ['speedSlider', 'speedValue', 'speed', '']
+        ];
+        
+        sliders.forEach(([id, valId, key, suf]) => {
+            document.getElementById(id).addEventListener('input', e => {
+                state[key] = parseFloat(e.target.value);
+                document.getElementById(valId).textContent = e.target.value + suf;
+                if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
+                else if (key !== 'speed') build();
+                // Speed changes don't need rebuild, just affect animation
+            });
+        });
+        
+        document.getElementById('textInput').addEventListener('input', e => {
+            state.text = e.target.value || 'TYPE ';
+            build();
+        });
+        
+        // Load custom font then initialize
+        document.fonts.load('100px Genk').then(() => {
+            init();
+        }).catch(() => {
+            // Fallback if font fails to load
+            init();
+        });
+    </script>
+</body>
+</html>
