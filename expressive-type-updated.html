@@ -657,21 +657,53 @@
                 });
 
                 // Setup video encoder
+                let encoderFailed = false;
                 videoEncoder = new VideoEncoder({
                     output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-                    error: e => console.error('Encoder error:', e)
+                    error: e => {
+                        console.error('Encoder error:', e);
+                        encoderFailed = true;
+                        isRecording = false;
+                        alert('Video encoder failed: ' + e.message);
+                        btn.textContent = 'MP4';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.disabled = false;
+                    }
                 });
 
-                videoEncoder.configure({
-                    codec: 'avc1.42001f', // Baseline profile level 3.1 (widely supported)
-                    width: videoWidth,
-                    height: videoHeight,
-                    bitrate: 8_000_000,
-                    framerate: 60
-                });
+                try {
+                    videoEncoder.configure({
+                        codec: 'avc1.42001f', // Baseline profile level 3.1 (widely supported)
+                        width: videoWidth,
+                        height: videoHeight,
+                        bitrate: 8_000_000,
+                        framerate: 60
+                    });
+
+                    // Wait a bit to ensure configuration completes
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                    if (encoderFailed || videoEncoder.state !== 'configured') {
+                        throw new Error('Encoder failed to configure. Resolution: ' + videoWidth + 'x' + videoHeight);
+                    }
+
+                    console.log('Encoder configured successfully');
+                } catch (e) {
+                    console.error('Failed to configure encoder:', e);
+                    alert('Failed to start video export: ' + e.message);
+                    isRecording = false;
+                    btn.textContent = 'MP4';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    return;
+                }
 
                 // Capture frames - render as fast as possible
                 const captureFrame = () => {
+                    if (encoderFailed) {
+                        return;
+                    }
                     if (!isRecording) {
                         console.log('Finalizing video...');
 
@@ -705,6 +737,13 @@
                         return;
                     }
 
+                    // Check if encoder is still configured
+                    if (videoEncoder.state !== 'configured') {
+                        console.error('Encoder not configured, stopping capture');
+                        isRecording = false;
+                        return;
+                    }
+
                     // Check if encoder can accept more frames
                     if (videoEncoder.encodeQueueSize > 30) {
                         // Wait a bit if queue is too full
@@ -726,9 +765,7 @@
                         timestamp: (frameNumber * 1_000_000) / 60
                     });
 
-                    if (videoEncoder.state === 'configured') {
-                        videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
-                    }
+                    videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
                     frame.close();
 
                     frameNumber++;
