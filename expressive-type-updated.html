@@ -632,7 +632,7 @@
                 muxer = new Muxer({
                     target,
                     video: {
-                        codec: 'avc',
+                        // Don't specify codec here - let it infer from encoder
                         width: renderer.domElement.width,
                         height: renderer.domElement.height
                     },
