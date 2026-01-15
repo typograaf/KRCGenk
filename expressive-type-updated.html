@@ -657,21 +657,22 @@
                 // Capture frames - render as fast as possible
                 const captureFrame = () => {
                     if (!isRecording) {
-                        // Show processing state
-                        btn.textContent = 'Processing...';
-                        btn.disabled = true;
+                        console.log('Finalizing video...');
 
                         // Finalize
                         videoEncoder.flush().then(() => {
+                            console.log('Encoder flushed, finalizing muxer...');
                             videoEncoder.close();
                             muxer.finalize();
                             const { buffer } = muxer.target;
+                            console.log('Muxer finalized, buffer size:', buffer.byteLength);
                             const blob = new Blob([buffer], { type: 'video/mp4' });
                             const url = URL.createObjectURL(blob);
                             const link = document.createElement('a');
                             link.download = 'expressive-type-' + Date.now() + '.mp4';
                             link.href = url;
                             link.click();
+                            console.log('Download triggered');
                             URL.revokeObjectURL(url);
                             btn.textContent = 'MP4';
                             btn.style.background = '';
@@ -679,6 +680,7 @@
                             btn.disabled = false;
                         }).catch(e => {
                             console.error('Error finalizing video:', e);
+                            alert('Error creating video: ' + e.message);
                             btn.textContent = 'MP4';
                             btn.style.background = '';
                             btn.style.color = '';
@@ -712,8 +714,11 @@
 
                 captureFrame();
             } else {
-                // Stop recording - don't cancel frame, let it finalize
+                // Stop recording
+                console.log('Stop button clicked');
                 isRecording = false;
+                btn.textContent = 'Processing...';
+                btn.disabled = true;
             }
         });
 
