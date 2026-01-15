@@ -653,7 +653,7 @@
                     framerate: 60
                 });
 
-                // Capture frames
+                // Capture frames - render as fast as possible
                 const captureFrame = () => {
                     if (!isRecording) {
                         // Finalize
@@ -686,8 +686,8 @@
 
                     frameNumber++;
 
-                    // Schedule next frame at 60fps
-                    setTimeout(captureFrame, 1000 / 60);
+                    // Render next frame immediately (as fast as possible)
+                    requestAnimationFrame(captureFrame);
                 };
 
                 captureFrame();
