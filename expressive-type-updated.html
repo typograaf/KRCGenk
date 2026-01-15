@@ -81,6 +81,25 @@
             font-size: 11px;
             color: #6b7c93;
         }
+        .color-swatches {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .color-swatch:hover {
+            border-color: #c4f135;
+        }
+        .color-swatch.active {
+            border-color: #c4f135;
+        }
         #canvas-container { flex: 1; }
     </style>
 </head>
@@ -92,7 +111,27 @@
             <label class="control-label">Text</label>
             <input type="text" class="text-input" id="textInput" value="RACING FORZA  ">
         </div>
-        
+
+        <div class="control-group">
+            <label class="control-label">Background Color</label>
+            <div class="color-swatches" id="bgColorSwatches">
+                <div class="color-swatch active" data-color="82CDFF" style="background-color: #82CDFF;"></div>
+                <div class="color-swatch" data-color="001550" style="background-color: #001550;"></div>
+                <div class="color-swatch" data-color="003CC4" style="background-color: #003CC4;"></div>
+                <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Text Color</label>
+            <div class="color-swatches" id="fgColorSwatches">
+                <div class="color-swatch" data-color="82CDFF" style="background-color: #82CDFF;"></div>
+                <div class="color-swatch active" data-color="001550" style="background-color: #001550;"></div>
+                <div class="color-swatch" data-color="003CC4" style="background-color: #003CC4;"></div>
+                <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+            </div>
+        </div>
+
         <div class="control-group">
             <label class="control-label">Shape Size</label>
             <div class="slider-container">
@@ -158,14 +197,16 @@
             rotX: -45,
             rotY: 0,
             rotZ: -45,
-            speed: 0.5
+            speed: 0.5,
+            bgColor: '82CDFF',
+            fgColor: '001550'
         };
         
         function init() {
             const container = document.getElementById('canvas-container');
             
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x7dd3fc);
+            scene.background = new THREE.Color(parseInt(state.bgColor, 16));
             
             camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 2000);
             camera.position.set(0, 0, 800);
@@ -318,12 +359,12 @@
             const actualDepth = canvas.height / (scale * 0.75);
 
             // Draw background
-            ctx.fillStyle = '#7dd3fc';
+            ctx.fillStyle = '#' + state.bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // Draw text - calculate proper vertical position using font metrics
             ctx.font = `${fontSize}px ${fontFamily}`;
-            ctx.fillStyle = '#1e3a5f';
+            ctx.fillStyle = '#' + state.fgColor;
             ctx.textBaseline = 'alphabetic';
 
             // Position text vertically centered (baseline position)
@@ -472,7 +513,28 @@
             state.text = e.target.value || 'TYPE ';
             build();
         });
-        
+
+        // Background color swatches
+        document.querySelectorAll('#bgColorSwatches .color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', e => {
+                document.querySelectorAll('#bgColorSwatches .color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+                state.bgColor = swatch.dataset.color;
+                scene.background = new THREE.Color(parseInt(state.bgColor, 16));
+                build();
+            });
+        });
+
+        // Foreground color swatches
+        document.querySelectorAll('#fgColorSwatches .color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', e => {
+                document.querySelectorAll('#fgColorSwatches .color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+                state.fgColor = swatch.dataset.color;
+                build();
+            });
+        });
+
         // Load custom font then initialize
         document.fonts.load('100px Genk').then(() => {
             init();
