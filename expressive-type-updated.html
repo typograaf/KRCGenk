@@ -712,11 +712,8 @@
 
                 captureFrame();
             } else {
-                // Stop recording
+                // Stop recording - don't cancel frame, let it finalize
                 isRecording = false;
-                if (captureFrameId) {
-                    cancelAnimationFrame(captureFrameId);
-                }
             }
         });
 
