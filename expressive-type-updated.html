@@ -390,8 +390,8 @@
                 // Create faces (two triangles per segment)
                 if (i > 0) {
                     const base = (i - 1) * 2;
-                    indices.push(base, base + 3, base + 1);
-                    indices.push(base, base + 2, base + 3);
+                    indices.push(base, base + 1, base + 3);
+                    indices.push(base, base + 3, base + 2);
                 }
             }
             
