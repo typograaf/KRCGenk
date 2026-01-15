@@ -603,6 +603,7 @@
         let muxer;
         let videoEncoder;
         let frameNumber = 0;
+        let captureFrameId = null;
 
         document.getElementById('exportMP4').addEventListener('click', async () => {
             const btn = document.getElementById('exportMP4');
@@ -656,8 +657,13 @@
                 // Capture frames - render as fast as possible
                 const captureFrame = () => {
                     if (!isRecording) {
+                        // Show processing state
+                        btn.textContent = 'Processing...';
+                        btn.disabled = true;
+
                         // Finalize
                         videoEncoder.flush().then(() => {
+                            videoEncoder.close();
                             muxer.finalize();
                             const { buffer } = muxer.target;
                             const blob = new Blob([buffer], { type: 'video/mp4' });
@@ -670,11 +676,13 @@
                             btn.textContent = 'MP4';
                             btn.style.background = '';
                             btn.style.color = '';
+                            btn.disabled = false;
                         }).catch(e => {
                             console.error('Error finalizing video:', e);
                             btn.textContent = 'MP4';
                             btn.style.background = '';
                             btn.style.color = '';
+                            btn.disabled = false;
                         });
                         return;
                     }
@@ -682,7 +690,7 @@
                     // Check if encoder can accept more frames
                     if (videoEncoder.encodeQueueSize > 30) {
                         // Wait a bit if queue is too full
-                        setTimeout(captureFrame, 10);
+                        captureFrameId = setTimeout(captureFrame, 10);
                         return;
                     }
 
@@ -699,13 +707,16 @@
                     frameNumber++;
 
                     // Render next frame immediately (as fast as possible)
-                    requestAnimationFrame(captureFrame);
+                    captureFrameId = requestAnimationFrame(captureFrame);
                 };
 
                 captureFrame();
             } else {
                 // Stop recording
                 isRecording = false;
+                if (captureFrameId) {
+                    cancelAnimationFrame(captureFrameId);
+                }
             }
         });
 
