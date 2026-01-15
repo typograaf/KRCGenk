@@ -250,8 +250,14 @@
             topMesh.position.z = depth / 2;
             group.add(topMesh);
             
-            // Bottom face
-            const botMesh = new THREE.Mesh(topGeom.clone(), topMat.clone());
+            // Bottom face - fully transparent
+            const botMat = new THREE.MeshStandardMaterial({
+                color: 0x7dd3fc,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0
+            });
+            const botMesh = new THREE.Mesh(topGeom.clone(), botMat);
             botMesh.position.z = -depth / 2;
             group.add(botMesh);
             
@@ -402,22 +408,7 @@
             
             const bandMesh = new THREE.Mesh(geom, mat);
             group.add(bandMesh);
-            
-            // Add edge lines
-            const edgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a5f });
-            
-            // Top edge
-            const topEdgeGeom = new THREE.BufferGeometry().setFromPoints(
-                points.map(p => new THREE.Vector3(p.x, p.y, halfD))
-            );
-            group.add(new THREE.LineLoop(topEdgeGeom, edgeMat));
-            
-            // Bottom edge
-            const botEdgeGeom = new THREE.BufferGeometry().setFromPoints(
-                points.map(p => new THREE.Vector3(p.x, p.y, -halfD))
-            );
-            group.add(new THREE.LineLoop(botEdgeGeom, edgeMat));
-            
+
             return depth;
         }
         
