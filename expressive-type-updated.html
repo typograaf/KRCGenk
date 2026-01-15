@@ -403,7 +403,7 @@
             
             const mat = new THREE.MeshBasicMaterial({
                 map: texture,
-                side: THREE.BackSide  // Only show outside face where text is visible
+                side: THREE.DoubleSide  // Show both outside and inside faces
             });
             
             const bandMesh = new THREE.Mesh(geom, mat);
