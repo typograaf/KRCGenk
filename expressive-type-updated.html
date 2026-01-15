@@ -647,7 +647,7 @@
                 });
 
                 videoEncoder.configure({
-                    codec: 'avc1.42001f',
+                    codec: 'avc1.640033', // High profile, level 5.1 (supports up to 4K)
                     width: renderer.domElement.width,
                     height: renderer.domElement.height,
                     bitrate: 8_000_000,
@@ -703,7 +703,9 @@
                         timestamp: (frameNumber * 1_000_000) / 60
                     });
 
-                    videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                    if (videoEncoder.state === 'configured') {
+                        videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                    }
                     frame.close();
 
                     frameNumber++;
