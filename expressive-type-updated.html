@@ -627,14 +627,24 @@
 
                 const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
 
+                // Scale down resolution for video export (max 1920 wide)
+                const maxWidth = 1920;
+                const canvasWidth = renderer.domElement.width;
+                const canvasHeight = renderer.domElement.height;
+                const scale = canvasWidth > maxWidth ? maxWidth / canvasWidth : 1;
+                const videoWidth = Math.floor(canvasWidth * scale);
+                const videoHeight = Math.floor(canvasHeight * scale);
+
+                console.log(`Video resolution: ${videoWidth}x${videoHeight}`);
+
                 // Setup muxer
                 const target = new ArrayBufferTarget();
                 muxer = new Muxer({
                     target,
                     video: {
-                        // Don't specify codec here - let it infer from encoder
-                        width: renderer.domElement.width,
-                        height: renderer.domElement.height
+                        codec: 'avc',
+                        width: videoWidth,
+                        height: videoHeight
                     },
                     fastStart: 'in-memory',
                     firstTimestampBehavior: 'offset'
@@ -647,9 +657,9 @@
                 });
 
                 videoEncoder.configure({
-                    codec: 'avc1.640033', // High profile, level 5.1 (supports up to 4K)
-                    width: renderer.domElement.width,
-                    height: renderer.domElement.height,
+                    codec: 'avc1.42001f', // Baseline profile level 3.1 (widely supported)
+                    width: videoWidth,
+                    height: videoHeight,
                     bitrate: 8_000_000,
                     framerate: 60
                 });
@@ -699,7 +709,14 @@
                     // Render and capture frame
                     renderer.render(scene, camera);
 
-                    const frame = new VideoFrame(renderer.domElement, {
+                    // Create canvas at scaled resolution
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = videoWidth;
+                    tempCanvas.height = videoHeight;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.drawImage(renderer.domElement, 0, 0, videoWidth, videoHeight);
+
+                    const frame = new VideoFrame(tempCanvas, {
                         timestamp: (frameNumber * 1_000_000) / 60
                     });
 
