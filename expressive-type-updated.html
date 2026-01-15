@@ -304,10 +304,14 @@
             ctx.font = `${fontSize}px ${fontFamily}`;
             const metrics = ctx.measureText(text);
             const actualTextWidth = metrics.width;
-            
-            // Use depth * scale but with reduced factor (0.25) for less padding
+
+            // Calculate actual text height with minimal padding
+            const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+            const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+            const textHeight = ascent + descent;
+
             canvas.width = Math.ceil(actualTextWidth);
-            canvas.height = Math.ceil(depth * scale * 0.25);
+            canvas.height = Math.ceil(textHeight * 1.1); // Add 10% padding
             
             // Draw background
             ctx.fillStyle = '#7dd3fc';
@@ -317,13 +321,10 @@
             ctx.font = `${fontSize}px ${fontFamily}`;
             ctx.fillStyle = '#1e3a5f';
             ctx.textBaseline = 'alphabetic';
-            
-            // Position text so it's visually centered
-            // Use actualBoundingBoxAscent to find the baseline position
-            const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
-            const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
-            const yPos = canvas.height / 2 + ascent / 2 - descent / 2;
-            
+
+            // Position text vertically centered (baseline position)
+            const yPos = (canvas.height + ascent - descent) / 2;
+
             ctx.fillText(text, 0, yPos);
             
             const texture = new THREE.CanvasTexture(canvas);
