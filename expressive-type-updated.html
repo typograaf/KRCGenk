@@ -670,7 +670,19 @@
                             btn.textContent = 'MP4';
                             btn.style.background = '';
                             btn.style.color = '';
+                        }).catch(e => {
+                            console.error('Error finalizing video:', e);
+                            btn.textContent = 'MP4';
+                            btn.style.background = '';
+                            btn.style.color = '';
                         });
+                        return;
+                    }
+
+                    // Check if encoder can accept more frames
+                    if (videoEncoder.encodeQueueSize > 30) {
+                        // Wait a bit if queue is too full
+                        setTimeout(captureFrame, 10);
                         return;
                     }
 
