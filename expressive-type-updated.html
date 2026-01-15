@@ -238,18 +238,18 @@
             // Create top and bottom rounded rect faces
             const shape = createRoundedRectShape(s, s, r);
             
-            // Top face
+            // Top face - fully transparent
             const topGeom = new THREE.ShapeGeometry(shape);
             const topMat = new THREE.MeshStandardMaterial({
                 color: 0x7dd3fc,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.3
+                opacity: 0
             });
             const topMesh = new THREE.Mesh(topGeom, topMat);
             topMesh.position.z = depth / 2;
             group.add(topMesh);
-            
+
             // Bottom face - fully transparent
             const botMat = new THREE.MeshStandardMaterial({
                 color: 0x7dd3fc,
@@ -403,7 +403,7 @@
             
             const mat = new THREE.MeshBasicMaterial({
                 map: texture,
-                side: THREE.DoubleSide
+                side: THREE.FrontSide  // Only show outside face where text is visible
             });
             
             const bandMesh = new THREE.Mesh(geom, mat);
