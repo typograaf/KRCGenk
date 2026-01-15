@@ -312,11 +312,14 @@
 
             canvas.width = Math.ceil(actualTextWidth);
             canvas.height = Math.ceil(textHeight * 1.1); // Add 10% padding
-            
+
+            // Recalculate actual depth based on canvas height so 3D band matches text size
+            const actualDepth = canvas.height / scale;
+
             // Draw background
             ctx.fillStyle = '#7dd3fc';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             // Draw text - calculate proper vertical position using font metrics
             ctx.font = `${fontSize}px ${fontFamily}`;
             ctx.fillStyle = '#1e3a5f';
@@ -326,7 +329,7 @@
             const yPos = (canvas.height + ascent - descent) / 2;
 
             ctx.fillText(text, 0, yPos);
-            
+
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -335,9 +338,9 @@
 
             // Store texture reference for animation (outside face)
             currentTexture = texture;
-            
-            // Build band geometry
-            const halfD = depth / 2;
+
+            // Build band geometry using actual depth
+            const halfD = actualDepth / 2;
             
             const vertices = [];
             const uvs = [];
@@ -418,7 +421,7 @@
             const bandMeshInside = new THREE.Mesh(geomInside, matInside);
             group.add(bandMeshInside);
 
-            return depth;
+            return actualDepth;
         }
         
         function updateRotation() {
