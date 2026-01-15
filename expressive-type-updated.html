@@ -305,9 +305,9 @@
             const metrics = ctx.measureText(text);
             const actualTextWidth = metrics.width;
             
-            // Use depth * scale but with reduced factor (0.125) to minimize padding
+            // Use depth * scale but with reduced factor (0.25) for less padding
             canvas.width = Math.ceil(actualTextWidth);
-            canvas.height = Math.ceil(depth * scale * 0.125);
+            canvas.height = Math.ceil(depth * scale * 0.25);
             
             // Draw background
             ctx.fillStyle = '#7dd3fc';
