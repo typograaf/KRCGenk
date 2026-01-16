@@ -1473,11 +1473,6 @@
 
         // Export PNG
         document.getElementById('exportPNG').addEventListener('click', () => {
-            const currentPixelRatio = renderer.getPixelRatio();
-            const currentZoom = state.zoom;
-
-            renderer.setPixelRatio(1);
-            group.scale.set(1, 1, 1);
             renderer.render(scene, camera);
 
             const dataURL = renderer.domElement.toDataURL('image/png');
@@ -1485,9 +1480,6 @@
             link.download = 'krcg-graphic-' + Date.now() + '.png';
             link.href = dataURL;
             link.click();
-
-            group.scale.set(currentZoom, currentZoom, currentZoom);
-            renderer.setPixelRatio(currentPixelRatio);
         });
 
         // Export MP4
