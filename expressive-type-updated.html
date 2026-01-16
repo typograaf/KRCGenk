@@ -1633,7 +1633,12 @@
                 tempCanvas.width = videoWidth;
                 tempCanvas.height = videoHeight;
                 const tempCtx = tempCanvas.getContext('2d');
-                tempCtx.drawImage(renderer.domElement, 0, 0, videoWidth, videoHeight);
+                // Scale from high-DPI source to logical destination
+                tempCtx.drawImage(
+                    renderer.domElement,
+                    0, 0, renderer.domElement.width, renderer.domElement.height,
+                    0, 0, videoWidth, videoHeight
+                );
 
                 const frame = new VideoFrame(tempCanvas, {
                     timestamp: (frameNumber * 1_000_000) / 60
