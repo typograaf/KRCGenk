@@ -212,6 +212,34 @@
         #grid-overlay.visible {
             display: block;
         }
+        .easing-editor {
+            margin-top: 8px;
+        }
+        #easingCanvas {
+            width: 100%;
+            height: 180px;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
+            border-radius: 6px;
+            cursor: crosshair;
+            display: block;
+        }
+        .easing-input {
+            width: 100%;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #FFFFFF;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 8px;
+            text-align: center;
+        }
+        .easing-input:focus {
+            outline: none;
+            border-color: #82CDFF;
+        }
     </style>
 </head>
 <body>
@@ -346,6 +374,14 @@
             </label>
         </div>
 
+        <div class="control-group">
+            <label class="control-label">Easing Curve</label>
+            <div class="easing-editor">
+                <canvas id="easingCanvas" width="252" height="180"></canvas>
+                <input type="text" class="easing-input" id="easingInput" value="0, 0, 0.58, 1" placeholder="x1, y1, x2, y2">
+            </div>
+        </div>
+
         <div class="export-buttons">
             <button class="export-btn" id="exportPNG">PNG</button>
             <button class="export-btn" id="exportMP4">MP4</button>
@@ -366,6 +402,7 @@
         let textureOffset = 0;
         let currentTexture = null;
         let currentTextureInside = null;
+        let animationStartTime = 0;
         
         const defaultValues = {
             size: 280,
@@ -393,8 +430,14 @@
             zoom: 1,
             offsetX: 0,
             offsetY: 0,
-            showGrid: false
+            showGrid: false,
+            easingP1: { x: 0, y: 0 },
+            easingP2: { x: 0.58, y: 1 }
         };
+
+        // Easing editor state
+        let easingCanvas, easingCtx;
+        let draggingHandle = null;
 
         function scaleCanvasToFit() {
             const container = document.getElementById('canvas-container');
@@ -760,18 +803,248 @@
                 gridOverlay.classList.remove('visible');
             }
         }
+
+        // Cubic bezier easing function
+        function cubicBezier(t, p1, p2) {
+            // For easing, we solve for y given t (time progress)
+            const cx = 3 * p1.x;
+            const bx = 3 * (p2.x - p1.x) - cx;
+            const ax = 1 - cx - bx;
+
+            const cy = 3 * p1.y;
+            const by = 3 * (p2.y - p1.y) - cy;
+            const ay = 1 - cy - by;
+
+            // Calculate y for given t
+            return ((ay * t + by) * t + cy) * t;
+        }
+
+        // Solve for t given x using Newton-Raphson method
+        function solveCubicBezierX(x, p1, p2) {
+            if (x <= 0) return 0;
+            if (x >= 1) return 1;
+
+            const cx = 3 * p1.x;
+            const bx = 3 * (p2.x - p1.x) - cx;
+            const ax = 1 - cx - bx;
+
+            let t = x; // Initial guess
+            for (let i = 0; i < 8; i++) {
+                const currentX = ((ax * t + bx) * t + cx) * t;
+                const currentSlope = (3 * ax * t + 2 * bx) * t + cx;
+                if (Math.abs(currentSlope) < 1e-6) break;
+                t -= (currentX - x) / currentSlope;
+            }
+            return t;
+        }
+
+        // Apply easing to get y from x
+        function applyEasing(x, p1, p2) {
+            const t = solveCubicBezierX(x, p1, p2);
+            return cubicBezier(t, p1, p2);
+        }
+
+        // Draw the bezier curve editor
+        function drawEasingCurve() {
+            if (!easingCanvas || !easingCtx) return;
+
+            const w = easingCanvas.width;
+            const h = easingCanvas.height;
+            const padding = 20;
+            const gridSize = w - padding * 2;
+
+            easingCtx.clearRect(0, 0, w, h);
+
+            // Draw grid background
+            easingCtx.strokeStyle = 'rgba(130, 205, 255, 0.15)';
+            easingCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const x = padding + (gridSize / 4) * i;
+                const y = padding + (gridSize / 4) * i;
+                easingCtx.beginPath();
+                easingCtx.moveTo(x, padding);
+                easingCtx.lineTo(x, padding + gridSize);
+                easingCtx.stroke();
+                easingCtx.beginPath();
+                easingCtx.moveTo(padding, y);
+                easingCtx.lineTo(padding + gridSize, y);
+                easingCtx.stroke();
+            }
+
+            // Convert normalized coords to canvas coords
+            const toCanvasX = (x) => padding + x * gridSize;
+            const toCanvasY = (y) => padding + gridSize - y * gridSize;
+
+            // Draw bezier curve
+            easingCtx.strokeStyle = '#82CDFF';
+            easingCtx.lineWidth = 2;
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
+
+            // Draw curve with many segments for smooth appearance
+            for (let i = 0; i <= 100; i++) {
+                const t = i / 100;
+                const x = ((1 - t) ** 3) * 0 + 3 * ((1 - t) ** 2) * t * state.easingP1.x +
+                          3 * (1 - t) * (t ** 2) * state.easingP2.x + (t ** 3) * 1;
+                const y = ((1 - t) ** 3) * 0 + 3 * ((1 - t) ** 2) * t * state.easingP1.y +
+                          3 * (1 - t) * (t ** 2) * state.easingP2.y + (t ** 3) * 1;
+                easingCtx.lineTo(toCanvasX(x), toCanvasY(y));
+            }
+            easingCtx.stroke();
+
+            // Draw control lines
+            easingCtx.strokeStyle = 'rgba(130, 205, 255, 0.3)';
+            easingCtx.lineWidth = 1;
+            easingCtx.setLineDash([4, 4]);
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
+            easingCtx.lineTo(toCanvasX(state.easingP1.x), toCanvasY(state.easingP1.y));
+            easingCtx.stroke();
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(1), toCanvasY(1));
+            easingCtx.lineTo(toCanvasX(state.easingP2.x), toCanvasY(state.easingP2.y));
+            easingCtx.stroke();
+            easingCtx.setLineDash([]);
+
+            // Draw handles
+            const drawHandle = (x, y, active) => {
+                easingCtx.fillStyle = active ? '#FFFFFF' : '#82CDFF';
+                easingCtx.strokeStyle = '#001550';
+                easingCtx.lineWidth = 2;
+                easingCtx.beginPath();
+                easingCtx.arc(toCanvasX(x), toCanvasY(y), 6, 0, Math.PI * 2);
+                easingCtx.fill();
+                easingCtx.stroke();
+            };
+
+            drawHandle(state.easingP1.x, state.easingP1.y, draggingHandle === 'p1');
+            drawHandle(state.easingP2.x, state.easingP2.y, draggingHandle === 'p2');
+
+            // Draw start and end points
+            easingCtx.fillStyle = '#FFFFFF';
+            easingCtx.beginPath();
+            easingCtx.arc(toCanvasX(0), toCanvasY(0), 4, 0, Math.PI * 2);
+            easingCtx.fill();
+            easingCtx.beginPath();
+            easingCtx.arc(toCanvasX(1), toCanvasY(1), 4, 0, Math.PI * 2);
+            easingCtx.fill();
+        }
+
+        // Initialize easing editor
+        function initEasingEditor() {
+            easingCanvas = document.getElementById('easingCanvas');
+            easingCtx = easingCanvas.getContext('2d');
+
+            const padding = 20;
+            const gridSize = easingCanvas.width - padding * 2;
+
+            const fromCanvasX = (cx) => (cx - padding) / gridSize;
+            const fromCanvasY = (cy) => 1 - (cy - padding) / gridSize;
+
+            const getHandleAt = (x, y) => {
+                const toCanvasX = (x) => padding + x * gridSize;
+                const toCanvasY = (y) => padding + gridSize - y * gridSize;
+
+                const dist1 = Math.hypot(x - toCanvasX(state.easingP1.x), y - toCanvasY(state.easingP1.y));
+                const dist2 = Math.hypot(x - toCanvasX(state.easingP2.x), y - toCanvasY(state.easingP2.y));
+
+                if (dist1 < 12) return 'p1';
+                if (dist2 < 12) return 'p2';
+                return null;
+            };
+
+            easingCanvas.addEventListener('mousedown', (e) => {
+                const rect = easingCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                draggingHandle = getHandleAt(x, y);
+                if (draggingHandle) {
+                    drawEasingCurve();
+                }
+            });
+
+            easingCanvas.addEventListener('mousemove', (e) => {
+                if (!draggingHandle) return;
+
+                const rect = easingCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                let nx = Math.max(0, Math.min(1, fromCanvasX(x)));
+                let ny = Math.max(0, Math.min(1, fromCanvasY(y)));
+
+                if (draggingHandle === 'p1') {
+                    state.easingP1.x = nx;
+                    state.easingP1.y = ny;
+                } else if (draggingHandle === 'p2') {
+                    state.easingP2.x = nx;
+                    state.easingP2.y = ny;
+                }
+
+                updateEasingInput();
+                drawEasingCurve();
+            });
+
+            easingCanvas.addEventListener('mouseup', () => {
+                draggingHandle = null;
+                drawEasingCurve();
+            });
+
+            easingCanvas.addEventListener('mouseleave', () => {
+                draggingHandle = null;
+                drawEasingCurve();
+            });
+
+            drawEasingCurve();
+        }
+
+        function updateEasingInput() {
+            const input = document.getElementById('easingInput');
+            const p1x = Math.round(state.easingP1.x * 100) / 100;
+            const p1y = Math.round(state.easingP1.y * 100) / 100;
+            const p2x = Math.round(state.easingP2.x * 100) / 100;
+            const p2y = Math.round(state.easingP2.y * 100) / 100;
+            input.value = `${p1x}, ${p1y}, ${p2x}, ${p2y}`;
+        }
+
+        function parseEasingInput() {
+            const input = document.getElementById('easingInput');
+            const parts = input.value.split(',').map(s => parseFloat(s.trim()));
+
+            if (parts.length === 4 && parts.every(p => !isNaN(p))) {
+                state.easingP1.x = Math.max(0, Math.min(1, parts[0]));
+                state.easingP1.y = Math.max(0, Math.min(1, parts[1]));
+                state.easingP2.x = Math.max(0, Math.min(1, parts[2]));
+                state.easingP2.y = Math.max(0, Math.min(1, parts[3]));
+                drawEasingCurve();
+            } else {
+                updateEasingInput(); // Reset to valid values
+            }
+        }
         
-        function animate() {
+        function animate(timestamp) {
             requestAnimationFrame(animate);
 
-            // Animate texture offset for both outside and inside faces
+            if (!animationStartTime) animationStartTime = timestamp;
+
+            // Animate texture offset with easing
             if (state.speed > 0) {
-                textureOffset += state.speed * 0.001;
+                // Calculate progress through cycle (2 seconds per cycle, adjusted by speed)
+                const cycleDuration = 2000 / state.speed; // milliseconds
+                const elapsed = (timestamp - animationStartTime) % cycleDuration;
+                const linearProgress = elapsed / cycleDuration;
+
+                // Apply easing to progress
+                const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+
+                // Set texture offset based on eased progress
+                const offset = easedProgress;
+
                 if (currentTexture) {
-                    currentTexture.offset.x = textureOffset;
+                    currentTexture.offset.x = offset;
                 }
                 if (currentTextureInside) {
-                    currentTextureInside.offset.x = textureOffset;
+                    currentTextureInside.offset.x = offset;
                 }
             }
 
@@ -857,6 +1130,15 @@
         document.getElementById('gridToggle').addEventListener('change', e => {
             state.showGrid = e.target.checked;
             updateGrid();
+        });
+
+        // Easing input
+        document.getElementById('easingInput').addEventListener('blur', parseEasingInput);
+        document.getElementById('easingInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                parseEasingInput();
+                e.target.blur();
+            }
         });
 
         // Background color swatches
@@ -1109,9 +1391,11 @@
         // Load custom font then initialize
         document.fonts.load('100px Genk').then(() => {
             init();
+            initEasingEditor();
         }).catch(() => {
             // Fallback if font fails to load
             init();
+            initEasingEditor();
         });
     </script>
 </body>
