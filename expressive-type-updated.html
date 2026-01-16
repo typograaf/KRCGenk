@@ -1251,7 +1251,7 @@
             if (state.verticalMode) {
                 // Vertical mode: tall narrow shape
                 // Width based on text height, height based on text width
-                shapeW = w / textAspect;
+                shapeW = Math.max(50, w / textAspect);
                 shapeH = w;
             } else {
                 // Horizontal mode: wide shape (original square)
@@ -1260,8 +1260,8 @@
             }
 
             const hw = shapeW/2, hh = shapeH/2;
-            // Clamp radius to fit the shape dimensions
-            const rClamped = Math.min(r, hw - 5, hh - 5);
+            // Clamp radius to fit the shape dimensions (ensure positive)
+            const rClamped = Math.max(1, Math.min(r, hw - 5, hh - 5));
 
             const path = new THREE.Path();
             path.moveTo(-hw + rClamped, hh);
@@ -1282,11 +1282,7 @@
             }
             perimeter += points[points.length - 1].distanceTo(points[0]);
 
-            const refFontSize = 100;
-            ctx.font = `${refFontSize}px ${fontFamily}`;
-            const textWidth = ctx.measureText(text).width;
-
-            const textAspect = textWidth / refFontSize;
+            // textAspect already calculated at top of function
             const depth = perimeter / textAspect;
 
             const scale = 6;
