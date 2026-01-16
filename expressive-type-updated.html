@@ -1105,12 +1105,13 @@
         function drawEasingCurve() {
             if (!easingCanvas || !easingCtx) return;
 
-            const w = easingCanvas.width;
-            const h = easingCanvas.height;
+            const rect = easingCanvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
             const padding = 12;
             const gridSize = w - padding * 2;
 
-            easingCtx.clearRect(0, 0, w, h);
+            easingCtx.clearRect(0, 0, easingCanvas.width, easingCanvas.height);
 
             // Draw grid
             easingCtx.strokeStyle = '#334473';
@@ -1161,9 +1162,19 @@
             easingCanvas = document.getElementById('easingCanvas');
             easingCtx = easingCanvas.getContext('2d');
 
+            // Handle high-DPI displays
+            const dpr = window.devicePixelRatio || 1;
+            const rect = easingCanvas.getBoundingClientRect();
+            easingCanvas.width = rect.width * dpr;
+            easingCanvas.height = rect.height * dpr;
+            easingCtx.scale(dpr, dpr);
+
             const padding = 12;
 
-            const getGridSize = () => easingCanvas.width - padding * 2;
+            const getGridSize = () => {
+                const r = easingCanvas.getBoundingClientRect();
+                return r.width - padding * 2;
+            };
 
             const toCanvasCoords = (nx, ny) => {
                 const gridSize = getGridSize();
