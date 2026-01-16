@@ -1150,10 +1150,10 @@
             return shape;
         }
 
-        function finishTextBand(points, perimeter, canvas, actualDepth) {
+        function finishTextBand(points, perimeter, canvas, actualDepth, isVertical = false) {
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.ClampToEdgeWrapping;
+            texture.wrapT = isVertical ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             texture.needsUpdate = true;
 
@@ -1174,13 +1174,20 @@
                 if (i > 0) {
                     cumLength += points[i].distanceTo(points[i-1]);
                 }
-                const u = Math.max(0, Math.min(1, 1 - (cumLength / totalLength)));
+                const t = Math.max(0, Math.min(1, 1 - (cumLength / totalLength)));
 
                 vertices.push(p.x, p.y, halfD);
                 vertices.push(p.x, p.y, -halfD);
 
-                uvs.push(u, 1);
-                uvs.push(u, 0);
+                if (isVertical) {
+                    // Vertical mode: V varies along perimeter, U is constant (0 or 1 for depth)
+                    uvs.push(1, t);
+                    uvs.push(0, t);
+                } else {
+                    // Horizontal mode: U varies along perimeter, V is constant
+                    uvs.push(t, 1);
+                    uvs.push(t, 0);
+                }
 
                 if (i > 0) {
                     const base = (i - 1) * 2;
@@ -1213,9 +1220,14 @@
                 if (i > 0) {
                     cumLength += points[i].distanceTo(points[i-1]);
                 }
-                const u = Math.max(0, Math.min(1, cumLength / totalLength));
-                uvsInside.push(u, 1);
-                uvsInside.push(u, 0);
+                const t = Math.max(0, Math.min(1, cumLength / totalLength));
+                if (isVertical) {
+                    uvsInside.push(1, t);
+                    uvsInside.push(0, t);
+                } else {
+                    uvsInside.push(t, 1);
+                    uvsInside.push(t, 0);
+                }
             }
 
             const geomInside = new THREE.BufferGeometry();
@@ -1309,7 +1321,9 @@
                     ctx.fillText(text, 0, yPos);
                 }
 
-                return finishTextBand(points, perimeter, canvas, actualDepth);
+                // For vertical mode, the depth is the text width
+                const verticalDepth = canvas.width / (scale * 0.75);
+                return finishTextBand(points, perimeter, canvas, verticalDepth, true);
             }
 
             // Horizontal mode (original)
