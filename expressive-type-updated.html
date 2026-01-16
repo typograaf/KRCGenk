@@ -1150,6 +1150,93 @@
             return shape;
         }
 
+        function finishVerticalTextBand(points, perimeter, canvas, actualDepth) {
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.RepeatWrapping; // Wrap vertically for scrolling
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            texture.needsUpdate = true;
+
+            currentTexture = texture;
+
+            const halfD = actualDepth / 2;
+
+            const vertices = [];
+            const uvs = [];
+            const indices = [];
+
+            let cumLength = 0;
+            const totalLength = perimeter;
+
+            for (let i = 0; i < points.length; i++) {
+                const p = points[i];
+
+                if (i > 0) {
+                    cumLength += points[i].distanceTo(points[i-1]);
+                }
+                // V varies along perimeter for vertical scrolling
+                const v = Math.max(0, Math.min(1, 1 - (cumLength / totalLength)));
+
+                vertices.push(p.x, p.y, halfD);
+                vertices.push(p.x, p.y, -halfD);
+
+                // U is constant (0 or 1 for front/back), V varies
+                uvs.push(1, v);
+                uvs.push(0, v);
+
+                if (i > 0) {
+                    const base = (i - 1) * 2;
+                    indices.push(base, base + 3, base + 1);
+                    indices.push(base, base + 2, base + 3);
+                }
+            }
+
+            const geom = new THREE.BufferGeometry();
+            geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geom.setIndex(indices);
+            geom.computeVertexNormals();
+
+            const matOutside = new THREE.MeshBasicMaterial({
+                map: texture,
+                side: THREE.FrontSide
+            });
+
+            const bandMeshOutside = new THREE.Mesh(geom, matOutside);
+            group.add(bandMeshOutside);
+
+            const textureInside = texture.clone();
+            textureInside.needsUpdate = true;
+            currentTextureInside = textureInside;
+
+            const uvsInside = [];
+            cumLength = 0;
+            for (let i = 0; i < points.length; i++) {
+                if (i > 0) {
+                    cumLength += points[i].distanceTo(points[i-1]);
+                }
+                const v = Math.max(0, Math.min(1, cumLength / totalLength));
+                uvsInside.push(1, v);
+                uvsInside.push(0, v);
+            }
+
+            const geomInside = new THREE.BufferGeometry();
+            geomInside.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geomInside.setAttribute('uv', new THREE.Float32BufferAttribute(uvsInside, 2));
+            geomInside.setIndex(indices);
+            geomInside.computeVertexNormals();
+
+            const matInside = new THREE.MeshBasicMaterial({
+                map: textureInside,
+                side: THREE.BackSide
+            });
+
+            const bandMeshInside = new THREE.Mesh(geomInside, matInside);
+            group.add(bandMeshInside);
+
+            return actualDepth;
+        }
+
         function finishTextBand(points, perimeter, canvas, actualDepth) {
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
@@ -1249,15 +1336,73 @@
 
             let shapeW, shapeH;
             if (state.verticalMode) {
-                // Vertical mode: tall narrow shape
-                // Width based on text height, height based on text width
-                shapeW = Math.max(50, w / textAspect);
-                shapeH = w;
-            } else {
-                // Horizontal mode: wide shape (original square)
-                shapeW = w;
-                shapeH = h;
+                // Vertical mode: tall narrow shape with stacked text moving upward
+                const scale = 6;
+
+                // Calculate shape width based on text width
+                const fontSize = w * 0.3; // Font size relative to shape size
+                ctx.font = `${fontSize}px ${fontFamily}`;
+                const metrics = ctx.measureText(text);
+                const singleTextWidth = metrics.width;
+                const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+                const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+                const lineHeight = (ascent + descent) * 1.15;
+
+                // Shape dimensions: width based on text, height is taller
+                shapeW = singleTextWidth / scale;
+                shapeH = w; // Use the size parameter for height
+
+                const hw = shapeW/2, hh = shapeH/2;
+                const rClamped = Math.max(1, Math.min(r, hw - 5, hh - 5));
+
+                // Create the tall narrow path
+                const path = new THREE.Path();
+                path.moveTo(-hw + rClamped, hh);
+                path.lineTo(hw - rClamped, hh);
+                path.quadraticCurveTo(hw, hh, hw, hh - rClamped);
+                path.lineTo(hw, -hh + rClamped);
+                path.quadraticCurveTo(hw, -hh, hw - rClamped, -hh);
+                path.lineTo(-hw + rClamped, -hh);
+                path.quadraticCurveTo(-hw, -hh, -hw, -hh + rClamped);
+                path.lineTo(-hw, hh - rClamped);
+                path.quadraticCurveTo(-hw, hh, -hw + rClamped, hh);
+
+                const points = path.getPoints(100);
+
+                let perimeter = 0;
+                for (let i = 1; i < points.length; i++) {
+                    perimeter += points[i].distanceTo(points[i-1]);
+                }
+                perimeter += points[points.length - 1].distanceTo(points[0]);
+
+                // Calculate number of lines needed to fill perimeter
+                const numLines = Math.ceil(perimeter / (lineHeight / scale)) + 2;
+
+                // Create texture with vertically stacked text
+                canvas.width = Math.ceil(singleTextWidth);
+                canvas.height = Math.ceil(lineHeight * numLines);
+
+                ctx.fillStyle = '#' + state.bgColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.font = `${fontSize}px ${fontFamily}`;
+                ctx.fillStyle = '#' + state.fgColor;
+                ctx.textBaseline = 'alphabetic';
+
+                // Draw text stacked vertically
+                for (let i = 0; i < numLines; i++) {
+                    const yPos = lineHeight * i + ascent;
+                    ctx.fillText(text, 0, yPos);
+                }
+
+                const actualDepth = canvas.width / scale;
+
+                return finishVerticalTextBand(points, perimeter, canvas, actualDepth);
             }
+
+            // Horizontal mode: wide shape (original square)
+            shapeW = w;
+            shapeH = h;
 
             const hw = shapeW/2, hh = shapeH/2;
             // Clamp radius to fit the shape dimensions (ensure positive)
@@ -1661,10 +1806,22 @@
                 const offset = easedProgress;
 
                 if (currentTexture) {
-                    currentTexture.offset.x = offset;
+                    if (state.verticalMode) {
+                        currentTexture.offset.y = offset;
+                        currentTexture.offset.x = 0;
+                    } else {
+                        currentTexture.offset.x = offset;
+                        currentTexture.offset.y = 0;
+                    }
                 }
                 if (currentTextureInside) {
-                    currentTextureInside.offset.x = offset;
+                    if (state.verticalMode) {
+                        currentTextureInside.offset.y = offset;
+                        currentTextureInside.offset.x = 0;
+                    } else {
+                        currentTextureInside.offset.x = offset;
+                        currentTextureInside.offset.y = 0;
+                    }
                 }
             }
 
@@ -1948,10 +2105,22 @@
                 const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
 
                 if (currentTexture) {
-                    currentTexture.offset.x = easedProgress;
+                    if (state.verticalMode) {
+                        currentTexture.offset.y = easedProgress;
+                        currentTexture.offset.x = 0;
+                    } else {
+                        currentTexture.offset.x = easedProgress;
+                        currentTexture.offset.y = 0;
+                    }
                 }
                 if (currentTextureInside) {
-                    currentTextureInside.offset.x = easedProgress;
+                    if (state.verticalMode) {
+                        currentTextureInside.offset.y = easedProgress;
+                        currentTextureInside.offset.x = 0;
+                    } else {
+                        currentTextureInside.offset.x = easedProgress;
+                        currentTextureInside.offset.y = 0;
+                    }
                 }
 
                 renderer.render(scene, camera);
