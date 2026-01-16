@@ -160,11 +160,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: auto;
+            overflow: hidden;
+            position: relative;
         }
         #canvas-container canvas {
             display: block;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transform-origin: center center;
         }
     </style>
 </head>
@@ -283,8 +285,23 @@
             rotZ: -45,
             speed: 0.5,
             bgColor: '82CDFF',
-            fgColor: '001550'
+            fgColor: '001550',
+            zoom: 1
         };
+
+        function scaleCanvasToFit() {
+            const container = document.getElementById('canvas-container');
+            const canvas = renderer.domElement;
+
+            const containerWidth = container.clientWidth;
+            const containerHeight = container.clientHeight;
+
+            const scaleX = containerWidth / state.canvasWidth;
+            const scaleY = containerHeight / state.canvasHeight;
+            const scale = Math.min(scaleX, scaleY) * 0.95; // 95% to add some padding
+
+            canvas.style.transform = `scale(${scale})`;
+        }
         
         function init() {
             const container = document.getElementById('canvas-container');
@@ -307,12 +324,28 @@
             
             group = new THREE.Group();
             scene.add(group);
-            
+
+            // Scale canvas to fit container
+            scaleCanvasToFit();
+
             // Wait for font to load before building
             document.fonts.ready.then(() => {
                 build();
             });
-            
+
+            // Mouse wheel zoom
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY * -0.001;
+                state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
+                group.scale.set(state.zoom, state.zoom, state.zoom);
+            });
+
+            // Window resize
+            window.addEventListener('resize', () => {
+                scaleCanvasToFit();
+            });
+
             // Mouse drag
             let drag = false, prev = {x:0, y:0};
             renderer.domElement.onmousedown = e => { drag = true; prev = {x: e.clientX, y: e.clientY}; };
@@ -644,6 +677,9 @@
                 camera.aspect = width / height;
                 camera.updateProjectionMatrix();
                 renderer.setSize(width, height);
+
+                // Scale canvas to fit new dimensions
+                scaleCanvasToFit();
             });
         });
 
