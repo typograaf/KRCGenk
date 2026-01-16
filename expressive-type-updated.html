@@ -1185,33 +1185,20 @@
             };
 
             const fromCanvasCoords = (cx, cy) => {
-                const rect = easingCanvas.getBoundingClientRect();
-                const scaleX = easingCanvas.width / rect.width;
-                const scaleY = easingCanvas.height / rect.height;
                 const gridSize = getGridSize();
 
-                const canvasX = cx * scaleX;
-                const canvasY = cy * scaleY;
-
                 return {
-                    x: Math.max(0, Math.min(1, (canvasX - padding) / gridSize)),
-                    y: Math.max(0, Math.min(1, 1 - (canvasY - padding) / gridSize))
+                    x: Math.max(0, Math.min(1, (cx - padding) / gridSize)),
+                    y: Math.max(0, Math.min(1, 1 - (cy - padding) / gridSize))
                 };
             };
 
             const getHandleAt = (mouseX, mouseY) => {
-                const rect = easingCanvas.getBoundingClientRect();
-                const scaleX = easingCanvas.width / rect.width;
-                const scaleY = easingCanvas.height / rect.height;
-
-                const canvasX = mouseX * scaleX;
-                const canvasY = mouseY * scaleY;
-
                 const p1Pos = toCanvasCoords(state.easingP1.x, state.easingP1.y);
                 const p2Pos = toCanvasCoords(state.easingP2.x, state.easingP2.y);
 
-                const dist1 = Math.hypot(canvasX - p1Pos.x, canvasY - p1Pos.y);
-                const dist2 = Math.hypot(canvasX - p2Pos.x, canvasY - p2Pos.y);
+                const dist1 = Math.hypot(mouseX - p1Pos.x, mouseY - p1Pos.y);
+                const dist2 = Math.hypot(mouseX - p2Pos.x, mouseY - p2Pos.y);
 
                 if (dist1 < 15) return 'p1';
                 if (dist2 < 15) return 'p2';
