@@ -170,10 +170,35 @@
         }
 
         .toggle-checkbox {
+            display: none;
+        }
+
+        .toggle-box {
             width: 16px;
             height: 16px;
+            background: #1a2c62;
+            border: 1px solid #334473;
+            border-radius: 4px;
             cursor: pointer;
-            accent-color: #82CDFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toggle-box:hover {
+            border-color: #82CDFF;
+        }
+
+        .toggle-box svg {
+            width: 7px;
+            height: 4px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .toggle-checkbox:checked + .toggle-box svg {
+            opacity: 1;
         }
 
         /* Slider Styles */
@@ -496,6 +521,11 @@
                     <div class="toggle-row">
                         <span class="toggle-label">Show 3×3 Grid</span>
                         <input type="checkbox" class="toggle-checkbox" id="gridToggle">
+                        <label class="toggle-box" for="gridToggle">
+                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </label>
                     </div>
                 </div>
             </div>
