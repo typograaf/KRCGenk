@@ -1181,8 +1181,9 @@
 
                 if (isVertical) {
                     // Vertical mode: V varies along perimeter, U is constant (0 or 1 for depth)
-                    uvs.push(1, t);
-                    uvs.push(0, t);
+                    // Flip V (1-t) to correct texture orientation
+                    uvs.push(1, 1 - t);
+                    uvs.push(0, 1 - t);
                 } else {
                     // Horizontal mode: U varies along perimeter, V is constant
                     uvs.push(t, 1);
@@ -1222,8 +1223,8 @@
                 }
                 const t = Math.max(0, Math.min(1, cumLength / totalLength));
                 if (isVertical) {
-                    uvsInside.push(1, t);
-                    uvsInside.push(0, t);
+                    uvsInside.push(1, 1 - t);
+                    uvsInside.push(0, 1 - t);
                 } else {
                     uvsInside.push(t, 1);
                     uvsInside.push(t, 0);
@@ -1263,7 +1264,7 @@
                 const textAspect = singleTextWidth / refFontSize;
 
                 // Calculate how many times to repeat text vertically
-                const targetHeight = w * 2.5; // Make it tall
+                const targetHeight = w * 1.25; // Make it tall (half the previous stretch)
                 shapeW = w / textAspect * 0.8;
                 shapeH = targetHeight;
 
