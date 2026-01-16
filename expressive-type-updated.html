@@ -1338,6 +1338,7 @@
             if (state.verticalMode) {
                 // Vertical mode: tall narrow shape with stacked text moving upward
                 const scale = 6;
+                const numLines = 4; // Only 3-4 words vertically
 
                 // Calculate shape width based on text width
                 const fontSize = w * 0.3; // Font size relative to shape size
@@ -1348,9 +1349,9 @@
                 const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
                 const lineHeight = (ascent + descent) * 1.15;
 
-                // Shape dimensions: width based on text, height is taller
+                // Shape dimensions: width based on text, height based on number of lines
                 shapeW = singleTextWidth / scale;
-                shapeH = w; // Use the size parameter for height
+                shapeH = (lineHeight * numLines) / scale;
 
                 const hw = shapeW/2, hh = shapeH/2;
                 const rClamped = Math.max(1, Math.min(r, hw - 5, hh - 5));
@@ -1375,9 +1376,6 @@
                 }
                 perimeter += points[points.length - 1].distanceTo(points[0]);
 
-                // Calculate number of lines needed to fill perimeter
-                const numLines = Math.ceil(perimeter / (lineHeight / scale)) + 2;
-
                 // Create texture with vertically stacked text
                 canvas.width = Math.ceil(singleTextWidth);
                 canvas.height = Math.ceil(lineHeight * numLines);
@@ -1389,11 +1387,18 @@
                 ctx.fillStyle = '#' + state.fgColor;
                 ctx.textBaseline = 'alphabetic';
 
+                // Flip horizontally to correct texture orientation
+                ctx.save();
+                ctx.translate(canvas.width, 0);
+                ctx.scale(-1, 1);
+
                 // Draw text stacked vertically
                 for (let i = 0; i < numLines; i++) {
                     const yPos = lineHeight * i + ascent;
                     ctx.fillText(text, 0, yPos);
                 }
+
+                ctx.restore();
 
                 const actualDepth = canvas.width / scale;
 
@@ -1905,6 +1910,24 @@
         // Vertical mode toggle
         document.getElementById('verticalToggle').addEventListener('change', e => {
             state.verticalMode = e.target.checked;
+            if (state.verticalMode) {
+                // Set rotation to x:0, y:90, z:0 for vertical mode
+                state.rotX = 0;
+                state.rotY = 90;
+                state.rotZ = 0;
+            } else {
+                // Reset to default rotation for horizontal mode
+                state.rotX = defaultValues.rotX;
+                state.rotY = defaultValues.rotY;
+                state.rotZ = defaultValues.rotZ;
+            }
+            // Update slider displays
+            document.getElementById('rotXSlider').value = state.rotX;
+            document.getElementById('rotXValue').value = state.rotX;
+            document.getElementById('rotYSlider').value = state.rotY;
+            document.getElementById('rotYValue').value = state.rotY;
+            document.getElementById('rotZSlider').value = state.rotZ;
+            document.getElementById('rotZValue').value = state.rotZ;
             build();
         });
 
