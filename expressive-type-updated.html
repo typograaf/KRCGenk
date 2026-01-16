@@ -3,191 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expressive Type</title>
+    <title>KRCG Graphic Generator</title>
     <style>
         @font-face {
             font-family: 'Genk';
-            src: url(data:font/otf;base64,T1RUTwALAIAAAwAwQ0ZGIPwCByUAAARwAAANn0dERUYADwAeAAASEAAAABRHU1VCqSq2HwAAEiQAAABQT1MvMmc9YSsAAAHMAAAAYGNtYXACEgGsAAAD5AAAAGxoZWFkLKJ7mgAAAMQAAAA2aGhlYQeDAqsAAAGoAAAAJGhtdHgm4QLQAAAA/AAAAKxtYXhwACtQAAAAALwAAAAGbmFtZSCbPPEAAAIsAAABtnBvc3T/nwAyAAAEUAAAACAAAFAAACsAAAABAAAAAQAARFOtZF8PPPUAAwPoAAAAAOWOnGYAAAAA5Y6cZgAJ/+gCZQICAAAABwACAAAAAAAAAPoALwAjAAAA3AARANwAEQDcABEA3AARAJwAEQCcABEA3AARANwAEQBuABEA3AARANwAEQCSABEBSgARANwAEQDcABEA3AARAN0AEQDcABEA3AARALYACQDcABEA3AARAUoAEQDcABEA3AARANwAEQDcABEA3AARAHkACQDcABEA3AARANwAEQDcABEA3AARANwAEQDcABEA3AARASQACQH4ABEBSgARAnYAEQABAAACWAAAArwCdgAJAAkCZQABAAAAAAAAAAAAAAAAAAAAKwAEAOcBkAAFAAgCigJYAAAASwKKAlgAAAFeADIA+gAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAABVS1dOAMAAIACgAfQAAAK8AlgAGAAAAAEAAAAAAfQB9AAAACAAAgAAAAgAZgADAAEECQABACQAAAADAAEECQACAA4AJAADAAEECQADAEgAMgADAAEECQAEADQAegADAAEECQAFAD4ArgADAAEECQAGADIA7AADAAEECQAQABQBHgADAAEECQARAB4BMgBnAGUAbgBrADIANgAwADEAMQA1ACAAUgBvAHUAbgBkAGUAZABSAGUAZwB1AGwAYQByADEALgAwADAAMAA7AFUASwBXAE4AOwBnAGUAbgBrADIANgAwADEAMQA1AC0AUgBlAGcAdQBsAGEAcgBSAG8AdQBuAGQAZQBkAGcAZQBuAGsAMgA2ADAAMQAxADUAIABSAGUAZwB1AGwAYQByACAAUgBvAHUAbgBkAGUAZABWAGUAcgBzAGkAbwBuACAAMQAuADAAMAAwADsARwBsAHkAcABoAHMAIAAzAC4ANQAgACgAMwA1ADAAOQApAGcAZQBu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) format('opentype');
+            src: url(data:font/otf;base64,T1RUTwALAIAAAwAwQ0ZGIPwCByUAAARwAAANn0dERUYADwAeAAASEAAAABRHU1VCqSq2HwAAEiQAAABQT1MvMmc9YSsAAAHMAAAAYGNtYXACEgGsAAAD5AAAAGxoZWFkLKJ7mgAAAMQAAAA2aGhlYQeDAqsAAAGoAAAAJGhtdHgm4QLQAAAA/AAAAKxtYXhwACtQAAAAALwAAAAGbmFtZSCbPPEAAAIsAAABtnBvc3T/nwAyAAAEUAAAACAAAFAAACsAAAABAAAAAQAARFOtZF8PPPUAAwPoAAAAAOWOnGYAAAAA5Y6cZgAJ/+gCZQICAAAABwACAAAAAAAAAPoALwAjAAAA3AARANwAEQDcABEA3AARAJwAEQCcABEA3AARANwAEQBuABEA3AARANwAEQCSABEBSgARANwAEQDcABEA3AARAN0AEQDcABEA3AARALYACQDcABEA3AARAUoAEQDcABEA3AARANwAEQDcABEA3AARAHkACQDcABEA3AARANwAEQDcABEA3AARANwAEQDcABEA3AARASQACQH4ABEBSgARAnYAEQABAAACWAAAArwCdgAJAAkCZQABAAAAAAAAAAAAAAAAAAAAKwAEAOcBkAAFAAgCigJYAAAASwKKAlgAAAFeADIA+gAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAABVS1dOAMAAIACgAfQAAAK8AlgAGAAAAAEAAAAAAfQB9AAAACAAAgAAAAgAZgADAAEECQABACQAAAADAAEECQACAA4AJAADAAEECQADAEgAMgADAAEECQAEADQAegADAAEECQAFAD4ArgADAAEECQAGADIA7AADAAEECQAQABQBHgADAAEECQARAB4BMgBnAGUAbgBrADIANgAwADEAMQA1ACAAUgBvAHUAbgBkAGUAZABSAGUAZwB1AGwAYQByADEALgAwADAAMAA7AFUASwBXAE4AOwBnAGUAbgBrADIANgAwADEAMQA1AC0AUgBlAGcAdQBsAGEAcgBSAG8AdQBuAGQAZQBkAGcAZQBuAGsAMgA2ADAAMQAxADUAIABSAGUAZwB1AGwAYQByACAAUgBvAHUAbgBkAGUAZABWAGUAcgBzAGkAbwBuACAAMQAuADAAMAAwADsARwBsAHkAcABoAHMAIAAzAC4ANQAgACgAMwA1ADAAOQApAGcAZQBu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) format('opentype');
             font-weight: normal;
             font-style: normal;
         }
-        
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
             height: 100%;
             overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         body {
-            font-family: Helvetica, Arial, sans-serif;
             background: #001550;
             color: #82CDFF;
             display: flex;
-        }
-        .control-panel {
-            width: 300px;
-            height: 100%;
-            background: #001550;
-            border-right: 1px solid #003CC4;
+            gap: 24px;
             padding: 24px;
-            overflow-y: auto;
+        }
+
+        /* Left Sidebar */
+        .sidebar-left {
+            width: 200px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             flex-shrink: 0;
         }
-        .control-group { margin-bottom: 24px; }
-        .control-label {
-            font-size: 10px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: #82CDFF;
-            margin-bottom: 10px;
-            display: block;
+
+        .sidebar-left-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .text-input {
-            width: 100%;
-            background: #003CC4;
-            border: 1px solid #82CDFF;
-            border-radius: 6px;
-            padding: 12px 14px;
-            color: #FFFFFF;
-            font-family: inherit;
-            font-size: 14px;
+
+        /* Right Sidebar */
+        .sidebar-right {
+            width: 200px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
         }
-        .text-input:focus { outline: none; border-color: #82CDFF; }
-        .slider-container {
-            position: relative;
+
+        /* Header/Logo */
+        .header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-        .slider-wrapper {
-            flex: 1;
-            position: relative;
+
+        .header-icon {
+            font-family: 'Genk', sans-serif;
+            font-size: 34px;
+            color: #86d9ff;
+            line-height: 0.78;
         }
-        .slider {
+
+        .header-title {
+            font-size: 12px;
+            color: #82cdff;
+        }
+
+        /* Panel Styles */
+        .panel {
+            background: #0d2159;
+            border: 1px solid #334473;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .panel-dark {
+            background: #1a2c62;
+            border: 1px solid #334473;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        /* Text Input */
+        .text-input {
             width: 100%;
-            height: 6px;
-            -webkit-appearance: none;
-            background: #003CC4;
-            border-radius: 3px;
-            cursor: pointer;
+            background: #1a2c62;
+            border: 1px solid #334473;
+            border-radius: 6px;
+            padding: 12px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 12px;
+            letter-spacing: 0.12px;
         }
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: #82CDFF;
-            border-radius: 50%;
-            cursor: pointer;
+        .text-input:focus {
+            outline: none;
+            border-color: #82CDFF;
         }
+        .text-input::placeholder {
+            color: #82CDFF;
+            opacity: 0.6;
+        }
+
+        /* Control Labels */
+        .control-label {
+            font-size: 12px;
+            color: #82CDFF;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* Color Swatches */
+        .color-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .color-swatches {
+            display: flex;
+            gap: 6px;
+        }
+
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .color-swatch:hover,
+        .color-swatch.active {
+            border-color: #334473;
+        }
+
+        /* Grid Toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            color: #82CDFF;
+        }
+
+        .toggle-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #82CDFF;
+        }
+
+        /* Slider Styles */
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            color: #82CDFF;
+        }
+
         .slider-value {
-            position: absolute;
-            right: 0;
-            top: -20px;
-            font-size: 11px;
+            font-size: 8px;
+            font-weight: bold;
             color: #82CDFF;
             background: transparent;
             border: none;
             text-align: right;
-            width: 50px;
-            cursor: text;
+            width: 40px;
         }
+
         .slider-value:focus {
             outline: none;
             color: #FFFFFF;
         }
-        .reset-btn {
-            width: 24px;
-            height: 24px;
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-track {
+            flex: 1;
+            height: 2px;
+            background: #1a2c62;
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .slider {
+            width: 100%;
+            height: 12px;
+            -webkit-appearance: none;
             background: transparent;
-            border: 1px solid #003CC4;
-            border-radius: 4px;
-            color: #82CDFF;
             cursor: pointer;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .slider::-webkit-slider-runnable-track {
+            height: 2px;
+            background: #1a2c62;
+            border-radius: 12px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #82CDFF;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -5px;
+        }
+
+        .reset-btn {
+            width: 16px;
+            height: 16px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            padding: 0;
-            transition: all 0.2s;
             flex-shrink: 0;
         }
-        .reset-btn:hover {
-            background: #003CC4;
-            border-color: #82CDFF;
+
+        .reset-btn svg {
+            width: 16px;
+            height: 16px;
         }
-        .color-swatches {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .color-swatch {
-            width: 40px;
-            height: 40px;
-            border-radius: 6px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-        .color-swatch:hover {
-            border-color: #82CDFF;
-        }
-        .color-swatch.active {
-            border-color: #82CDFF;
-        }
-        .size-buttons {
+
+        /* Canvas Size Buttons */
+        .size-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 6px;
         }
+
         .size-btn {
-            background: #003CC4;
-            border: 2px solid transparent;
+            background: #1a2c62;
+            border: 1px solid #334473;
             border-radius: 6px;
-            padding: 10px;
+            padding: 12px;
             color: #82CDFF;
-            font-family: inherit;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 8px;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .size-btn:hover {
             border-color: #82CDFF;
         }
+
         .size-btn.active {
             border-color: #82CDFF;
             background: #82CDFF;
             color: #001550;
         }
-        .export-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 32px;
-        }
-        .export-btn {
-            flex: 1;
-            background: #003CC4;
-            border: 1px solid #82CDFF;
+
+        /* Easing Curve Editor */
+        .easing-container {
+            background: #1a2c62;
+            border: 1px solid #334473;
             border-radius: 6px;
-            padding: 10px;
+            padding: 12px;
+            position: relative;
+        }
+
+        #easingCanvas {
+            width: 100%;
+            aspect-ratio: 1;
+            display: block;
+            cursor: crosshair;
+        }
+
+        .easing-point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #82CDFF;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .easing-input {
+            width: 100%;
+            background: #1a2c62;
+            border: 1px solid #334473;
+            border-radius: 6px;
+            padding: 12px;
             color: #82CDFF;
-            font-family: inherit;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .easing-input:focus {
+            outline: none;
+            border-color: #82CDFF;
+        }
+
+        /* Output Buttons */
+        .output-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .output-btn {
+            flex: 1;
+            background: #1a2c62;
+            border: 1px solid #334473;
+            border-radius: 6px;
+            padding: 12px;
+            color: #82CDFF;
+            font-size: 8px;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .export-btn:hover {
+
+        .output-btn:hover {
             background: #82CDFF;
             color: #001550;
         }
-        .export-btn:disabled {
+
+        .output-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        /* Canvas Container */
         #canvas-container {
             flex: 1;
             height: 100%;
@@ -196,13 +366,15 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
+            background: #82CDFF;
+            border-radius: 12px;
         }
+
         #canvas-container canvas {
             display: block;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             transform-origin: center center;
-            border-radius: 8px;
         }
+
         #grid-overlay {
             position: absolute;
             top: 50%;
@@ -212,187 +384,307 @@
             transform-origin: center center;
             z-index: 10;
         }
+
         #grid-overlay.visible {
             display: block;
         }
-        .easing-editor {
-            margin-top: 8px;
+
+        /* Branding Footer */
+        .branding {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
-        #easingCanvas {
-            width: 100%;
-            aspect-ratio: 1;
-            background: #003CC4;
-            border: 1px solid #82CDFF;
-            border-radius: 6px;
-            cursor: crosshair;
-            display: block;
+
+        .branding-icon {
+            width: 17px;
+            height: 17px;
         }
-        .easing-input {
-            width: 100%;
-            background: #003CC4;
-            border: 1px solid #82CDFF;
-            border-radius: 6px;
-            padding: 8px 10px;
-            color: #FFFFFF;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            margin-top: 8px;
-            text-align: center;
+
+        .branding-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
         }
-        .easing-input:focus {
-            outline: none;
-            border-color: #82CDFF;
+
+        .branding-label {
+            font-size: 7px;
+            color: #82CDFF;
+            letter-spacing: -0.14px;
+        }
+
+        .branding-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #82CDFF;
+            text-transform: uppercase;
+            letter-spacing: 0.14px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .branding-copyright {
+            font-size: 4px;
+            vertical-align: super;
+            margin-left: 1px;
+        }
+
+        /* Multi-slider panels */
+        .slider-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
     </style>
 </head>
 <body>
-    <div class="control-panel">
-        <div class="control-group">
-            <label class="control-label">Text</label>
-            <input type="text" class="text-input" id="textInput" value="RACING FORZA  ">
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">Canvas Size</label>
-            <div class="size-buttons" id="sizeButtons">
-                <button class="size-btn active" data-size="1920x1080">1920x1080</button>
-                <button class="size-btn" data-size="1080x1350">1080x1350</button>
-                <button class="size-btn" data-size="1080x1920">1080x1920</button>
-                <button class="size-btn" data-size="1920x1920">1920x1920</button>
+    <!-- Left Sidebar -->
+    <div class="sidebar-left">
+        <div class="sidebar-left-content">
+            <!-- Header -->
+            <div class="header">
+                <span class="header-icon">@</span>
+                <span class="header-title">KRCG Graphic Generator</span>
             </div>
-        </div>
 
-        <div class="control-group">
-            <label class="control-label">Background Color</label>
-            <div class="color-swatches" id="bgColorSwatches">
-                <div class="color-swatch active" data-color="82CDFF" style="background-color: #82CDFF;"></div>
-                <div class="color-swatch" data-color="001550" style="background-color: #001550;"></div>
-                <div class="color-swatch" data-color="003CC4" style="background-color: #003CC4;"></div>
-                <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
-            </div>
-        </div>
+            <!-- Text Input -->
+            <input type="text" class="text-input" id="textInput" value="RACING FORZA  " placeholder="TEXT GOES HERE...">
 
-        <div class="control-group">
-            <label class="control-label">Text Color</label>
-            <div class="color-swatches" id="fgColorSwatches">
-                <div class="color-swatch" data-color="82CDFF" style="background-color: #82CDFF;"></div>
-                <div class="color-swatch active" data-color="001550" style="background-color: #001550;"></div>
-                <div class="color-swatch" data-color="003CC4" style="background-color: #003CC4;"></div>
-                <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">Shape Size</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="sizeValue" value="280">
-                    <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
+            <!-- Colors Panel -->
+            <div class="panel">
+                <div class="color-section">
+                    <div>
+                        <span class="control-label">Background Colour</span>
+                        <div class="color-swatches" id="bgColorSwatches">
+                            <div class="color-swatch active" data-color="82CDFF" style="background-color: #82CDFF;"></div>
+                            <div class="color-swatch" data-color="07144a" style="background-color: #07144a;"></div>
+                            <div class="color-swatch" data-color="1f3ab6" style="background-color: #1f3ab6;"></div>
+                            <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="control-label">Text Colour</span>
+                        <div class="color-swatches" id="fgColorSwatches">
+                            <div class="color-swatch" data-color="82CDFF" style="background-color: #82CDFF;"></div>
+                            <div class="color-swatch active" data-color="07144a" style="background-color: #07144a;"></div>
+                            <div class="color-swatch" data-color="1f3ab6" style="background-color: #1f3ab6;"></div>
+                            <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+                        </div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">Show 3×3 Grid</span>
+                        <input type="checkbox" class="toggle-checkbox" id="gridToggle">
+                    </div>
                 </div>
-                <button class="reset-btn" data-reset="size">↻</button>
             </div>
-        </div>
 
-        <div class="control-group">
-            <label class="control-label">Corner Radius</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="radiusValue" value="60">
-                    <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
+            <!-- Shape Size & Corner Radius -->
+            <div class="panel">
+                <div class="slider-panel">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Shape Size</span>
+                            <input type="text" class="slider-value" id="sizeValue" value="280">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
+                            </div>
+                            <button class="reset-btn" data-reset="size">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Corner Radius</span>
+                            <input type="text" class="slider-value" id="radiusValue" value="60">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
+                            </div>
+                            <button class="reset-btn" data-reset="radius">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <button class="reset-btn" data-reset="radius">↻</button>
             </div>
-        </div>
 
-        <div class="control-group">
-            <label class="control-label">Rotation X</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="rotXValue" value="-45°">
-                    <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-45">
+            <!-- Rotation Controls -->
+            <div class="panel">
+                <div class="slider-panel">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Rotation X</span>
+                            <input type="text" class="slider-value" id="rotXValue" value="-45">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-45">
+                            </div>
+                            <button class="reset-btn" data-reset="rotX">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Rotation Y</span>
+                            <input type="text" class="slider-value" id="rotYValue" value="0">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="0">
+                            </div>
+                            <button class="reset-btn" data-reset="rotY">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Rotation Z</span>
+                            <input type="text" class="slider-value" id="rotZValue" value="-45">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="-45">
+                            </div>
+                            <button class="reset-btn" data-reset="rotZ">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <button class="reset-btn" data-reset="rotX">↻</button>
             </div>
-        </div>
 
-        <div class="control-group">
-            <label class="control-label">Rotation Y</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="rotYValue" value="0°">
-                    <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="0">
+            <!-- Offset Controls -->
+            <div class="panel">
+                <div class="slider-panel">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Offset X</span>
+                            <input type="text" class="slider-value" id="offsetXValue" value="0">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="offsetXSlider" min="-500" max="500" value="0">
+                            </div>
+                            <button class="reset-btn" data-reset="offsetX">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Offset Y</span>
+                            <input type="text" class="slider-value" id="offsetYValue" value="0">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="offsetYSlider" min="-500" max="500" value="0">
+                            </div>
+                            <button class="reset-btn" data-reset="offsetY">
+                                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <button class="reset-btn" data-reset="rotY">↻</button>
             </div>
         </div>
 
-        <div class="control-group">
-            <label class="control-label">Rotation Z</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="rotZValue" value="-45°">
-                    <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="-45">
-                </div>
-                <button class="reset-btn" data-reset="rotZ">↻</button>
+        <!-- Branding Footer -->
+        <div class="branding">
+            <svg class="branding-icon" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="8.5" cy="8.5" r="7.5" stroke="#82CDFF" stroke-width="1.5"/>
+                <path d="M5 8.5H12M8.5 5V12" stroke="#82CDFF" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <div class="branding-text">
+                <span class="branding-label">A Graphic Tool by</span>
+                <span class="branding-name">TYPOGRAAF<span class="branding-copyright">&copy;</span></span>
             </div>
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">Animation Speed</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="speedValue" value="0.5">
-                    <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
-                </div>
-                <button class="reset-btn" data-reset="speed">↻</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">Offset X</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="offsetXValue" value="0">
-                    <input type="range" class="slider" id="offsetXSlider" min="-500" max="500" value="0">
-                </div>
-                <button class="reset-btn" data-reset="offsetX">↻</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">Offset Y</label>
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <input type="text" class="slider-value" id="offsetYValue" value="0">
-                    <input type="range" class="slider" id="offsetYSlider" min="-500" max="500" value="0">
-                </div>
-                <button class="reset-btn" data-reset="offsetY">↻</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">
-                <input type="checkbox" id="gridToggle" style="margin-right: 8px;">
-                Show 3×3 Grid
-            </label>
-        </div>
-
-        <div class="control-group">
-            <label class="control-label">Easing Curve</label>
-            <div class="easing-editor">
-                <canvas id="easingCanvas" width="252" height="252"></canvas>
-                <input type="text" class="easing-input" id="easingInput" value="0.25, 0.25, 0.75, 0.75" placeholder="x1, y1, x2, y2">
-            </div>
-        </div>
-
-        <div class="export-buttons">
-            <button class="export-btn" id="exportPNG">PNG</button>
-            <button class="export-btn" id="exportMP4">MP4</button>
         </div>
     </div>
 
+    <!-- Canvas Container -->
     <div id="canvas-container">
         <svg id="grid-overlay"></svg>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar-right">
+        <!-- Canvas Size -->
+        <div class="panel">
+            <span class="control-label">Canvas Size</span>
+            <div class="size-grid" id="sizeButtons">
+                <button class="size-btn active" data-size="1920x1080">1920×1080</button>
+                <button class="size-btn" data-size="1080x1350">1080×1350</button>
+                <button class="size-btn" data-size="1080x1920">1080×1920</button>
+                <button class="size-btn" data-size="1920x1920">1920×1920</button>
+            </div>
+        </div>
+
+        <!-- Animation Speed -->
+        <div class="panel">
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">Animation Speed</span>
+                    <input type="text" class="slider-value" id="speedValue" value="0.5">
+                </div>
+                <div class="slider-row">
+                    <div class="slider-track">
+                        <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
+                    </div>
+                    <button class="reset-btn" data-reset="speed">
+                        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 8C2 11.3137 4.68629 14 8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2" stroke="#334473" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M8 2L5 5M8 2L5 -1" stroke="#334473" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 3)"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easing Curve -->
+        <div class="panel">
+            <span class="control-label">Easing Curve</span>
+            <div class="easing-container">
+                <canvas id="easingCanvas" width="152" height="152"></canvas>
+            </div>
+            <input type="text" class="easing-input" id="easingInput" value="0.25, 0.25, 0.75, 0.75">
+        </div>
+
+        <!-- Output -->
+        <div class="panel">
+            <span class="control-label">Output</span>
+            <div class="output-buttons">
+                <button class="output-btn" id="exportPNG">PNG</button>
+                <button class="output-btn" id="exportMP4">MP4</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -406,7 +698,7 @@
         let currentTexture = null;
         let currentTextureInside = null;
         let animationStartTime = 0;
-        
+
         const defaultValues = {
             size: 280,
             radius: 60,
@@ -429,7 +721,7 @@
             rotZ: -45,
             speed: 0.5,
             bgColor: '82CDFF',
-            fgColor: '001550',
+            fgColor: '07144a',
             zoom: 1,
             offsetX: 0,
             offsetY: 0,
@@ -446,22 +738,19 @@
             const container = document.getElementById('canvas-container');
             const canvas = renderer.domElement;
 
-            // Use a small timeout to ensure container dimensions are calculated
             requestAnimationFrame(() => {
                 const containerWidth = container.clientWidth;
                 const containerHeight = container.clientHeight;
 
                 const scaleX = containerWidth / state.canvasWidth;
                 const scaleY = containerHeight / state.canvasHeight;
-                const scale = Math.min(scaleX, scaleY) * 0.9; // 90% to add padding
+                const scale = Math.min(scaleX, scaleY) * 0.9;
 
                 canvas.style.transform = `scale(${scale})`;
-
-                // Update grid to match canvas scale
                 updateGrid();
             });
         }
-        
+
         function init() {
             const container = document.getElementById('canvas-container');
 
@@ -473,49 +762,42 @@
 
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(state.canvasWidth, state.canvasHeight);
-            renderer.setPixelRatio(window.devicePixelRatio || 1); // Use device pixel ratio for sharp rendering
+            renderer.setPixelRatio(window.devicePixelRatio || 1);
             container.appendChild(renderer.domElement);
-            
+
             scene.add(new THREE.AmbientLight(0xffffff, 0.8));
             const dir = new THREE.DirectionalLight(0xffffff, 0.5);
             dir.position.set(1, 1, 1);
             scene.add(dir);
-            
+
             group = new THREE.Group();
             scene.add(group);
 
-            // Scale canvas to fit container
             scaleCanvasToFit();
 
-            // Wait for font to load before building
             document.fonts.ready.then(() => {
                 build();
             });
 
-            // Mouse wheel zoom
             container.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 const delta = e.deltaY * -0.001;
                 state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
                 group.scale.set(state.zoom, state.zoom, state.zoom);
 
-                // Only increase pixel ratio when zoomed IN (> 1) for sharper rendering
                 const basePixelRatio = window.devicePixelRatio || 1;
                 if (state.zoom > 1) {
-                    const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2); // Cap at 2x
+                    const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2);
                     renderer.setPixelRatio(zoomPixelRatio);
                 } else {
-                    // Keep base pixel ratio when zoomed out or at normal zoom
                     renderer.setPixelRatio(basePixelRatio);
                 }
             });
 
-            // Window resize
             window.addEventListener('resize', () => {
                 scaleCanvasToFit();
             });
 
-            // Mouse drag
             let drag = false, prev = {x:0, y:0};
             renderer.domElement.onmousedown = e => { drag = true; prev = {x: e.clientX, y: e.clientY}; };
             document.onmousemove = e => {
@@ -524,8 +806,8 @@
                 state.rotX = Math.max(-90, Math.min(90, state.rotX - (e.clientY - prev.y) * 0.3));
                 document.getElementById('rotXSlider').value = state.rotX;
                 document.getElementById('rotYSlider').value = state.rotY;
-                document.getElementById('rotXValue').textContent = Math.round(state.rotX) + '°';
-                document.getElementById('rotYValue').textContent = Math.round(state.rotY) + '°';
+                document.getElementById('rotXValue').value = Math.round(state.rotX);
+                document.getElementById('rotYValue').value = Math.round(state.rotY);
                 updateRotation();
                 prev = {x: e.clientX, y: e.clientY};
             };
@@ -533,7 +815,7 @@
 
             animate();
         }
-        
+
         function clearGroup() {
             while (group.children.length) {
                 const c = group.children[0];
@@ -547,24 +829,23 @@
                 });
             }
         }
-        
+
         function build() {
             clearGroup();
 
             const s = state.size;
             const r = Math.min(state.radius, s/2 - 5);
 
-            // Create the text band around the perimeter (this calculates depth)
             createTextBand(s, s, r);
 
             updateRotation();
             updateOffset();
         }
-        
+
         function createRoundedRectShape(w, h, r) {
             const shape = new THREE.Shape();
             const hw = w/2, hh = h/2;
-            
+
             shape.moveTo(-hw + r, -hh);
             shape.lineTo(hw - r, -hh);
             shape.quadraticCurveTo(hw, -hh, hw, -hh + r);
@@ -574,14 +855,13 @@
             shape.quadraticCurveTo(-hw, hh, -hw, hh - r);
             shape.lineTo(-hw, -hh + r);
             shape.quadraticCurveTo(-hw, -hh, -hw + r, -hh);
-            
+
             return shape;
         }
-        
+
         function createTextBand(w, h, r) {
             const hw = w/2, hh = h/2;
-            
-            // Get path points around the rounded rectangle
+
             const path = new THREE.Path();
             path.moveTo(-hw + r, hh);
             path.lineTo(hw - r, hh);
@@ -592,63 +872,50 @@
             path.quadraticCurveTo(-hw, -hh, -hw, -hh + r);
             path.lineTo(-hw, hh - r);
             path.quadraticCurveTo(-hw, hh, -hw + r, hh);
-            
+
             const points = path.getPoints(100);
-            
-            // Calculate perimeter length (including closing segment back to start)
+
             let perimeter = 0;
             for (let i = 1; i < points.length; i++) {
                 perimeter += points[i].distanceTo(points[i-1]);
             }
-            // Add closing segment
             perimeter += points[points.length - 1].distanceTo(points[0]);
-            
-            // Create canvas with text - measure first to calculate depth
+
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const text = state.text.trim() + ' '; // Add single space at end
-            
-            // Use a reference font size to measure text aspect ratio
+            const text = state.text.trim() + ' ';
+
             const refFontSize = 100;
             const fontFamily = 'Genk, Arial Black, sans-serif';
             ctx.font = `${refFontSize}px ${fontFamily}`;
             const textWidth = ctx.measureText(text).width;
-            
-            // Calculate depth so text fits exactly once around perimeter
+
             const textAspect = textWidth / refFontSize;
             const depth = perimeter / textAspect;
-            
-            // Now create the actual canvas at proper resolution
+
             const scale = 6;
             const fontSize = depth * scale * 0.75;
-            
-            // Canvas width should match the text width at this font size
+
             ctx.font = `${fontSize}px ${fontFamily}`;
             const metrics = ctx.measureText(text);
             const actualTextWidth = metrics.width;
 
-            // Calculate actual text height with minimal padding
             const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
             const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
             const textHeight = ascent + descent;
 
             canvas.width = Math.ceil(actualTextWidth);
-            canvas.height = Math.ceil(textHeight * 1.1); // Add 10% padding
+            canvas.height = Math.ceil(textHeight * 1.1);
 
-            // Recalculate actual depth based on canvas height so 3D band matches text size
-            // Account for the 0.75 multiplier used in fontSize calculation
             const actualDepth = canvas.height / (scale * 0.75);
 
-            // Draw background
             ctx.fillStyle = '#' + state.bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw text - calculate proper vertical position using font metrics
             ctx.font = `${fontSize}px ${fontFamily}`;
             ctx.fillStyle = '#' + state.fgColor;
             ctx.textBaseline = 'alphabetic';
 
-            // Position text vertically centered (baseline position)
             const yPos = (canvas.height + ascent - descent) / 2;
 
             ctx.fillText(text, 0, yPos);
@@ -659,51 +926,44 @@
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             texture.needsUpdate = true;
 
-            // Store texture reference for animation (outside face)
             currentTexture = texture;
 
-            // Build band geometry using actual depth
             const halfD = actualDepth / 2;
-            
+
             const vertices = [];
             const uvs = [];
             const indices = [];
-            
+
             let cumLength = 0;
             const totalLength = perimeter;
-            
+
             for (let i = 0; i < points.length; i++) {
                 const p = points[i];
-                
-                // Calculate UV x based on distance along perimeter
+
                 if (i > 0) {
                     cumLength += points[i].distanceTo(points[i-1]);
                 }
-                // U maps 0-1 across the full perimeter, clamped to valid range
                 const u = Math.max(0, Math.min(1, 1 - (cumLength / totalLength)));
-                
-                // Two vertices per point (top and bottom of band)
-                vertices.push(p.x, p.y, halfD);   // top
-                vertices.push(p.x, p.y, -halfD);  // bottom
-                
-                uvs.push(u, 1);  // top
-                uvs.push(u, 0);  // bottom
-                
-                // Create faces (two triangles per segment)
+
+                vertices.push(p.x, p.y, halfD);
+                vertices.push(p.x, p.y, -halfD);
+
+                uvs.push(u, 1);
+                uvs.push(u, 0);
+
                 if (i > 0) {
                     const base = (i - 1) * 2;
                     indices.push(base, base + 3, base + 1);
                     indices.push(base, base + 2, base + 3);
                 }
             }
-            
+
             const geom = new THREE.BufferGeometry();
             geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
             geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             geom.setIndex(indices);
             geom.computeVertexNormals();
-            
-            // Create outside face (front) - normal rendering
+
             const matOutside = new THREE.MeshBasicMaterial({
                 map: texture,
                 side: THREE.FrontSide
@@ -712,22 +972,19 @@
             const bandMeshOutside = new THREE.Mesh(geom, matOutside);
             group.add(bandMeshOutside);
 
-            // Create inside face (back) - needs flipped UVs to scroll same direction
             const textureInside = texture.clone();
             textureInside.needsUpdate = true;
             currentTextureInside = textureInside;
 
-            // Create geometry with flipped UV coordinates for inside face
             const uvsInside = [];
             cumLength = 0;
             for (let i = 0; i < points.length; i++) {
                 if (i > 0) {
                     cumLength += points[i].distanceTo(points[i-1]);
                 }
-                // Flip U coordinate so inside scrolls same visual direction as outside
                 const u = Math.max(0, Math.min(1, cumLength / totalLength));
-                uvsInside.push(u, 1);  // top
-                uvsInside.push(u, 0);  // bottom
+                uvsInside.push(u, 1);
+                uvsInside.push(u, 0);
             }
 
             const geomInside = new THREE.BufferGeometry();
@@ -746,7 +1003,7 @@
 
             return actualDepth;
         }
-        
+
         function updateRotation() {
             group.rotation.x = THREE.MathUtils.degToRad(state.rotX);
             group.rotation.y = THREE.MathUtils.degToRad(state.rotY);
@@ -766,22 +1023,17 @@
             if (state.showGrid) {
                 gridOverlay.classList.add('visible');
 
-                // Set SVG dimensions to match canvas
                 gridOverlay.setAttribute('width', state.canvasWidth);
                 gridOverlay.setAttribute('height', state.canvasHeight);
 
-                // Apply the same transform as the canvas, but also translate to center
                 const canvasTransform = canvas.style.transform || 'scale(1)';
                 gridOverlay.style.transform = `translate(-50%, -50%) ${canvasTransform}`;
 
-                // Clear existing grid
                 gridOverlay.innerHTML = '';
 
-                // Draw 3x3 grid (2 vertical lines, 2 horizontal lines)
                 const cellWidth = state.canvasWidth / 3;
                 const cellHeight = state.canvasHeight / 3;
 
-                // Vertical lines
                 for (let i = 1; i < 3; i++) {
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     line.setAttribute('x1', cellWidth * i);
@@ -793,7 +1045,6 @@
                     gridOverlay.appendChild(line);
                 }
 
-                // Horizontal lines
                 for (let i = 1; i < 3; i++) {
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     line.setAttribute('x1', 0);
@@ -809,9 +1060,7 @@
             }
         }
 
-        // Cubic bezier easing function
         function cubicBezier(t, p1, p2) {
-            // For easing, we solve for y given t (time progress)
             const cx = 3 * p1.x;
             const bx = 3 * (p2.x - p1.x) - cx;
             const ax = 1 - cx - bx;
@@ -820,11 +1069,9 @@
             const by = 3 * (p2.y - p1.y) - cy;
             const ay = 1 - cy - by;
 
-            // Calculate y for given t
             return ((ay * t + by) * t + cy) * t;
         }
 
-        // Solve for t given x using Newton-Raphson method
         function solveCubicBezierX(x, p1, p2) {
             if (x <= 0) return 0;
             if (x >= 1) return 1;
@@ -833,7 +1080,7 @@
             const bx = 3 * (p2.x - p1.x) - cx;
             const ax = 1 - cx - bx;
 
-            let t = x; // Initial guess
+            let t = x;
             for (let i = 0; i < 8; i++) {
                 const currentX = ((ax * t + bx) * t + cx) * t;
                 const currentSlope = (3 * ax * t + 2 * bx) * t + cx;
@@ -843,25 +1090,23 @@
             return t;
         }
 
-        // Apply easing to get y from x
         function applyEasing(x, p1, p2) {
             const t = solveCubicBezierX(x, p1, p2);
             return cubicBezier(t, p1, p2);
         }
 
-        // Draw the bezier curve editor
         function drawEasingCurve() {
             if (!easingCanvas || !easingCtx) return;
 
             const w = easingCanvas.width;
             const h = easingCanvas.height;
-            const padding = 20;
+            const padding = 12;
             const gridSize = w - padding * 2;
 
             easingCtx.clearRect(0, 0, w, h);
 
-            // Draw grid background
-            easingCtx.strokeStyle = 'rgba(130, 205, 255, 0.15)';
+            // Draw grid
+            easingCtx.strokeStyle = '#334473';
             easingCtx.lineWidth = 1;
             for (let i = 0; i <= 4; i++) {
                 const x = padding + (gridSize / 4) * i;
@@ -876,73 +1121,37 @@
                 easingCtx.stroke();
             }
 
-            // Convert normalized coords to canvas coords
             const toCanvasX = (x) => padding + x * gridSize;
             const toCanvasY = (y) => padding + gridSize - y * gridSize;
 
-            // Draw bezier curve
+            // Draw diagonal line
             easingCtx.strokeStyle = '#82CDFF';
-            easingCtx.lineWidth = 2;
-            easingCtx.beginPath();
-            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
-
-            // Draw curve with many segments for smooth appearance
-            for (let i = 0; i <= 100; i++) {
-                const t = i / 100;
-                const x = ((1 - t) ** 3) * 0 + 3 * ((1 - t) ** 2) * t * state.easingP1.x +
-                          3 * (1 - t) * (t ** 2) * state.easingP2.x + (t ** 3) * 1;
-                const y = ((1 - t) ** 3) * 0 + 3 * ((1 - t) ** 2) * t * state.easingP1.y +
-                          3 * (1 - t) * (t ** 2) * state.easingP2.y + (t ** 3) * 1;
-                easingCtx.lineTo(toCanvasX(x), toCanvasY(y));
-            }
-            easingCtx.stroke();
-
-            // Draw control lines
-            easingCtx.strokeStyle = 'rgba(130, 205, 255, 0.3)';
             easingCtx.lineWidth = 1;
-            easingCtx.setLineDash([4, 4]);
             easingCtx.beginPath();
             easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
-            easingCtx.lineTo(toCanvasX(state.easingP1.x), toCanvasY(state.easingP1.y));
+            easingCtx.lineTo(toCanvasX(1), toCanvasY(1));
             easingCtx.stroke();
-            easingCtx.beginPath();
-            easingCtx.moveTo(toCanvasX(1), toCanvasY(1));
-            easingCtx.lineTo(toCanvasX(state.easingP2.x), toCanvasY(state.easingP2.y));
-            easingCtx.stroke();
-            easingCtx.setLineDash([]);
 
             // Draw handles
-            const drawHandle = (x, y, active) => {
-                easingCtx.fillStyle = active ? '#FFFFFF' : '#82CDFF';
-                easingCtx.strokeStyle = '#001550';
-                easingCtx.lineWidth = 2;
+            const drawHandle = (x, y) => {
+                easingCtx.fillStyle = '#82CDFF';
                 easingCtx.beginPath();
-                easingCtx.arc(toCanvasX(x), toCanvasY(y), 6, 0, Math.PI * 2);
+                easingCtx.arc(toCanvasX(x), toCanvasY(y), 3, 0, Math.PI * 2);
                 easingCtx.fill();
-                easingCtx.stroke();
             };
 
-            drawHandle(state.easingP1.x, state.easingP1.y, draggingHandle === 'p1');
-            drawHandle(state.easingP2.x, state.easingP2.y, draggingHandle === 'p2');
-
-            // Draw start and end points
-            easingCtx.fillStyle = '#FFFFFF';
-            easingCtx.beginPath();
-            easingCtx.arc(toCanvasX(0), toCanvasY(0), 4, 0, Math.PI * 2);
-            easingCtx.fill();
-            easingCtx.beginPath();
-            easingCtx.arc(toCanvasX(1), toCanvasY(1), 4, 0, Math.PI * 2);
-            easingCtx.fill();
+            drawHandle(state.easingP1.x, state.easingP1.y);
+            drawHandle(state.easingP2.x, state.easingP2.y);
+            drawHandle(0, 0);
+            drawHandle(1, 1);
         }
 
-        // Initialize easing editor
         function initEasingEditor() {
             easingCanvas = document.getElementById('easingCanvas');
             easingCtx = easingCanvas.getContext('2d');
 
-            const padding = 20;
+            const padding = 12;
 
-            // Helper functions to convert between canvas and normalized coordinates
             const getGridSize = () => easingCanvas.width - padding * 2;
 
             const toCanvasCoords = (nx, ny) => {
@@ -959,7 +1168,6 @@
                 const scaleY = easingCanvas.height / rect.height;
                 const gridSize = getGridSize();
 
-                // Scale mouse position to canvas coordinates
                 const canvasX = cx * scaleX;
                 const canvasY = cy * scaleY;
 
@@ -974,7 +1182,6 @@
                 const scaleX = easingCanvas.width / rect.width;
                 const scaleY = easingCanvas.height / rect.height;
 
-                // Scale mouse position to canvas coordinates
                 const canvasX = mouseX * scaleX;
                 const canvasY = mouseY * scaleY;
 
@@ -1032,7 +1239,6 @@
             easingCanvas.addEventListener('mouseup', handleMouseUp);
             easingCanvas.addEventListener('mouseleave', handleMouseUp);
 
-            // Add document-level handlers for better dragging experience
             document.addEventListener('mousemove', (e) => {
                 if (draggingHandle) {
                     handleMouseMove(e);
@@ -1064,26 +1270,22 @@
                 state.easingP2.y = Math.max(0, Math.min(1, parts[3]));
                 drawEasingCurve();
             } else {
-                updateEasingInput(); // Reset to valid values
+                updateEasingInput();
             }
         }
-        
+
         function animate(timestamp) {
             requestAnimationFrame(animate);
 
             if (!animationStartTime) animationStartTime = timestamp;
 
-            // Animate texture offset with easing
             if (state.speed > 0) {
-                // Calculate progress through cycle (2 seconds per cycle, adjusted by speed)
-                const cycleDuration = 2000 / state.speed; // milliseconds
+                const cycleDuration = 2000 / state.speed;
                 const elapsed = (timestamp - animationStartTime) % cycleDuration;
                 const linearProgress = elapsed / cycleDuration;
 
-                // Apply easing to progress
                 const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
 
-                // Set texture offset based on eased progress
                 const offset = easedProgress;
 
                 if (currentTexture) {
@@ -1096,24 +1298,23 @@
 
             renderer.render(scene, camera);
         }
-        
+
         // Sliders
         const sliders = [
             ['sizeSlider', 'sizeValue', 'size', ''],
             ['radiusSlider', 'radiusValue', 'radius', ''],
-            ['rotXSlider', 'rotXValue', 'rotX', '°'],
-            ['rotYSlider', 'rotYValue', 'rotY', '°'],
-            ['rotZSlider', 'rotZValue', 'rotZ', '°'],
+            ['rotXSlider', 'rotXValue', 'rotX', ''],
+            ['rotYSlider', 'rotYValue', 'rotY', ''],
+            ['rotZSlider', 'rotZValue', 'rotZ', ''],
             ['speedSlider', 'speedValue', 'speed', ''],
             ['offsetXSlider', 'offsetXValue', 'offsetX', ''],
             ['offsetYSlider', 'offsetYValue', 'offsetY', '']
         ];
-        
+
         sliders.forEach(([id, valId, key, suf]) => {
             const slider = document.getElementById(id);
             const valueInput = document.getElementById(valId);
 
-            // Slider input updates value display
             slider.addEventListener('input', e => {
                 state[key] = parseFloat(e.target.value);
                 valueInput.value = e.target.value + suf;
@@ -1122,7 +1323,6 @@
                 else if (key !== 'speed') build();
             });
 
-            // Value input updates slider and state
             valueInput.addEventListener('input', e => {
                 const numValue = parseFloat(e.target.value.replace(suf, ''));
                 if (!isNaN(numValue)) {
@@ -1138,7 +1338,7 @@
                 }
             });
         });
-        
+
         document.getElementById('textInput').addEventListener('input', e => {
             state.text = e.target.value || 'TYPE ';
             build();
@@ -1151,17 +1351,12 @@
                 const defaultValue = defaultValues[key];
                 state[key] = defaultValue;
 
-                // Update slider and value display
                 const slider = document.getElementById(key + 'Slider');
                 const valueInput = document.getElementById(key + 'Value');
 
                 slider.value = defaultValue;
+                valueInput.value = defaultValue;
 
-                // Add suffix for rotation values
-                const suffix = (key === 'rotX' || key === 'rotY' || key === 'rotZ') ? '°' : '';
-                valueInput.value = defaultValue + suffix;
-
-                // Trigger appropriate update
                 if (key === 'rotX' || key === 'rotY' || key === 'rotZ') {
                     updateRotation();
                 } else if (key === 'offsetX' || key === 'offsetY') {
@@ -1217,19 +1412,16 @@
                 state.canvasWidth = width;
                 state.canvasHeight = height;
 
-                // Update camera and renderer
                 camera.aspect = width / height;
                 camera.updateProjectionMatrix();
                 renderer.setSize(width, height);
 
-                // Scale canvas to fit new dimensions (also updates grid)
                 scaleCanvasToFit();
             });
         });
 
         // Export PNG
         document.getElementById('exportPNG').addEventListener('click', () => {
-            // Temporarily reset pixel ratio and zoom for export
             const currentPixelRatio = renderer.getPixelRatio();
             const currentZoom = state.zoom;
 
@@ -1239,11 +1431,10 @@
 
             const dataURL = renderer.domElement.toDataURL('image/png');
             const link = document.createElement('a');
-            link.download = 'expressive-type-' + Date.now() + '.png';
+            link.download = 'krcg-graphic-' + Date.now() + '.png';
             link.href = dataURL;
             link.click();
 
-            // Restore zoom and pixel ratio
             group.scale.set(currentZoom, currentZoom, currentZoom);
             renderer.setPixelRatio(currentPixelRatio);
         });
@@ -1260,187 +1451,159 @@
             const btn = document.getElementById('exportMP4');
 
             if (isRecording) {
-                // Already recording, ignore
                 return;
             }
 
-            // Start recording one complete cycle
             isRecording = true;
             frameNumber = 0;
 
-            // Calculate frames needed for one complete animation cycle
-            const cycleDuration = 2000 / state.speed; // milliseconds
-            totalFrames = Math.ceil((cycleDuration / 1000) * 60); // 60fps
+            const cycleDuration = 2000 / state.speed;
+            totalFrames = Math.ceil((cycleDuration / 1000) * 60);
 
             btn.textContent = 'Exporting...';
             btn.style.background = '#82CDFF';
             btn.style.color = '#001550';
             btn.disabled = true;
 
-                // Wait for mp4-muxer to load
-                await new Promise(resolve => {
-                    const check = () => {
-                        if (window.mp4Muxer) resolve();
-                        else setTimeout(check, 50);
-                    };
-                    check();
+            await new Promise(resolve => {
+                const check = () => {
+                    if (window.mp4Muxer) resolve();
+                    else setTimeout(check, 50);
+                };
+                check();
+            });
+
+            const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
+
+            const videoWidth = renderer.domElement.width;
+            const videoHeight = renderer.domElement.height;
+
+            const target = new ArrayBufferTarget();
+            muxer = new Muxer({
+                target,
+                video: {
+                    codec: 'avc',
+                    width: videoWidth,
+                    height: videoHeight
+                },
+                fastStart: 'in-memory',
+                firstTimestampBehavior: 'offset'
+            });
+
+            let encoderFailed = false;
+            videoEncoder = new VideoEncoder({
+                output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+                error: e => {
+                    console.error('Encoder error:', e);
+                    encoderFailed = true;
+                    isRecording = false;
+                    alert('Video encoder failed: ' + e.message);
+                    btn.textContent = 'MP4';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.disabled = false;
+                }
+            });
+
+            try {
+                videoEncoder.configure({
+                    codec: 'avc1.640033',
+                    width: videoWidth,
+                    height: videoHeight,
+                    bitrate: 15_000_000,
+                    framerate: 60
                 });
 
-                const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
+                await new Promise(resolve => setTimeout(resolve, 100));
 
-                // Use full canvas resolution for video export
-                const videoWidth = renderer.domElement.width;
-                const videoHeight = renderer.domElement.height;
+                if (encoderFailed || videoEncoder.state !== 'configured') {
+                    throw new Error('Encoder failed to configure.');
+                }
+            } catch (e) {
+                console.error('Failed to configure encoder:', e);
+                alert('Failed to start video export: ' + e.message);
+                isRecording = false;
+                btn.textContent = 'MP4';
+                btn.style.background = '';
+                btn.style.color = '';
+                return;
+            }
 
-                console.log(`Video export: ${videoWidth}x${videoHeight} (${videoWidth * videoHeight} pixels)`);
+            const captureFrame = () => {
+                if (encoderFailed) {
+                    return;
+                }
 
-                // Setup muxer
-                const target = new ArrayBufferTarget();
-                muxer = new Muxer({
-                    target,
-                    video: {
-                        codec: 'avc',
-                        width: videoWidth,
-                        height: videoHeight
-                    },
-                    fastStart: 'in-memory',
-                    firstTimestampBehavior: 'offset'
-                });
+                if (frameNumber >= totalFrames) {
+                    isRecording = false;
 
-                // Setup video encoder
-                let encoderFailed = false;
-                videoEncoder = new VideoEncoder({
-                    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-                    error: e => {
-                        console.error('Encoder error:', e);
-                        encoderFailed = true;
-                        isRecording = false;
-                        alert('Video encoder failed: ' + e.message);
+                    videoEncoder.flush().then(() => {
+                        videoEncoder.close();
+                        muxer.finalize();
+                        const { buffer } = muxer.target;
+                        const blob = new Blob([buffer], { type: 'video/mp4' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.download = 'krcg-graphic-' + Date.now() + '.mp4';
+                        link.href = url;
+                        link.click();
+                        URL.revokeObjectURL(url);
                         btn.textContent = 'MP4';
                         btn.style.background = '';
                         btn.style.color = '';
                         btn.disabled = false;
-                    }
-                });
-
-                try {
-                    videoEncoder.configure({
-                        codec: 'avc1.640033', // High profile level 5.1 (supports 4K and higher)
-                        width: videoWidth,
-                        height: videoHeight,
-                        bitrate: 15_000_000,
-                        framerate: 60
+                    }).catch(e => {
+                        console.error('Error finalizing video:', e);
+                        alert('Error creating video: ' + e.message);
+                        btn.textContent = 'MP4';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.disabled = false;
                     });
-
-                    // Wait a bit to ensure configuration completes
-                    await new Promise(resolve => setTimeout(resolve, 100));
-
-                    if (encoderFailed || videoEncoder.state !== 'configured') {
-                        throw new Error('Encoder failed to configure. Resolution: ' + videoWidth + 'x' + videoHeight);
-                    }
-
-                    console.log('Encoder configured successfully');
-                } catch (e) {
-                    console.error('Failed to configure encoder:', e);
-                    alert('Failed to start video export: ' + e.message);
-                    isRecording = false;
-                    btn.textContent = 'MP4';
-                    btn.style.background = '';
-                    btn.style.color = '';
                     return;
                 }
 
-                // Capture frames - render as fast as possible
-                const captureFrame = () => {
-                    if (encoderFailed) {
-                        return;
-                    }
+                if (videoEncoder.state !== 'configured') {
+                    isRecording = false;
+                    return;
+                }
 
-                    // Check if we've captured all frames for one complete cycle
-                    if (frameNumber >= totalFrames) {
-                        console.log('Captured all frames, finalizing video...');
-                        isRecording = false;
+                if (videoEncoder.encodeQueueSize > 30) {
+                    captureFrameId = setTimeout(captureFrame, 10);
+                    return;
+                }
 
-                        // Finalize
-                        videoEncoder.flush().then(() => {
-                            console.log('Encoder flushed, finalizing muxer...');
-                            videoEncoder.close();
-                            muxer.finalize();
-                            const { buffer } = muxer.target;
-                            console.log('Muxer finalized, buffer size:', buffer.byteLength);
-                            const blob = new Blob([buffer], { type: 'video/mp4' });
-                            const url = URL.createObjectURL(blob);
-                            const link = document.createElement('a');
-                            link.download = 'expressive-type-' + Date.now() + '.mp4';
-                            link.href = url;
-                            link.click();
-                            console.log('Download triggered');
-                            URL.revokeObjectURL(url);
-                            btn.textContent = 'MP4';
-                            btn.style.background = '';
-                            btn.style.color = '';
-                            btn.disabled = false;
-                        }).catch(e => {
-                            console.error('Error finalizing video:', e);
-                            alert('Error creating video: ' + e.message);
-                            btn.textContent = 'MP4';
-                            btn.style.background = '';
-                            btn.style.color = '';
-                            btn.disabled = false;
-                        });
-                        return;
-                    }
+                const linearProgress = frameNumber / totalFrames;
+                const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
 
-                    // Check if encoder is still configured
-                    if (videoEncoder.state !== 'configured') {
-                        console.error('Encoder not configured, stopping capture');
-                        isRecording = false;
-                        return;
-                    }
+                if (currentTexture) {
+                    currentTexture.offset.x = easedProgress;
+                }
+                if (currentTextureInside) {
+                    currentTextureInside.offset.x = easedProgress;
+                }
 
-                    // Check if encoder can accept more frames
-                    if (videoEncoder.encodeQueueSize > 30) {
-                        // Wait a bit if queue is too full
-                        captureFrameId = setTimeout(captureFrame, 10);
-                        return;
-                    }
+                renderer.render(scene, camera);
 
-                    // Calculate animation progress for this frame (0.0 to 1.0)
-                    const linearProgress = frameNumber / totalFrames;
-                    const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = videoWidth;
+                tempCanvas.height = videoHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(renderer.domElement, 0, 0, videoWidth, videoHeight);
 
-                    // Update textures with the calculated progress
-                    if (currentTexture) {
-                        currentTexture.offset.x = easedProgress;
-                    }
-                    if (currentTextureInside) {
-                        currentTextureInside.offset.x = easedProgress;
-                    }
+                const frame = new VideoFrame(tempCanvas, {
+                    timestamp: (frameNumber * 1_000_000) / 60
+                });
 
-                    // Render frame
-                    renderer.render(scene, camera);
+                videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                frame.close();
 
-                    // Create canvas at scaled resolution
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = videoWidth;
-                    tempCanvas.height = videoHeight;
-                    const tempCtx = tempCanvas.getContext('2d');
-                    tempCtx.drawImage(renderer.domElement, 0, 0, videoWidth, videoHeight);
+                frameNumber++;
 
-                    const frame = new VideoFrame(tempCanvas, {
-                        timestamp: (frameNumber * 1_000_000) / 60
-                    });
+                captureFrameId = requestAnimationFrame(captureFrame);
+            };
 
-                    videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
-                    frame.close();
-
-                    frameNumber++;
-
-                    // Render next frame immediately (as fast as possible)
-                    captureFrameId = requestAnimationFrame(captureFrame);
-                };
-
-                captureFrame();
+            captureFrame();
         });
 
         // Load custom font then initialize
@@ -1448,7 +1611,6 @@
             init();
             initEasingEditor();
         }).catch(() => {
-            // Fallback if font fails to load
             init();
             initEasingEditor();
         });
