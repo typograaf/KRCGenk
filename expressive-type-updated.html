@@ -1340,18 +1340,18 @@
                 const wordsPerSide = 3;
                 const numLines = wordsPerSide * 4; // 3 words per side × 4 sides
 
-                // Calculate shape width based on text width
-                const fontSize = w * 0.5; // Font size relative to shape size
+                // Calculate shape width based on text width - use higher resolution
+                const fontSize = w * 2; // Larger font for higher resolution texture
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 const metrics = ctx.measureText(text);
                 const singleTextWidth = metrics.width;
                 const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
                 const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
-                const lineHeight = (ascent + descent) * 1.15;
+                const lineHeight = (ascent + descent) * 1.05; // Tighter line spacing
 
                 // Shape dimensions: make it roughly square so each side gets equal words
-                // Each side should fit 4 words worth of perimeter
-                const sideLength = lineHeight * wordsPerSide;
+                const scaleFactor = 4; // Scale down for 3D shape
+                const sideLength = (lineHeight * wordsPerSide) / scaleFactor;
                 shapeW = sideLength;
                 shapeH = sideLength;
 
@@ -1403,7 +1403,7 @@
                 ctx.restore();
 
                 // Depth is based on text width (thickness of the band)
-                const actualDepth = singleTextWidth / (fontSize / lineHeight);
+                const actualDepth = singleTextWidth / scaleFactor;
 
                 return finishVerticalTextBand(points, perimeter, canvas, actualDepth);
             }
