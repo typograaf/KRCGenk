@@ -1241,9 +1241,23 @@
             const text = state.text.trim() + ' ';
             const fontFamily = 'Genk, Arial Black, sans-serif';
 
-            // In vertical mode, swap width and height to rotate the shape 90°
-            let shapeW = state.verticalMode ? h : w;
-            let shapeH = state.verticalMode ? w : h;
+            // Measure text to determine aspect ratio
+            const refFontSize = 100;
+            ctx.font = `${refFontSize}px ${fontFamily}`;
+            const textWidth = ctx.measureText(text).width;
+            const textAspect = textWidth / refFontSize;
+
+            let shapeW, shapeH;
+            if (state.verticalMode) {
+                // Vertical mode: tall narrow shape
+                // Width based on text height, height based on text width
+                shapeW = w / textAspect;
+                shapeH = w;
+            } else {
+                // Horizontal mode: wide shape (original square)
+                shapeW = w;
+                shapeH = h;
+            }
 
             const hw = shapeW/2, hh = shapeH/2;
             // Clamp radius to fit the shape dimensions
