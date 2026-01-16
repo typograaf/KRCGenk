@@ -205,6 +205,39 @@
             opacity: 1;
         }
 
+        /* Repeat Controls */
+        .repeat-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .repeat-btn {
+            width: 20px;
+            height: 20px;
+            background: #1a2c62;
+            border: 1px solid #334473;
+            border-radius: 4px;
+            color: #82CDFF;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .repeat-btn:hover {
+            border-color: #82CDFF;
+        }
+
+        .repeat-value {
+            font-size: 11px;
+            color: #82CDFF;
+            min-width: 24px;
+            text-align: center;
+        }
+
         /* Slider Styles */
         .slider-group {
             display: flex;
@@ -718,6 +751,14 @@
                             </svg>
                         </label>
                     </div>
+                    <div class="toggle-row" id="repeatRow">
+                        <span class="toggle-label">Repeat</span>
+                        <div class="repeat-controls">
+                            <button class="repeat-btn" id="repeatMinus">−</button>
+                            <span class="repeat-value" id="repeatValue">1×</span>
+                            <button class="repeat-btn" id="repeatPlus">+</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -955,6 +996,7 @@
             offsetY: 0,
             showGrid: false,
             verticalMode: false,
+            repeat: 1,
             easingP1: { x: 0.25, y: 0.25 },
             easingP2: { x: 0.75, y: 0.75 }
         };
@@ -1325,7 +1367,9 @@
         function createTextBand(w, h, r) {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const text = state.text.trim() + ' ';
+            const baseText = state.text.trim() + ' ';
+            // Apply repeat for horizontal mode only
+            const text = state.verticalMode ? baseText : baseText.repeat(state.repeat);
             const fontFamily = 'Genk, Arial Black, sans-serif';
 
             // Measure text to determine aspect ratio
@@ -1350,7 +1394,7 @@
                 const lineHeight = (ascent + descent) * 1.05; // Tighter line spacing
 
                 // Shape dimensions: make it roughly square so each side gets equal words
-                const scaleFactor = 4; // Scale down for 3D shape
+                const scaleFactor = 2; // Scale down for 3D shape (larger shape)
                 const sideLength = (lineHeight * wordsPerSide) / scaleFactor;
                 shapeW = sideLength;
                 shapeH = sideLength;
@@ -1918,11 +1962,15 @@
                 state.rotX = 0;
                 state.rotY = -90;
                 state.rotZ = 0;
+                // Hide repeat controls in vertical mode
+                document.getElementById('repeatRow').style.display = 'none';
             } else {
                 // Reset to default rotation for horizontal mode
                 state.rotX = defaultValues.rotX;
                 state.rotY = defaultValues.rotY;
                 state.rotZ = defaultValues.rotZ;
+                // Show repeat controls in horizontal mode
+                document.getElementById('repeatRow').style.display = 'flex';
             }
             // Update slider displays
             document.getElementById('rotXSlider').value = state.rotX;
@@ -1932,6 +1980,23 @@
             document.getElementById('rotZSlider').value = state.rotZ;
             document.getElementById('rotZValue').value = state.rotZ;
             build();
+        });
+
+        // Repeat controls (horizontal mode only)
+        document.getElementById('repeatMinus').addEventListener('click', () => {
+            if (state.repeat > 1) {
+                state.repeat--;
+                document.getElementById('repeatValue').textContent = state.repeat + '×';
+                build();
+            }
+        });
+
+        document.getElementById('repeatPlus').addEventListener('click', () => {
+            if (state.repeat < 5) {
+                state.repeat++;
+                document.getElementById('repeatValue').textContent = state.repeat + '×';
+                build();
+            }
         });
 
         // Easing input
