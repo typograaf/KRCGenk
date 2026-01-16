@@ -1394,7 +1394,7 @@
                 const lineHeight = (ascent + descent) * 1.05; // Tighter line spacing
 
                 // Shape dimensions: make it roughly square so each side gets equal words
-                const scaleFactor = 2; // Scale down for 3D shape (larger shape)
+                const scaleFactor = 4; // Scale down for 3D shape
                 const sideLength = (lineHeight * wordsPerSide) / scaleFactor;
                 shapeW = sideLength;
                 shapeH = sideLength;
@@ -1849,7 +1849,7 @@
             if (!animationStartTime) animationStartTime = timestamp;
 
             if (state.speed > 0) {
-                const cycleDuration = 2000 / state.speed;
+                const cycleDuration = 8000 / state.speed;
                 const elapsed = (timestamp - animationStartTime) % cycleDuration;
                 const linearProgress = elapsed / cycleDuration;
 
@@ -2075,7 +2075,7 @@
             isRecording = true;
             frameNumber = 0;
 
-            const cycleDuration = 2000 / state.speed;
+            const cycleDuration = 8000 / state.speed;
             totalFrames = Math.ceil((cycleDuration / 1000) * 60);
 
             btn.textContent = 'Exporting...';
