@@ -513,19 +513,24 @@
             }
 
             #canvas-container canvas {
-                border-radius: 0;
+                border-radius: 0 0 12px 12px;
             }
 
             .sidebar-left {
                 width: 100%;
                 height: auto;
-                padding: 16px;
-                padding-top: 20px;
+                padding: 0;
                 flex-shrink: 0;
+                background: #0a1a4a;
+                border-radius: 12px 12px 0 0;
+                margin-top: -12px;
+                position: relative;
+                z-index: 101;
             }
 
             .sidebar-left-content {
                 gap: 10px;
+                padding: 20px 16px 16px 16px;
             }
 
             .sidebar-right {
@@ -533,10 +538,12 @@
                 height: auto;
                 padding: 0 16px 16px 16px;
                 flex-shrink: 0;
+                background: #0a1a4a;
             }
 
             .branding {
                 margin-top: 16px;
+                padding: 0 16px 16px 16px;
             }
 
             .panel {
@@ -633,8 +640,8 @@
         }
 
         @media (max-width: 480px) {
-            .sidebar-left {
-                padding: 12px;
+            .sidebar-left-content {
+                padding: 16px 12px 12px 12px;
             }
 
             .sidebar-right {
