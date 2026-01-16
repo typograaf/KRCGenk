@@ -677,7 +677,7 @@
             </div>
 
             <!-- Text Input -->
-            <input type="text" class="text-input" id="textInput" value="RACING FORZA  " placeholder="TEXT GOES HERE...">
+            <input type="text" class="text-input" id="textInput" value="KRC GENK  " placeholder="TEXT GOES HERE...">
 
             <!-- Colors Panel -->
             <div class="panel">
@@ -939,7 +939,7 @@
         };
 
         const state = {
-            text: 'RACING FORZA  ',
+            text: 'KRC GENK  ',
             canvasWidth: 1920,
             canvasHeight: 1080,
             size: 280,
@@ -1337,8 +1337,8 @@
             let shapeW, shapeH;
             if (state.verticalMode) {
                 // Vertical mode: tall narrow shape with stacked text moving upward
-                const wordsPerSide = 4;
-                const numLines = wordsPerSide * 4; // 4 words per side × 4 sides
+                const wordsPerSide = 3;
+                const numLines = wordsPerSide * 4; // 3 words per side × 4 sides
 
                 // Calculate shape width based on text width
                 const fontSize = w * 0.5; // Font size relative to shape size
@@ -1914,9 +1914,9 @@
         document.getElementById('verticalToggle').addEventListener('change', e => {
             state.verticalMode = e.target.checked;
             if (state.verticalMode) {
-                // Set rotation to x:0, y:90, z:0 for vertical mode
+                // Set rotation to x:0, y:-90, z:0 for vertical mode
                 state.rotX = 0;
-                state.rotY = 90;
+                state.rotY = -90;
                 state.rotZ = 0;
             } else {
                 // Reset to default rotation for horizontal mode
