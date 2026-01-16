@@ -217,7 +217,7 @@
         }
         #easingCanvas {
             width: 100%;
-            height: 180px;
+            aspect-ratio: 1;
             background: #003CC4;
             border: 1px solid #82CDFF;
             border-radius: 6px;
@@ -377,7 +377,7 @@
         <div class="control-group">
             <label class="control-label">Easing Curve</label>
             <div class="easing-editor">
-                <canvas id="easingCanvas" width="252" height="180"></canvas>
+                <canvas id="easingCanvas" width="252" height="252"></canvas>
                 <input type="text" class="easing-input" id="easingInput" value="0, 0, 0.58, 1" placeholder="x1, y1, x2, y2">
             </div>
         </div>
@@ -936,64 +936,105 @@
             easingCtx = easingCanvas.getContext('2d');
 
             const padding = 20;
-            const gridSize = easingCanvas.width - padding * 2;
 
-            const fromCanvasX = (cx) => (cx - padding) / gridSize;
-            const fromCanvasY = (cy) => 1 - (cy - padding) / gridSize;
+            // Helper functions to convert between canvas and normalized coordinates
+            const getGridSize = () => easingCanvas.width - padding * 2;
 
-            const getHandleAt = (x, y) => {
-                const toCanvasX = (x) => padding + x * gridSize;
-                const toCanvasY = (y) => padding + gridSize - y * gridSize;
+            const toCanvasCoords = (nx, ny) => {
+                const gridSize = getGridSize();
+                return {
+                    x: padding + nx * gridSize,
+                    y: padding + gridSize - ny * gridSize
+                };
+            };
 
-                const dist1 = Math.hypot(x - toCanvasX(state.easingP1.x), y - toCanvasY(state.easingP1.y));
-                const dist2 = Math.hypot(x - toCanvasX(state.easingP2.x), y - toCanvasY(state.easingP2.y));
+            const fromCanvasCoords = (cx, cy) => {
+                const rect = easingCanvas.getBoundingClientRect();
+                const scaleX = easingCanvas.width / rect.width;
+                const scaleY = easingCanvas.height / rect.height;
+                const gridSize = getGridSize();
 
-                if (dist1 < 12) return 'p1';
-                if (dist2 < 12) return 'p2';
+                // Scale mouse position to canvas coordinates
+                const canvasX = cx * scaleX;
+                const canvasY = cy * scaleY;
+
+                return {
+                    x: Math.max(0, Math.min(1, (canvasX - padding) / gridSize)),
+                    y: Math.max(0, Math.min(1, 1 - (canvasY - padding) / gridSize))
+                };
+            };
+
+            const getHandleAt = (mouseX, mouseY) => {
+                const rect = easingCanvas.getBoundingClientRect();
+                const scaleX = easingCanvas.width / rect.width;
+                const scaleY = easingCanvas.height / rect.height;
+
+                // Scale mouse position to canvas coordinates
+                const canvasX = mouseX * scaleX;
+                const canvasY = mouseY * scaleY;
+
+                const p1Pos = toCanvasCoords(state.easingP1.x, state.easingP1.y);
+                const p2Pos = toCanvasCoords(state.easingP2.x, state.easingP2.y);
+
+                const dist1 = Math.hypot(canvasX - p1Pos.x, canvasY - p1Pos.y);
+                const dist2 = Math.hypot(canvasX - p2Pos.x, canvasY - p2Pos.y);
+
+                if (dist1 < 15) return 'p1';
+                if (dist2 < 15) return 'p2';
                 return null;
             };
 
             easingCanvas.addEventListener('mousedown', (e) => {
                 const rect = easingCanvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                draggingHandle = getHandleAt(x, y);
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                draggingHandle = getHandleAt(mouseX, mouseY);
                 if (draggingHandle) {
+                    e.preventDefault();
                     drawEasingCurve();
                 }
             });
 
-            easingCanvas.addEventListener('mousemove', (e) => {
+            const handleMouseMove = (e) => {
                 if (!draggingHandle) return;
 
                 const rect = easingCanvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
 
-                let nx = Math.max(0, Math.min(1, fromCanvasX(x)));
-                let ny = Math.max(0, Math.min(1, fromCanvasY(y)));
+                const normalized = fromCanvasCoords(mouseX, mouseY);
 
                 if (draggingHandle === 'p1') {
-                    state.easingP1.x = nx;
-                    state.easingP1.y = ny;
+                    state.easingP1.x = normalized.x;
+                    state.easingP1.y = normalized.y;
                 } else if (draggingHandle === 'p2') {
-                    state.easingP2.x = nx;
-                    state.easingP2.y = ny;
+                    state.easingP2.x = normalized.x;
+                    state.easingP2.y = normalized.y;
                 }
 
                 updateEasingInput();
                 drawEasingCurve();
+            };
+
+            const handleMouseUp = () => {
+                if (draggingHandle) {
+                    draggingHandle = null;
+                    drawEasingCurve();
+                }
+            };
+
+            easingCanvas.addEventListener('mousemove', handleMouseMove);
+            easingCanvas.addEventListener('mouseup', handleMouseUp);
+            easingCanvas.addEventListener('mouseleave', handleMouseUp);
+
+            // Add document-level handlers for better dragging experience
+            document.addEventListener('mousemove', (e) => {
+                if (draggingHandle) {
+                    handleMouseMove(e);
+                }
             });
 
-            easingCanvas.addEventListener('mouseup', () => {
-                draggingHandle = null;
-                drawEasingCurve();
-            });
-
-            easingCanvas.addEventListener('mouseleave', () => {
-                draggingHandle = null;
-                drawEasingCurve();
-            });
+            document.addEventListener('mouseup', handleMouseUp);
 
             drawEasingCurve();
         }
