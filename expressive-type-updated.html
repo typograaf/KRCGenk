@@ -1150,10 +1150,10 @@
             return shape;
         }
 
-        function finishTextBand(points, perimeter, canvas, actualDepth, isVertical = false) {
+        function finishTextBand(points, perimeter, canvas, actualDepth) {
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = isVertical ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             texture.needsUpdate = true;
 
@@ -1174,20 +1174,13 @@
                 if (i > 0) {
                     cumLength += points[i].distanceTo(points[i-1]);
                 }
-                const t = Math.max(0, Math.min(1, 1 - (cumLength / totalLength)));
+                const u = Math.max(0, Math.min(1, 1 - (cumLength / totalLength)));
 
                 vertices.push(p.x, p.y, halfD);
                 vertices.push(p.x, p.y, -halfD);
 
-                if (isVertical) {
-                    // Vertical mode: V varies along perimeter, U is constant (0 or 1 for depth)
-                    uvs.push(1, t);
-                    uvs.push(0, t);
-                } else {
-                    // Horizontal mode: U varies along perimeter, V is constant
-                    uvs.push(t, 1);
-                    uvs.push(t, 0);
-                }
+                uvs.push(u, 1);
+                uvs.push(u, 0);
 
                 if (i > 0) {
                     const base = (i - 1) * 2;
@@ -1220,14 +1213,9 @@
                 if (i > 0) {
                     cumLength += points[i].distanceTo(points[i-1]);
                 }
-                const t = Math.max(0, Math.min(1, cumLength / totalLength));
-                if (isVertical) {
-                    uvsInside.push(1, t);
-                    uvsInside.push(0, t);
-                } else {
-                    uvsInside.push(t, 1);
-                    uvsInside.push(t, 0);
-                }
+                const u = Math.max(0, Math.min(1, cumLength / totalLength));
+                uvsInside.push(u, 1);
+                uvsInside.push(u, 0);
             }
 
             const geomInside = new THREE.BufferGeometry();
@@ -1248,97 +1236,29 @@
         }
 
         function createTextBand(w, h, r) {
-            let shapeW = w, shapeH = h;
-
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             const text = state.text.trim() + ' ';
             const fontFamily = 'Genk, Arial Black, sans-serif';
 
-            if (state.verticalMode) {
-                // Vertical mode: tall narrow shape with stacked text
-                const refFontSize = 100;
-                ctx.font = `${refFontSize}px ${fontFamily}`;
-                const singleTextWidth = ctx.measureText(text).width;
-                const textAspect = singleTextWidth / refFontSize;
+            // In vertical mode, swap width and height to rotate the shape 90°
+            let shapeW = state.verticalMode ? h : w;
+            let shapeH = state.verticalMode ? w : h;
 
-                // Calculate how many times to repeat text vertically
-                const targetHeight = w * 0.7; // Make it tall but not too stretched
-                shapeW = w / textAspect * 0.8;
-                shapeH = targetHeight;
-
-                const hw = shapeW/2, hh = shapeH/2;
-                const rClamped = Math.min(r, shapeW/2 - 5, shapeH/2 - 5);
-
-                const path = new THREE.Path();
-                path.moveTo(-hw + rClamped, hh);
-                path.lineTo(hw - rClamped, hh);
-                path.quadraticCurveTo(hw, hh, hw, hh - rClamped);
-                path.lineTo(hw, -hh + rClamped);
-                path.quadraticCurveTo(hw, -hh, hw - rClamped, -hh);
-                path.lineTo(-hw + rClamped, -hh);
-                path.quadraticCurveTo(-hw, -hh, -hw, -hh + rClamped);
-                path.lineTo(-hw, hh - rClamped);
-                path.quadraticCurveTo(-hw, hh, -hw + rClamped, hh);
-
-                const points = path.getPoints(100);
-
-                let perimeter = 0;
-                for (let i = 1; i < points.length; i++) {
-                    perimeter += points[i].distanceTo(points[i-1]);
-                }
-                perimeter += points[points.length - 1].distanceTo(points[0]);
-
-                // Calculate font size based on shape width
-                const scale = 6;
-                const fontSize = shapeW * scale * 0.75;
-
-                ctx.font = `${fontSize}px ${fontFamily}`;
-                const metrics = ctx.measureText(text);
-                const actualTextWidth = metrics.width;
-                const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
-                const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
-                const lineHeight = (ascent + descent) * 1.1;
-
-                // Calculate number of lines to fill perimeter
-                const numLines = Math.ceil(perimeter / lineHeight);
-
-                canvas.width = Math.ceil(actualTextWidth);
-                canvas.height = Math.ceil(lineHeight * numLines);
-
-                const actualDepth = canvas.height / (scale * 0.75);
-
-                ctx.fillStyle = '#' + state.bgColor;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.font = `${fontSize}px ${fontFamily}`;
-                ctx.fillStyle = '#' + state.fgColor;
-                ctx.textBaseline = 'alphabetic';
-
-                // Draw text repeatedly vertically
-                for (let i = 0; i < numLines; i++) {
-                    const yPos = lineHeight * i + ascent;
-                    ctx.fillText(text, 0, yPos);
-                }
-
-                // For vertical mode, the depth is the text width
-                const verticalDepth = canvas.width / (scale * 0.75);
-                return finishTextBand(points, perimeter, canvas, verticalDepth, true);
-            }
-
-            // Horizontal mode (original)
-            const hw = w/2, hh = h/2;
+            const hw = shapeW/2, hh = shapeH/2;
+            // Clamp radius to fit the shape dimensions
+            const rClamped = Math.min(r, hw - 5, hh - 5);
 
             const path = new THREE.Path();
-            path.moveTo(-hw + r, hh);
-            path.lineTo(hw - r, hh);
-            path.quadraticCurveTo(hw, hh, hw, hh - r);
-            path.lineTo(hw, -hh + r);
-            path.quadraticCurveTo(hw, -hh, hw - r, -hh);
-            path.lineTo(-hw + r, -hh);
-            path.quadraticCurveTo(-hw, -hh, -hw, -hh + r);
-            path.lineTo(-hw, hh - r);
-            path.quadraticCurveTo(-hw, hh, -hw + r, hh);
+            path.moveTo(-hw + rClamped, hh);
+            path.lineTo(hw - rClamped, hh);
+            path.quadraticCurveTo(hw, hh, hw, hh - rClamped);
+            path.lineTo(hw, -hh + rClamped);
+            path.quadraticCurveTo(hw, -hh, hw - rClamped, -hh);
+            path.lineTo(-hw + rClamped, -hh);
+            path.quadraticCurveTo(-hw, -hh, -hw, -hh + rClamped);
+            path.lineTo(-hw, hh - rClamped);
+            path.quadraticCurveTo(-hw, hh, -hw + rClamped, hh);
 
             const points = path.getPoints(100);
 
