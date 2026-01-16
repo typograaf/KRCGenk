@@ -205,9 +205,12 @@
         }
         #grid-overlay {
             position: absolute;
+            top: 50%;
+            left: 50%;
             pointer-events: none;
             display: none;
             transform-origin: center center;
+            z-index: 10;
         }
         #grid-overlay.visible {
             display: block;
@@ -378,7 +381,7 @@
             <label class="control-label">Easing Curve</label>
             <div class="easing-editor">
                 <canvas id="easingCanvas" width="252" height="252"></canvas>
-                <input type="text" class="easing-input" id="easingInput" value="0, 0, 0.58, 1" placeholder="x1, y1, x2, y2">
+                <input type="text" class="easing-input" id="easingInput" value="0.25, 0.25, 0.75, 0.75" placeholder="x1, y1, x2, y2">
             </div>
         </div>
 
@@ -431,8 +434,8 @@
             offsetX: 0,
             offsetY: 0,
             showGrid: false,
-            easingP1: { x: 0, y: 0 },
-            easingP2: { x: 0.58, y: 1 }
+            easingP1: { x: 0.25, y: 0.25 },
+            easingP2: { x: 0.75, y: 0.75 }
         };
 
         // Easing editor state
@@ -756,23 +759,25 @@
 
         function updateGrid() {
             const gridOverlay = document.getElementById('grid-overlay');
+            if (!renderer) return;
+
             const canvas = renderer.domElement;
 
             if (state.showGrid) {
                 gridOverlay.classList.add('visible');
 
-                // Match the canvas size and scale
-                const canvasStyle = window.getComputedStyle(canvas);
-                const transform = canvasStyle.transform;
-
+                // Set SVG dimensions to match canvas
                 gridOverlay.setAttribute('width', state.canvasWidth);
                 gridOverlay.setAttribute('height', state.canvasHeight);
-                gridOverlay.style.transform = canvas.style.transform;
+
+                // Apply the same transform as the canvas, but also translate to center
+                const canvasTransform = canvas.style.transform || 'scale(1)';
+                gridOverlay.style.transform = `translate(-50%, -50%) ${canvasTransform}`;
 
                 // Clear existing grid
                 gridOverlay.innerHTML = '';
 
-                // Draw 3x3 grid (4 vertical lines, 4 horizontal lines)
+                // Draw 3x3 grid (2 vertical lines, 2 horizontal lines)
                 const cellWidth = state.canvasWidth / 3;
                 const cellHeight = state.canvasHeight / 3;
 
