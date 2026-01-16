@@ -349,10 +349,15 @@
                 state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
                 group.scale.set(state.zoom, state.zoom, state.zoom);
 
-                // Increase pixel ratio when zoomed in for sharper rendering
+                // Only increase pixel ratio when zoomed IN (> 1) for sharper rendering
                 const basePixelRatio = window.devicePixelRatio || 1;
-                const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2); // Cap at 2x
-                renderer.setPixelRatio(zoomPixelRatio);
+                if (state.zoom > 1) {
+                    const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2); // Cap at 2x
+                    renderer.setPixelRatio(zoomPixelRatio);
+                } else {
+                    // Keep base pixel ratio when zoomed out or at normal zoom
+                    renderer.setPixelRatio(basePixelRatio);
+                }
             });
 
             // Window resize
