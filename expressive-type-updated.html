@@ -101,6 +101,33 @@
         .color-swatch.active {
             border-color: #82CDFF;
         }
+        .size-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .size-btn {
+            background: #003CC4;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 10px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .size-btn:hover {
+            border-color: #82CDFF;
+        }
+        .size-btn.active {
+            border-color: #82CDFF;
+            background: #82CDFF;
+            color: #001550;
+        }
         .export-buttons {
             display: flex;
             gap: 8px;
@@ -128,7 +155,17 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        #canvas-container { flex: 1; }
+        #canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+        #canvas-container canvas {
+            display: block;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -136,6 +173,16 @@
         <div class="control-group">
             <label class="control-label">Text</label>
             <input type="text" class="text-input" id="textInput" value="RACING FORZA  ">
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Canvas Size</label>
+            <div class="size-buttons" id="sizeButtons">
+                <button class="size-btn active" data-size="1920x1080">1920x1080</button>
+                <button class="size-btn" data-size="1080x1350">1080x1350</button>
+                <button class="size-btn" data-size="1080x1920">1080x1920</button>
+                <button class="size-btn" data-size="1920x1920">1920x1920</button>
+            </div>
         </div>
 
         <div class="control-group">
@@ -227,6 +274,8 @@
         
         const state = {
             text: 'RACING FORZA  ',
+            canvasWidth: 1920,
+            canvasHeight: 1080,
             size: 280,
             radius: 60,
             rotX: -45,
@@ -239,16 +288,16 @@
         
         function init() {
             const container = document.getElementById('canvas-container');
-            
+
             scene = new THREE.Scene();
             scene.background = new THREE.Color(parseInt(state.bgColor, 16));
-            
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 2000);
+
+            camera = new THREE.PerspectiveCamera(45, state.canvasWidth / state.canvasHeight, 1, 2000);
             camera.position.set(0, 0, 800);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(state.canvasWidth, state.canvasHeight);
+            renderer.setPixelRatio(1); // Use 1:1 pixel ratio for exact dimensions
             container.appendChild(renderer.domElement);
             
             scene.add(new THREE.AmbientLight(0xffffff, 0.8));
@@ -279,13 +328,7 @@
                 prev = {x: e.clientX, y: e.clientY};
             };
             document.onmouseup = () => drag = false;
-            
-            window.onresize = () => {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            };
-            
+
             animate();
         }
         
@@ -585,6 +628,22 @@
                 swatch.classList.add('active');
                 state.fgColor = swatch.dataset.color;
                 build();
+            });
+        });
+
+        // Canvas size buttons
+        document.querySelectorAll('#sizeButtons .size-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('#sizeButtons .size-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const [width, height] = btn.dataset.size.split('x').map(Number);
+                state.canvasWidth = width;
+                state.canvasHeight = height;
+
+                // Update camera and renderer
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
             });
         });
 
