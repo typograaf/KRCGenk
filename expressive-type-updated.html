@@ -172,6 +172,7 @@
             display: block;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             transform-origin: center center;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -322,7 +323,7 @@
 
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(state.canvasWidth, state.canvasHeight);
-            renderer.setPixelRatio(1); // Use 1:1 pixel ratio for exact dimensions
+            renderer.setPixelRatio(window.devicePixelRatio || 1); // Use device pixel ratio for sharp rendering
             container.appendChild(renderer.domElement);
             
             scene.add(new THREE.AmbientLight(0xffffff, 0.8));
@@ -347,6 +348,11 @@
                 const delta = e.deltaY * -0.001;
                 state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
                 group.scale.set(state.zoom, state.zoom, state.zoom);
+
+                // Increase pixel ratio when zoomed in for sharper rendering
+                const basePixelRatio = window.devicePixelRatio || 1;
+                const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2); // Cap at 2x
+                renderer.setPixelRatio(zoomPixelRatio);
             });
 
             // Window resize
@@ -693,12 +699,23 @@
 
         // Export PNG
         document.getElementById('exportPNG').addEventListener('click', () => {
+            // Temporarily reset pixel ratio and zoom for export
+            const currentPixelRatio = renderer.getPixelRatio();
+            const currentZoom = state.zoom;
+
+            renderer.setPixelRatio(1);
+            group.scale.set(1, 1, 1);
             renderer.render(scene, camera);
+
             const dataURL = renderer.domElement.toDataURL('image/png');
             const link = document.createElement('a');
             link.download = 'expressive-type-' + Date.now() + '.png';
             link.href = dataURL;
             link.click();
+
+            // Restore zoom and pixel ratio
+            group.scale.set(currentZoom, currentZoom, currentZoom);
+            renderer.setPixelRatio(currentPixelRatio);
         });
 
         // Export MP4
