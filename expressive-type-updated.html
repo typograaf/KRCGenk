@@ -997,6 +997,7 @@
             showGrid: false,
             verticalMode: false,
             repeat: 2,
+            verticalRepeat: 3,
             easingP1: { x: 0.25, y: 0.25 },
             easingP2: { x: 0.75, y: 0.75 }
         };
@@ -1381,8 +1382,8 @@
             let shapeW, shapeH;
             if (state.verticalMode) {
                 // Vertical mode: tall narrow shape with stacked text moving upward
-                const wordsPerSide = 3;
-                const numLines = wordsPerSide * 4; // 3 words per side × 4 sides
+                const wordsPerSide = state.verticalRepeat;
+                const numLines = wordsPerSide * 4; // words per side × 4 sides
 
                 // Calculate shape width based on text width - use higher resolution
                 const fontSize = w * 4; // Larger font for higher resolution texture
@@ -1394,7 +1395,7 @@
                 const lineHeight = (ascent + descent) * 1.05; // Tighter line spacing
 
                 // Shape dimensions: make it roughly square so each side gets equal words
-                const scaleFactor = 4; // Scale down for 3D shape
+                const scaleFactor = 6; // Scale down for 3D shape
                 const sideLength = (lineHeight * wordsPerSide) / scaleFactor;
                 shapeW = sideLength;
                 shapeH = sideLength;
@@ -1859,7 +1860,7 @@
 
                 if (currentTexture) {
                     if (state.verticalMode) {
-                        currentTexture.offset.y = offset;
+                        currentTexture.offset.y = -offset; // Bottom to top
                         currentTexture.offset.x = 0;
                     } else {
                         currentTexture.offset.x = offset;
@@ -1868,7 +1869,7 @@
                 }
                 if (currentTextureInside) {
                     if (state.verticalMode) {
-                        currentTextureInside.offset.y = offset;
+                        currentTextureInside.offset.y = -offset; // Bottom to top
                         currentTextureInside.offset.x = 0;
                     } else {
                         currentTextureInside.offset.x = offset;
@@ -1962,15 +1963,15 @@
                 state.rotX = 0;
                 state.rotY = -90;
                 state.rotZ = 0;
-                // Hide repeat controls in vertical mode
-                document.getElementById('repeatRow').style.display = 'none';
+                // Update repeat display to show vertical repeat value
+                document.getElementById('repeatValue').textContent = state.verticalRepeat + '×';
             } else {
                 // Reset to default rotation for horizontal mode
                 state.rotX = defaultValues.rotX;
                 state.rotY = defaultValues.rotY;
                 state.rotZ = defaultValues.rotZ;
-                // Show repeat controls in horizontal mode
-                document.getElementById('repeatRow').style.display = 'flex';
+                // Update repeat display to show horizontal repeat value
+                document.getElementById('repeatValue').textContent = state.repeat + '×';
             }
             // Update slider displays
             document.getElementById('rotXSlider').value = state.rotX;
@@ -1982,20 +1983,40 @@
             build();
         });
 
-        // Repeat controls (horizontal mode only)
+        // Repeat controls (works for both horizontal and vertical modes)
         document.getElementById('repeatMinus').addEventListener('click', () => {
-            if (state.repeat > 1) {
-                state.repeat--;
-                document.getElementById('repeatValue').textContent = state.repeat + '×';
-                build();
+            if (state.verticalMode) {
+                // Vertical mode: min 3
+                if (state.verticalRepeat > 3) {
+                    state.verticalRepeat--;
+                    document.getElementById('repeatValue').textContent = state.verticalRepeat + '×';
+                    build();
+                }
+            } else {
+                // Horizontal mode: min 1
+                if (state.repeat > 1) {
+                    state.repeat--;
+                    document.getElementById('repeatValue').textContent = state.repeat + '×';
+                    build();
+                }
             }
         });
 
         document.getElementById('repeatPlus').addEventListener('click', () => {
-            if (state.repeat < 5) {
-                state.repeat++;
-                document.getElementById('repeatValue').textContent = state.repeat + '×';
-                build();
+            if (state.verticalMode) {
+                // Vertical mode: max 7
+                if (state.verticalRepeat < 7) {
+                    state.verticalRepeat++;
+                    document.getElementById('repeatValue').textContent = state.verticalRepeat + '×';
+                    build();
+                }
+            } else {
+                // Horizontal mode: max 5
+                if (state.repeat < 5) {
+                    state.repeat++;
+                    document.getElementById('repeatValue').textContent = state.repeat + '×';
+                    build();
+                }
             }
         });
 
@@ -2197,7 +2218,7 @@
 
                 if (currentTexture) {
                     if (state.verticalMode) {
-                        currentTexture.offset.y = easedProgress;
+                        currentTexture.offset.y = -easedProgress; // Bottom to top
                         currentTexture.offset.x = 0;
                     } else {
                         currentTexture.offset.x = easedProgress;
@@ -2206,7 +2227,7 @@
                 }
                 if (currentTextureInside) {
                     if (state.verticalMode) {
-                        currentTextureInside.offset.y = easedProgress;
+                        currentTextureInside.offset.y = -easedProgress; // Bottom to top
                         currentTextureInside.offset.x = 0;
                     } else {
                         currentTextureInside.offset.x = easedProgress;
