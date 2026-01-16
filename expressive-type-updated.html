@@ -53,7 +53,16 @@
             font-size: 14px;
         }
         .text-input:focus { outline: none; border-color: #82CDFF; }
-        .slider-container { position: relative; }
+        .slider-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .slider-wrapper {
+            flex: 1;
+            position: relative;
+        }
         .slider {
             width: 100%;
             height: 6px;
@@ -85,6 +94,26 @@
         .slider-value:focus {
             outline: none;
             color: #FFFFFF;
+        }
+        .reset-btn {
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: 1px solid #003CC4;
+            border-radius: 4px;
+            color: #82CDFF;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            padding: 0;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .reset-btn:hover {
+            background: #003CC4;
+            border-color: #82CDFF;
         }
         .color-swatches {
             display: flex;
@@ -216,48 +245,66 @@
         <div class="control-group">
             <label class="control-label">Shape Size</label>
             <div class="slider-container">
-                <input type="text" class="slider-value" id="sizeValue" value="280">
-                <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="sizeValue" value="280">
+                    <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
+                </div>
+                <button class="reset-btn" data-reset="size">↻</button>
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label">Corner Radius</label>
             <div class="slider-container">
-                <input type="text" class="slider-value" id="radiusValue" value="60">
-                <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="radiusValue" value="60">
+                    <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
+                </div>
+                <button class="reset-btn" data-reset="radius">↻</button>
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label">Rotation X</label>
             <div class="slider-container">
-                <input type="text" class="slider-value" id="rotXValue" value="-45°">
-                <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-45">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="rotXValue" value="-45°">
+                    <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-45">
+                </div>
+                <button class="reset-btn" data-reset="rotX">↻</button>
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label">Rotation Y</label>
             <div class="slider-container">
-                <input type="text" class="slider-value" id="rotYValue" value="0°">
-                <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="0">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="rotYValue" value="0°">
+                    <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="0">
+                </div>
+                <button class="reset-btn" data-reset="rotY">↻</button>
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label">Rotation Z</label>
             <div class="slider-container">
-                <input type="text" class="slider-value" id="rotZValue" value="-45°">
-                <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="-45">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="rotZValue" value="-45°">
+                    <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="-45">
+                </div>
+                <button class="reset-btn" data-reset="rotZ">↻</button>
             </div>
         </div>
 
         <div class="control-group">
             <label class="control-label">Animation Speed</label>
             <div class="slider-container">
-                <input type="text" class="slider-value" id="speedValue" value="0.5">
-                <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="speedValue" value="0.5">
+                    <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
+                </div>
+                <button class="reset-btn" data-reset="speed">↻</button>
             </div>
         </div>
 
@@ -280,6 +327,15 @@
         let currentTexture = null;
         let currentTextureInside = null;
         
+        const defaultValues = {
+            size: 280,
+            radius: 60,
+            rotX: -45,
+            rotY: 0,
+            rotZ: -45,
+            speed: 0.5
+        };
+
         const state = {
             text: 'RACING FORZA  ',
             canvasWidth: 1920,
@@ -660,6 +716,32 @@
         document.getElementById('textInput').addEventListener('input', e => {
             state.text = e.target.value || 'TYPE ';
             build();
+        });
+
+        // Reset buttons
+        document.querySelectorAll('.reset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.dataset.reset;
+                const defaultValue = defaultValues[key];
+                state[key] = defaultValue;
+
+                // Update slider and value display
+                const slider = document.getElementById(key + 'Slider');
+                const valueInput = document.getElementById(key + 'Value');
+
+                slider.value = defaultValue;
+
+                // Add suffix for rotation values
+                const suffix = (key === 'rotX' || key === 'rotY' || key === 'rotZ') ? '°' : '';
+                valueInput.value = defaultValue + suffix;
+
+                // Trigger appropriate update
+                if (key === 'rotX' || key === 'rotY' || key === 'rotZ') {
+                    updateRotation();
+                } else if (key !== 'speed') {
+                    build();
+                }
+            });
         });
 
         // Background color swatches
