@@ -13,20 +13,24 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
         body {
             font-family: Helvetica, Arial, sans-serif;
             background: #001550;
             color: #82CDFF;
-            min-height: 100vh;
             display: flex;
-            overflow: hidden;
         }
         .control-panel {
             width: 300px;
+            height: 100%;
             background: #001550;
             border-right: 1px solid #003CC4;
             padding: 24px;
             overflow-y: auto;
+            flex-shrink: 0;
         }
         .control-group { margin-bottom: 24px; }
         .control-label {
@@ -157,6 +161,7 @@
         }
         #canvas-container {
             flex: 1;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -293,14 +298,17 @@
             const container = document.getElementById('canvas-container');
             const canvas = renderer.domElement;
 
-            const containerWidth = container.clientWidth;
-            const containerHeight = container.clientHeight;
+            // Use a small timeout to ensure container dimensions are calculated
+            requestAnimationFrame(() => {
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
 
-            const scaleX = containerWidth / state.canvasWidth;
-            const scaleY = containerHeight / state.canvasHeight;
-            const scale = Math.min(scaleX, scaleY) * 0.95; // 95% to add some padding
+                const scaleX = containerWidth / state.canvasWidth;
+                const scaleY = containerHeight / state.canvasHeight;
+                const scale = Math.min(scaleX, scaleY) * 0.9; // 90% to add padding
 
-            canvas.style.transform = `scale(${scale})`;
+                canvas.style.transform = `scale(${scale})`;
+            });
         }
         
         function init() {
