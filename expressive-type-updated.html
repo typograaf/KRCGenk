@@ -12,29 +12,25 @@
             font-style: normal;
         }
         
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #0a1628;
-            color: #e8f0f8;
-            min-height: 100vh;
-            display: flex;
+        html, body {
+            height: 100%;
             overflow: hidden;
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            background: #001550;
+            color: #82CDFF;
+            display: flex;
         }
         .control-panel {
             width: 300px;
-            background: #111d32;
-            border-right: 1px solid #1e3a5f;
+            height: 100%;
+            background: #001550;
+            border-right: 1px solid #003CC4;
             padding: 24px;
             overflow-y: auto;
-        }
-        .panel-title {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 32px;
+            flex-shrink: 0;
         }
         .control-group { margin-bottom: 24px; }
         .control-label {
@@ -42,27 +38,36 @@
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 1.2px;
-            color: #6b7c93;
+            color: #82CDFF;
             margin-bottom: 10px;
             display: block;
         }
         .text-input {
             width: 100%;
-            background: #0a1628;
-            border: 1px solid #1e3a5f;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
             border-radius: 6px;
             padding: 12px 14px;
-            color: #e8f0f8;
+            color: #FFFFFF;
             font-family: inherit;
             font-size: 14px;
         }
-        .text-input:focus { outline: none; border-color: #c4f135; }
-        .slider-container { position: relative; }
+        .text-input:focus { outline: none; border-color: #82CDFF; }
+        .slider-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .slider-wrapper {
+            flex: 1;
+            position: relative;
+        }
         .slider {
             width: 100%;
             height: 6px;
             -webkit-appearance: none;
-            background: #0a1628;
+            background: #003CC4;
             border-radius: 3px;
             cursor: pointer;
         }
@@ -70,7 +75,7 @@
             -webkit-appearance: none;
             width: 18px;
             height: 18px;
-            background: #c4f135;
+            background: #82CDFF;
             border-radius: 50%;
             cursor: pointer;
         }
@@ -79,99 +84,396 @@
             right: 0;
             top: -20px;
             font-size: 11px;
-            color: #6b7c93;
+            color: #82CDFF;
+            background: transparent;
+            border: none;
+            text-align: right;
+            width: 50px;
+            cursor: text;
         }
-        #canvas-container { flex: 1; }
+        .slider-value:focus {
+            outline: none;
+            color: #FFFFFF;
+        }
+        .reset-btn {
+            width: 24px;
+            height: 24px;
+            background: transparent;
+            border: 1px solid #003CC4;
+            border-radius: 4px;
+            color: #82CDFF;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            padding: 0;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .reset-btn:hover {
+            background: #003CC4;
+            border-color: #82CDFF;
+        }
+        .color-swatches {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .color-swatch:hover {
+            border-color: #82CDFF;
+        }
+        .color-swatch.active {
+            border-color: #82CDFF;
+        }
+        .size-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .size-btn {
+            background: #003CC4;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 10px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .size-btn:hover {
+            border-color: #82CDFF;
+        }
+        .size-btn.active {
+            border-color: #82CDFF;
+            background: #82CDFF;
+            color: #001550;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 32px;
+        }
+        .export-btn {
+            flex: 1;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
+            border-radius: 6px;
+            padding: 10px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .export-btn:hover {
+            background: #82CDFF;
+            color: #001550;
+        }
+        .export-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #canvas-container {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        #canvas-container canvas {
+            display: block;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transform-origin: center center;
+            border-radius: 8px;
+        }
+        #grid-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            pointer-events: none;
+            display: none;
+            transform-origin: center center;
+            z-index: 10;
+        }
+        #grid-overlay.visible {
+            display: block;
+        }
+        .easing-editor {
+            margin-top: 8px;
+        }
+        #easingCanvas {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
+            border-radius: 6px;
+            cursor: crosshair;
+            display: block;
+        }
+        .easing-input {
+            width: 100%;
+            background: #003CC4;
+            border: 1px solid #82CDFF;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #FFFFFF;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 8px;
+            text-align: center;
+        }
+        .easing-input:focus {
+            outline: none;
+            border-color: #82CDFF;
+        }
     </style>
 </head>
 <body>
     <div class="control-panel">
-        <div class="panel-title">Expressive Type</div>
-        
         <div class="control-group">
             <label class="control-label">Text</label>
             <input type="text" class="text-input" id="textInput" value="RACING FORZA  ">
         </div>
-        
+
+        <div class="control-group">
+            <label class="control-label">Canvas Size</label>
+            <div class="size-buttons" id="sizeButtons">
+                <button class="size-btn active" data-size="1920x1080">1920x1080</button>
+                <button class="size-btn" data-size="1080x1350">1080x1350</button>
+                <button class="size-btn" data-size="1080x1920">1080x1920</button>
+                <button class="size-btn" data-size="1920x1920">1920x1920</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Background Color</label>
+            <div class="color-swatches" id="bgColorSwatches">
+                <div class="color-swatch active" data-color="82CDFF" style="background-color: #82CDFF;"></div>
+                <div class="color-swatch" data-color="001550" style="background-color: #001550;"></div>
+                <div class="color-swatch" data-color="003CC4" style="background-color: #003CC4;"></div>
+                <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Text Color</label>
+            <div class="color-swatches" id="fgColorSwatches">
+                <div class="color-swatch" data-color="82CDFF" style="background-color: #82CDFF;"></div>
+                <div class="color-swatch active" data-color="001550" style="background-color: #001550;"></div>
+                <div class="color-swatch" data-color="003CC4" style="background-color: #003CC4;"></div>
+                <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+            </div>
+        </div>
+
         <div class="control-group">
             <label class="control-label">Shape Size</label>
             <div class="slider-container">
-                <span class="slider-value" id="sizeValue">280</span>
-                <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="sizeValue" value="280">
+                    <input type="range" class="slider" id="sizeSlider" min="150" max="450" value="280">
+                </div>
+                <button class="reset-btn" data-reset="size">↻</button>
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Corner Radius</label>
             <div class="slider-container">
-                <span class="slider-value" id="radiusValue">60</span>
-                <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="radiusValue" value="60">
+                    <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
+                </div>
+                <button class="reset-btn" data-reset="radius">↻</button>
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Rotation X</label>
             <div class="slider-container">
-                <span class="slider-value" id="rotXValue">-25°</span>
-                <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-25">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="rotXValue" value="-45°">
+                    <input type="range" class="slider" id="rotXSlider" min="-90" max="90" value="-45">
+                </div>
+                <button class="reset-btn" data-reset="rotX">↻</button>
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Rotation Y</label>
             <div class="slider-container">
-                <span class="slider-value" id="rotYValue">30°</span>
-                <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="30">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="rotYValue" value="0°">
+                    <input type="range" class="slider" id="rotYSlider" min="-180" max="180" value="0">
+                </div>
+                <button class="reset-btn" data-reset="rotY">↻</button>
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Rotation Z</label>
             <div class="slider-container">
-                <span class="slider-value" id="rotZValue">0°</span>
-                <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="0">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="rotZValue" value="-45°">
+                    <input type="range" class="slider" id="rotZSlider" min="-180" max="180" value="-45">
+                </div>
+                <button class="reset-btn" data-reset="rotZ">↻</button>
             </div>
         </div>
-        
+
         <div class="control-group">
             <label class="control-label">Animation Speed</label>
             <div class="slider-container">
-                <span class="slider-value" id="speedValue">0.5</span>
-                <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="speedValue" value="0.5">
+                    <input type="range" class="slider" id="speedSlider" min="0" max="2" step="0.1" value="0.5">
+                </div>
+                <button class="reset-btn" data-reset="speed">↻</button>
             </div>
         </div>
+
+        <div class="control-group">
+            <label class="control-label">Offset X</label>
+            <div class="slider-container">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="offsetXValue" value="0">
+                    <input type="range" class="slider" id="offsetXSlider" min="-500" max="500" value="0">
+                </div>
+                <button class="reset-btn" data-reset="offsetX">↻</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Offset Y</label>
+            <div class="slider-container">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="offsetYValue" value="0">
+                    <input type="range" class="slider" id="offsetYSlider" min="-500" max="500" value="0">
+                </div>
+                <button class="reset-btn" data-reset="offsetY">↻</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="gridToggle" style="margin-right: 8px;">
+                Show 3×3 Grid
+            </label>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Easing Curve</label>
+            <div class="easing-editor">
+                <canvas id="easingCanvas" width="252" height="252"></canvas>
+                <input type="text" class="easing-input" id="easingInput" value="0.25, 0.25, 0.75, 0.75" placeholder="x1, y1, x2, y2">
+            </div>
+        </div>
+
+        <div class="export-buttons">
+            <button class="export-btn" id="exportPNG">PNG</button>
+            <button class="export-btn" id="exportMP4">MP4</button>
+        </div>
     </div>
-    
-    <div id="canvas-container"></div>
-    
+
+    <div id="canvas-container">
+        <svg id="grid-overlay"></svg>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module">
+        import * as mp4Muxer from 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/+esm';
+        window.mp4Muxer = mp4Muxer;
+    </script>
     <script>
         let scene, camera, renderer, group;
         let textureOffset = 0;
         let currentTexture = null;
+        let currentTextureInside = null;
+        let animationStartTime = 0;
         
-        const state = {
-            text: 'RACING FORZA  ',
+        const defaultValues = {
             size: 280,
             radius: 60,
-            rotX: -25,
-            rotY: 30,
-            rotZ: 0,
-            speed: 0.5
+            rotX: -45,
+            rotY: 0,
+            rotZ: -45,
+            speed: 0.5,
+            offsetX: 0,
+            offsetY: 0
         };
+
+        const state = {
+            text: 'RACING FORZA  ',
+            canvasWidth: 1920,
+            canvasHeight: 1080,
+            size: 280,
+            radius: 60,
+            rotX: -45,
+            rotY: 0,
+            rotZ: -45,
+            speed: 0.5,
+            bgColor: '82CDFF',
+            fgColor: '001550',
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+            showGrid: false,
+            easingP1: { x: 0.25, y: 0.25 },
+            easingP2: { x: 0.75, y: 0.75 }
+        };
+
+        // Easing editor state
+        let easingCanvas, easingCtx;
+        let draggingHandle = null;
+
+        function scaleCanvasToFit() {
+            const container = document.getElementById('canvas-container');
+            const canvas = renderer.domElement;
+
+            // Use a small timeout to ensure container dimensions are calculated
+            requestAnimationFrame(() => {
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+
+                const scaleX = containerWidth / state.canvasWidth;
+                const scaleY = containerHeight / state.canvasHeight;
+                const scale = Math.min(scaleX, scaleY) * 0.9; // 90% to add padding
+
+                canvas.style.transform = `scale(${scale})`;
+
+                // Update grid to match canvas scale
+                updateGrid();
+            });
+        }
         
         function init() {
             const container = document.getElementById('canvas-container');
-            
+
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x7dd3fc);
-            
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 2000);
+            scene.background = new THREE.Color(parseInt(state.bgColor, 16));
+
+            camera = new THREE.PerspectiveCamera(45, state.canvasWidth / state.canvasHeight, 1, 2000);
             camera.position.set(0, 0, 800);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(state.canvasWidth, state.canvasHeight);
+            renderer.setPixelRatio(window.devicePixelRatio || 1); // Use device pixel ratio for sharp rendering
             container.appendChild(renderer.domElement);
             
             scene.add(new THREE.AmbientLight(0xffffff, 0.8));
@@ -181,12 +483,38 @@
             
             group = new THREE.Group();
             scene.add(group);
-            
+
+            // Scale canvas to fit container
+            scaleCanvasToFit();
+
             // Wait for font to load before building
             document.fonts.ready.then(() => {
                 build();
             });
-            
+
+            // Mouse wheel zoom
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY * -0.001;
+                state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
+                group.scale.set(state.zoom, state.zoom, state.zoom);
+
+                // Only increase pixel ratio when zoomed IN (> 1) for sharper rendering
+                const basePixelRatio = window.devicePixelRatio || 1;
+                if (state.zoom > 1) {
+                    const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2); // Cap at 2x
+                    renderer.setPixelRatio(zoomPixelRatio);
+                } else {
+                    // Keep base pixel ratio when zoomed out or at normal zoom
+                    renderer.setPixelRatio(basePixelRatio);
+                }
+            });
+
+            // Window resize
+            window.addEventListener('resize', () => {
+                scaleCanvasToFit();
+            });
+
             // Mouse drag
             let drag = false, prev = {x:0, y:0};
             renderer.domElement.onmousedown = e => { drag = true; prev = {x: e.clientX, y: e.clientY}; };
@@ -202,13 +530,7 @@
                 prev = {x: e.clientX, y: e.clientY};
             };
             document.onmouseup = () => drag = false;
-            
-            window.onresize = () => {
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            };
-            
+
             animate();
         }
         
@@ -228,34 +550,15 @@
         
         function build() {
             clearGroup();
-            
+
             const s = state.size;
             const r = Math.min(state.radius, s/2 - 5);
-            
+
             // Create the text band around the perimeter (this calculates depth)
-            const depth = createTextBand(s, s, r);
-            
-            // Create top and bottom rounded rect faces
-            const shape = createRoundedRectShape(s, s, r);
-            
-            // Top face
-            const topGeom = new THREE.ShapeGeometry(shape);
-            const topMat = new THREE.MeshStandardMaterial({
-                color: 0x7dd3fc,
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.3
-            });
-            const topMesh = new THREE.Mesh(topGeom, topMat);
-            topMesh.position.z = depth / 2;
-            group.add(topMesh);
-            
-            // Bottom face
-            const botMesh = new THREE.Mesh(topGeom.clone(), topMat.clone());
-            botMesh.position.z = -depth / 2;
-            group.add(botMesh);
-            
+            createTextBand(s, s, r);
+
             updateRotation();
+            updateOffset();
         }
         
         function createRoundedRectShape(w, h, r) {
@@ -323,39 +626,44 @@
             ctx.font = `${fontSize}px ${fontFamily}`;
             const metrics = ctx.measureText(text);
             const actualTextWidth = metrics.width;
-            
-            // Use depth * scale but with reduced factor (0.5 instead of 1.0) to reduce padding
-            canvas.width = Math.ceil(actualTextWidth);
-            canvas.height = Math.ceil(depth * scale * 0.5);
-            
-            // Draw background
-            ctx.fillStyle = '#7dd3fc';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw text - calculate proper vertical position using font metrics
-            ctx.font = `${fontSize}px ${fontFamily}`;
-            ctx.fillStyle = '#1e3a5f';
-            ctx.textBaseline = 'alphabetic';
-            
-            // Position text so it's visually centered
-            // Use actualBoundingBoxAscent to find the baseline position
+
+            // Calculate actual text height with minimal padding
             const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
             const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
-            const yPos = canvas.height / 2 + ascent / 2 - descent / 2;
-            
+            const textHeight = ascent + descent;
+
+            canvas.width = Math.ceil(actualTextWidth);
+            canvas.height = Math.ceil(textHeight * 1.1); // Add 10% padding
+
+            // Recalculate actual depth based on canvas height so 3D band matches text size
+            // Account for the 0.75 multiplier used in fontSize calculation
+            const actualDepth = canvas.height / (scale * 0.75);
+
+            // Draw background
+            ctx.fillStyle = '#' + state.bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw text - calculate proper vertical position using font metrics
+            ctx.font = `${fontSize}px ${fontFamily}`;
+            ctx.fillStyle = '#' + state.fgColor;
+            ctx.textBaseline = 'alphabetic';
+
+            // Position text vertically centered (baseline position)
+            const yPos = (canvas.height + ascent - descent) / 2;
+
             ctx.fillText(text, 0, yPos);
-            
+
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.ClampToEdgeWrapping;
             texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
             texture.needsUpdate = true;
-            
-            // Store texture reference for animation
+
+            // Store texture reference for animation (outside face)
             currentTexture = texture;
-            
-            // Build band geometry
-            const halfD = depth / 2;
+
+            // Build band geometry using actual depth
+            const halfD = actualDepth / 2;
             
             const vertices = [];
             const uvs = [];
@@ -395,30 +703,48 @@
             geom.setIndex(indices);
             geom.computeVertexNormals();
             
-            const mat = new THREE.MeshBasicMaterial({
+            // Create outside face (front) - normal rendering
+            const matOutside = new THREE.MeshBasicMaterial({
                 map: texture,
-                side: THREE.DoubleSide
+                side: THREE.FrontSide
             });
-            
-            const bandMesh = new THREE.Mesh(geom, mat);
-            group.add(bandMesh);
-            
-            // Add edge lines
-            const edgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a5f });
-            
-            // Top edge
-            const topEdgeGeom = new THREE.BufferGeometry().setFromPoints(
-                points.map(p => new THREE.Vector3(p.x, p.y, halfD))
-            );
-            group.add(new THREE.LineLoop(topEdgeGeom, edgeMat));
-            
-            // Bottom edge
-            const botEdgeGeom = new THREE.BufferGeometry().setFromPoints(
-                points.map(p => new THREE.Vector3(p.x, p.y, -halfD))
-            );
-            group.add(new THREE.LineLoop(botEdgeGeom, edgeMat));
-            
-            return depth;
+
+            const bandMeshOutside = new THREE.Mesh(geom, matOutside);
+            group.add(bandMeshOutside);
+
+            // Create inside face (back) - needs flipped UVs to scroll same direction
+            const textureInside = texture.clone();
+            textureInside.needsUpdate = true;
+            currentTextureInside = textureInside;
+
+            // Create geometry with flipped UV coordinates for inside face
+            const uvsInside = [];
+            cumLength = 0;
+            for (let i = 0; i < points.length; i++) {
+                if (i > 0) {
+                    cumLength += points[i].distanceTo(points[i-1]);
+                }
+                // Flip U coordinate so inside scrolls same visual direction as outside
+                const u = Math.max(0, Math.min(1, cumLength / totalLength));
+                uvsInside.push(u, 1);  // top
+                uvsInside.push(u, 0);  // bottom
+            }
+
+            const geomInside = new THREE.BufferGeometry();
+            geomInside.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geomInside.setAttribute('uv', new THREE.Float32BufferAttribute(uvsInside, 2));
+            geomInside.setIndex(indices);
+            geomInside.computeVertexNormals();
+
+            const matInside = new THREE.MeshBasicMaterial({
+                map: textureInside,
+                side: THREE.BackSide
+            });
+
+            const bandMeshInside = new THREE.Mesh(geomInside, matInside);
+            group.add(bandMeshInside);
+
+            return actualDepth;
         }
         
         function updateRotation() {
@@ -426,16 +752,348 @@
             group.rotation.y = THREE.MathUtils.degToRad(state.rotY);
             group.rotation.z = THREE.MathUtils.degToRad(state.rotZ);
         }
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            // Animate texture offset
-            if (currentTexture && state.speed > 0) {
-                textureOffset += state.speed * 0.001;
-                currentTexture.offset.x = textureOffset;
+
+        function updateOffset() {
+            group.position.set(state.offsetX, state.offsetY, 0);
+        }
+
+        function updateGrid() {
+            const gridOverlay = document.getElementById('grid-overlay');
+            if (!renderer) return;
+
+            const canvas = renderer.domElement;
+
+            if (state.showGrid) {
+                gridOverlay.classList.add('visible');
+
+                // Set SVG dimensions to match canvas
+                gridOverlay.setAttribute('width', state.canvasWidth);
+                gridOverlay.setAttribute('height', state.canvasHeight);
+
+                // Apply the same transform as the canvas, but also translate to center
+                const canvasTransform = canvas.style.transform || 'scale(1)';
+                gridOverlay.style.transform = `translate(-50%, -50%) ${canvasTransform}`;
+
+                // Clear existing grid
+                gridOverlay.innerHTML = '';
+
+                // Draw 3x3 grid (2 vertical lines, 2 horizontal lines)
+                const cellWidth = state.canvasWidth / 3;
+                const cellHeight = state.canvasHeight / 3;
+
+                // Vertical lines
+                for (let i = 1; i < 3; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', cellWidth * i);
+                    line.setAttribute('y1', 0);
+                    line.setAttribute('x2', cellWidth * i);
+                    line.setAttribute('y2', state.canvasHeight);
+                    line.setAttribute('stroke', 'rgba(130, 205, 255, 0.5)');
+                    line.setAttribute('stroke-width', '2');
+                    gridOverlay.appendChild(line);
+                }
+
+                // Horizontal lines
+                for (let i = 1; i < 3; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', 0);
+                    line.setAttribute('y1', cellHeight * i);
+                    line.setAttribute('x2', state.canvasWidth);
+                    line.setAttribute('y2', cellHeight * i);
+                    line.setAttribute('stroke', 'rgba(130, 205, 255, 0.5)');
+                    line.setAttribute('stroke-width', '2');
+                    gridOverlay.appendChild(line);
+                }
+            } else {
+                gridOverlay.classList.remove('visible');
             }
-            
+        }
+
+        // Cubic bezier easing function
+        function cubicBezier(t, p1, p2) {
+            // For easing, we solve for y given t (time progress)
+            const cx = 3 * p1.x;
+            const bx = 3 * (p2.x - p1.x) - cx;
+            const ax = 1 - cx - bx;
+
+            const cy = 3 * p1.y;
+            const by = 3 * (p2.y - p1.y) - cy;
+            const ay = 1 - cy - by;
+
+            // Calculate y for given t
+            return ((ay * t + by) * t + cy) * t;
+        }
+
+        // Solve for t given x using Newton-Raphson method
+        function solveCubicBezierX(x, p1, p2) {
+            if (x <= 0) return 0;
+            if (x >= 1) return 1;
+
+            const cx = 3 * p1.x;
+            const bx = 3 * (p2.x - p1.x) - cx;
+            const ax = 1 - cx - bx;
+
+            let t = x; // Initial guess
+            for (let i = 0; i < 8; i++) {
+                const currentX = ((ax * t + bx) * t + cx) * t;
+                const currentSlope = (3 * ax * t + 2 * bx) * t + cx;
+                if (Math.abs(currentSlope) < 1e-6) break;
+                t -= (currentX - x) / currentSlope;
+            }
+            return t;
+        }
+
+        // Apply easing to get y from x
+        function applyEasing(x, p1, p2) {
+            const t = solveCubicBezierX(x, p1, p2);
+            return cubicBezier(t, p1, p2);
+        }
+
+        // Draw the bezier curve editor
+        function drawEasingCurve() {
+            if (!easingCanvas || !easingCtx) return;
+
+            const w = easingCanvas.width;
+            const h = easingCanvas.height;
+            const padding = 20;
+            const gridSize = w - padding * 2;
+
+            easingCtx.clearRect(0, 0, w, h);
+
+            // Draw grid background
+            easingCtx.strokeStyle = 'rgba(130, 205, 255, 0.15)';
+            easingCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const x = padding + (gridSize / 4) * i;
+                const y = padding + (gridSize / 4) * i;
+                easingCtx.beginPath();
+                easingCtx.moveTo(x, padding);
+                easingCtx.lineTo(x, padding + gridSize);
+                easingCtx.stroke();
+                easingCtx.beginPath();
+                easingCtx.moveTo(padding, y);
+                easingCtx.lineTo(padding + gridSize, y);
+                easingCtx.stroke();
+            }
+
+            // Convert normalized coords to canvas coords
+            const toCanvasX = (x) => padding + x * gridSize;
+            const toCanvasY = (y) => padding + gridSize - y * gridSize;
+
+            // Draw bezier curve
+            easingCtx.strokeStyle = '#82CDFF';
+            easingCtx.lineWidth = 2;
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
+
+            // Draw curve with many segments for smooth appearance
+            for (let i = 0; i <= 100; i++) {
+                const t = i / 100;
+                const x = ((1 - t) ** 3) * 0 + 3 * ((1 - t) ** 2) * t * state.easingP1.x +
+                          3 * (1 - t) * (t ** 2) * state.easingP2.x + (t ** 3) * 1;
+                const y = ((1 - t) ** 3) * 0 + 3 * ((1 - t) ** 2) * t * state.easingP1.y +
+                          3 * (1 - t) * (t ** 2) * state.easingP2.y + (t ** 3) * 1;
+                easingCtx.lineTo(toCanvasX(x), toCanvasY(y));
+            }
+            easingCtx.stroke();
+
+            // Draw control lines
+            easingCtx.strokeStyle = 'rgba(130, 205, 255, 0.3)';
+            easingCtx.lineWidth = 1;
+            easingCtx.setLineDash([4, 4]);
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
+            easingCtx.lineTo(toCanvasX(state.easingP1.x), toCanvasY(state.easingP1.y));
+            easingCtx.stroke();
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(1), toCanvasY(1));
+            easingCtx.lineTo(toCanvasX(state.easingP2.x), toCanvasY(state.easingP2.y));
+            easingCtx.stroke();
+            easingCtx.setLineDash([]);
+
+            // Draw handles
+            const drawHandle = (x, y, active) => {
+                easingCtx.fillStyle = active ? '#FFFFFF' : '#82CDFF';
+                easingCtx.strokeStyle = '#001550';
+                easingCtx.lineWidth = 2;
+                easingCtx.beginPath();
+                easingCtx.arc(toCanvasX(x), toCanvasY(y), 6, 0, Math.PI * 2);
+                easingCtx.fill();
+                easingCtx.stroke();
+            };
+
+            drawHandle(state.easingP1.x, state.easingP1.y, draggingHandle === 'p1');
+            drawHandle(state.easingP2.x, state.easingP2.y, draggingHandle === 'p2');
+
+            // Draw start and end points
+            easingCtx.fillStyle = '#FFFFFF';
+            easingCtx.beginPath();
+            easingCtx.arc(toCanvasX(0), toCanvasY(0), 4, 0, Math.PI * 2);
+            easingCtx.fill();
+            easingCtx.beginPath();
+            easingCtx.arc(toCanvasX(1), toCanvasY(1), 4, 0, Math.PI * 2);
+            easingCtx.fill();
+        }
+
+        // Initialize easing editor
+        function initEasingEditor() {
+            easingCanvas = document.getElementById('easingCanvas');
+            easingCtx = easingCanvas.getContext('2d');
+
+            const padding = 20;
+
+            // Helper functions to convert between canvas and normalized coordinates
+            const getGridSize = () => easingCanvas.width - padding * 2;
+
+            const toCanvasCoords = (nx, ny) => {
+                const gridSize = getGridSize();
+                return {
+                    x: padding + nx * gridSize,
+                    y: padding + gridSize - ny * gridSize
+                };
+            };
+
+            const fromCanvasCoords = (cx, cy) => {
+                const rect = easingCanvas.getBoundingClientRect();
+                const scaleX = easingCanvas.width / rect.width;
+                const scaleY = easingCanvas.height / rect.height;
+                const gridSize = getGridSize();
+
+                // Scale mouse position to canvas coordinates
+                const canvasX = cx * scaleX;
+                const canvasY = cy * scaleY;
+
+                return {
+                    x: Math.max(0, Math.min(1, (canvasX - padding) / gridSize)),
+                    y: Math.max(0, Math.min(1, 1 - (canvasY - padding) / gridSize))
+                };
+            };
+
+            const getHandleAt = (mouseX, mouseY) => {
+                const rect = easingCanvas.getBoundingClientRect();
+                const scaleX = easingCanvas.width / rect.width;
+                const scaleY = easingCanvas.height / rect.height;
+
+                // Scale mouse position to canvas coordinates
+                const canvasX = mouseX * scaleX;
+                const canvasY = mouseY * scaleY;
+
+                const p1Pos = toCanvasCoords(state.easingP1.x, state.easingP1.y);
+                const p2Pos = toCanvasCoords(state.easingP2.x, state.easingP2.y);
+
+                const dist1 = Math.hypot(canvasX - p1Pos.x, canvasY - p1Pos.y);
+                const dist2 = Math.hypot(canvasX - p2Pos.x, canvasY - p2Pos.y);
+
+                if (dist1 < 15) return 'p1';
+                if (dist2 < 15) return 'p2';
+                return null;
+            };
+
+            easingCanvas.addEventListener('mousedown', (e) => {
+                const rect = easingCanvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                draggingHandle = getHandleAt(mouseX, mouseY);
+                if (draggingHandle) {
+                    e.preventDefault();
+                    drawEasingCurve();
+                }
+            });
+
+            const handleMouseMove = (e) => {
+                if (!draggingHandle) return;
+
+                const rect = easingCanvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const normalized = fromCanvasCoords(mouseX, mouseY);
+
+                if (draggingHandle === 'p1') {
+                    state.easingP1.x = normalized.x;
+                    state.easingP1.y = normalized.y;
+                } else if (draggingHandle === 'p2') {
+                    state.easingP2.x = normalized.x;
+                    state.easingP2.y = normalized.y;
+                }
+
+                updateEasingInput();
+                drawEasingCurve();
+            };
+
+            const handleMouseUp = () => {
+                if (draggingHandle) {
+                    draggingHandle = null;
+                    drawEasingCurve();
+                }
+            };
+
+            easingCanvas.addEventListener('mousemove', handleMouseMove);
+            easingCanvas.addEventListener('mouseup', handleMouseUp);
+            easingCanvas.addEventListener('mouseleave', handleMouseUp);
+
+            // Add document-level handlers for better dragging experience
+            document.addEventListener('mousemove', (e) => {
+                if (draggingHandle) {
+                    handleMouseMove(e);
+                }
+            });
+
+            document.addEventListener('mouseup', handleMouseUp);
+
+            drawEasingCurve();
+        }
+
+        function updateEasingInput() {
+            const input = document.getElementById('easingInput');
+            const p1x = Math.round(state.easingP1.x * 100) / 100;
+            const p1y = Math.round(state.easingP1.y * 100) / 100;
+            const p2x = Math.round(state.easingP2.x * 100) / 100;
+            const p2y = Math.round(state.easingP2.y * 100) / 100;
+            input.value = `${p1x}, ${p1y}, ${p2x}, ${p2y}`;
+        }
+
+        function parseEasingInput() {
+            const input = document.getElementById('easingInput');
+            const parts = input.value.split(',').map(s => parseFloat(s.trim()));
+
+            if (parts.length === 4 && parts.every(p => !isNaN(p))) {
+                state.easingP1.x = Math.max(0, Math.min(1, parts[0]));
+                state.easingP1.y = Math.max(0, Math.min(1, parts[1]));
+                state.easingP2.x = Math.max(0, Math.min(1, parts[2]));
+                state.easingP2.y = Math.max(0, Math.min(1, parts[3]));
+                drawEasingCurve();
+            } else {
+                updateEasingInput(); // Reset to valid values
+            }
+        }
+        
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+
+            if (!animationStartTime) animationStartTime = timestamp;
+
+            // Animate texture offset with easing
+            if (state.speed > 0) {
+                // Calculate progress through cycle (2 seconds per cycle, adjusted by speed)
+                const cycleDuration = 2000 / state.speed; // milliseconds
+                const elapsed = (timestamp - animationStartTime) % cycleDuration;
+                const linearProgress = elapsed / cycleDuration;
+
+                // Apply easing to progress
+                const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+
+                // Set texture offset based on eased progress
+                const offset = easedProgress;
+
+                if (currentTexture) {
+                    currentTexture.offset.x = offset;
+                }
+                if (currentTextureInside) {
+                    currentTextureInside.offset.x = offset;
+                }
+            }
+
             renderer.render(scene, camera);
         }
         
@@ -446,16 +1104,38 @@
             ['rotXSlider', 'rotXValue', 'rotX', '°'],
             ['rotYSlider', 'rotYValue', 'rotY', '°'],
             ['rotZSlider', 'rotZValue', 'rotZ', '°'],
-            ['speedSlider', 'speedValue', 'speed', '']
+            ['speedSlider', 'speedValue', 'speed', ''],
+            ['offsetXSlider', 'offsetXValue', 'offsetX', ''],
+            ['offsetYSlider', 'offsetYValue', 'offsetY', '']
         ];
         
         sliders.forEach(([id, valId, key, suf]) => {
-            document.getElementById(id).addEventListener('input', e => {
+            const slider = document.getElementById(id);
+            const valueInput = document.getElementById(valId);
+
+            // Slider input updates value display
+            slider.addEventListener('input', e => {
                 state[key] = parseFloat(e.target.value);
-                document.getElementById(valId).textContent = e.target.value + suf;
+                valueInput.value = e.target.value + suf;
                 if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
+                else if (key === 'offsetX' || key === 'offsetY') updateOffset();
                 else if (key !== 'speed') build();
-                // Speed changes don't need rebuild, just affect animation
+            });
+
+            // Value input updates slider and state
+            valueInput.addEventListener('input', e => {
+                const numValue = parseFloat(e.target.value.replace(suf, ''));
+                if (!isNaN(numValue)) {
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    const clampedValue = Math.max(min, Math.min(max, numValue));
+                    state[key] = clampedValue;
+                    slider.value = clampedValue;
+                    valueInput.value = clampedValue + suf;
+                    if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
+                    else if (key === 'offsetX' || key === 'offsetY') updateOffset();
+                    else if (key !== 'speed') build();
+                }
             });
         });
         
@@ -463,13 +1143,314 @@
             state.text = e.target.value || 'TYPE ';
             build();
         });
-        
+
+        // Reset buttons
+        document.querySelectorAll('.reset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.dataset.reset;
+                const defaultValue = defaultValues[key];
+                state[key] = defaultValue;
+
+                // Update slider and value display
+                const slider = document.getElementById(key + 'Slider');
+                const valueInput = document.getElementById(key + 'Value');
+
+                slider.value = defaultValue;
+
+                // Add suffix for rotation values
+                const suffix = (key === 'rotX' || key === 'rotY' || key === 'rotZ') ? '°' : '';
+                valueInput.value = defaultValue + suffix;
+
+                // Trigger appropriate update
+                if (key === 'rotX' || key === 'rotY' || key === 'rotZ') {
+                    updateRotation();
+                } else if (key === 'offsetX' || key === 'offsetY') {
+                    updateOffset();
+                } else if (key !== 'speed') {
+                    build();
+                }
+            });
+        });
+
+        // Grid toggle
+        document.getElementById('gridToggle').addEventListener('change', e => {
+            state.showGrid = e.target.checked;
+            updateGrid();
+        });
+
+        // Easing input
+        document.getElementById('easingInput').addEventListener('blur', parseEasingInput);
+        document.getElementById('easingInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                parseEasingInput();
+                e.target.blur();
+            }
+        });
+
+        // Background color swatches
+        document.querySelectorAll('#bgColorSwatches .color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', e => {
+                document.querySelectorAll('#bgColorSwatches .color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+                state.bgColor = swatch.dataset.color;
+                scene.background = new THREE.Color(parseInt(state.bgColor, 16));
+                build();
+            });
+        });
+
+        // Foreground color swatches
+        document.querySelectorAll('#fgColorSwatches .color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', e => {
+                document.querySelectorAll('#fgColorSwatches .color-swatch').forEach(s => s.classList.remove('active'));
+                swatch.classList.add('active');
+                state.fgColor = swatch.dataset.color;
+                build();
+            });
+        });
+
+        // Canvas size buttons
+        document.querySelectorAll('#sizeButtons .size-btn').forEach(btn => {
+            btn.addEventListener('click', e => {
+                document.querySelectorAll('#sizeButtons .size-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const [width, height] = btn.dataset.size.split('x').map(Number);
+                state.canvasWidth = width;
+                state.canvasHeight = height;
+
+                // Update camera and renderer
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+
+                // Scale canvas to fit new dimensions (also updates grid)
+                scaleCanvasToFit();
+            });
+        });
+
+        // Export PNG
+        document.getElementById('exportPNG').addEventListener('click', () => {
+            // Temporarily reset pixel ratio and zoom for export
+            const currentPixelRatio = renderer.getPixelRatio();
+            const currentZoom = state.zoom;
+
+            renderer.setPixelRatio(1);
+            group.scale.set(1, 1, 1);
+            renderer.render(scene, camera);
+
+            const dataURL = renderer.domElement.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'expressive-type-' + Date.now() + '.png';
+            link.href = dataURL;
+            link.click();
+
+            // Restore zoom and pixel ratio
+            group.scale.set(currentZoom, currentZoom, currentZoom);
+            renderer.setPixelRatio(currentPixelRatio);
+        });
+
+        // Export MP4
+        let isRecording = false;
+        let muxer;
+        let videoEncoder;
+        let frameNumber = 0;
+        let totalFrames = 0;
+        let captureFrameId = null;
+
+        document.getElementById('exportMP4').addEventListener('click', async () => {
+            const btn = document.getElementById('exportMP4');
+
+            if (isRecording) {
+                // Already recording, ignore
+                return;
+            }
+
+            // Start recording one complete cycle
+            isRecording = true;
+            frameNumber = 0;
+
+            // Calculate frames needed for one complete animation cycle
+            const cycleDuration = 2000 / state.speed; // milliseconds
+            totalFrames = Math.ceil((cycleDuration / 1000) * 60); // 60fps
+
+            btn.textContent = 'Exporting...';
+            btn.style.background = '#82CDFF';
+            btn.style.color = '#001550';
+            btn.disabled = true;
+
+                // Wait for mp4-muxer to load
+                await new Promise(resolve => {
+                    const check = () => {
+                        if (window.mp4Muxer) resolve();
+                        else setTimeout(check, 50);
+                    };
+                    check();
+                });
+
+                const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
+
+                // Use full canvas resolution for video export
+                const videoWidth = renderer.domElement.width;
+                const videoHeight = renderer.domElement.height;
+
+                console.log(`Video export: ${videoWidth}x${videoHeight} (${videoWidth * videoHeight} pixels)`);
+
+                // Setup muxer
+                const target = new ArrayBufferTarget();
+                muxer = new Muxer({
+                    target,
+                    video: {
+                        codec: 'avc',
+                        width: videoWidth,
+                        height: videoHeight
+                    },
+                    fastStart: 'in-memory',
+                    firstTimestampBehavior: 'offset'
+                });
+
+                // Setup video encoder
+                let encoderFailed = false;
+                videoEncoder = new VideoEncoder({
+                    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+                    error: e => {
+                        console.error('Encoder error:', e);
+                        encoderFailed = true;
+                        isRecording = false;
+                        alert('Video encoder failed: ' + e.message);
+                        btn.textContent = 'MP4';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.disabled = false;
+                    }
+                });
+
+                try {
+                    videoEncoder.configure({
+                        codec: 'avc1.640033', // High profile level 5.1 (supports 4K and higher)
+                        width: videoWidth,
+                        height: videoHeight,
+                        bitrate: 15_000_000,
+                        framerate: 60
+                    });
+
+                    // Wait a bit to ensure configuration completes
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                    if (encoderFailed || videoEncoder.state !== 'configured') {
+                        throw new Error('Encoder failed to configure. Resolution: ' + videoWidth + 'x' + videoHeight);
+                    }
+
+                    console.log('Encoder configured successfully');
+                } catch (e) {
+                    console.error('Failed to configure encoder:', e);
+                    alert('Failed to start video export: ' + e.message);
+                    isRecording = false;
+                    btn.textContent = 'MP4';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    return;
+                }
+
+                // Capture frames - render as fast as possible
+                const captureFrame = () => {
+                    if (encoderFailed) {
+                        return;
+                    }
+
+                    // Check if we've captured all frames for one complete cycle
+                    if (frameNumber >= totalFrames) {
+                        console.log('Captured all frames, finalizing video...');
+                        isRecording = false;
+
+                        // Finalize
+                        videoEncoder.flush().then(() => {
+                            console.log('Encoder flushed, finalizing muxer...');
+                            videoEncoder.close();
+                            muxer.finalize();
+                            const { buffer } = muxer.target;
+                            console.log('Muxer finalized, buffer size:', buffer.byteLength);
+                            const blob = new Blob([buffer], { type: 'video/mp4' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.download = 'expressive-type-' + Date.now() + '.mp4';
+                            link.href = url;
+                            link.click();
+                            console.log('Download triggered');
+                            URL.revokeObjectURL(url);
+                            btn.textContent = 'MP4';
+                            btn.style.background = '';
+                            btn.style.color = '';
+                            btn.disabled = false;
+                        }).catch(e => {
+                            console.error('Error finalizing video:', e);
+                            alert('Error creating video: ' + e.message);
+                            btn.textContent = 'MP4';
+                            btn.style.background = '';
+                            btn.style.color = '';
+                            btn.disabled = false;
+                        });
+                        return;
+                    }
+
+                    // Check if encoder is still configured
+                    if (videoEncoder.state !== 'configured') {
+                        console.error('Encoder not configured, stopping capture');
+                        isRecording = false;
+                        return;
+                    }
+
+                    // Check if encoder can accept more frames
+                    if (videoEncoder.encodeQueueSize > 30) {
+                        // Wait a bit if queue is too full
+                        captureFrameId = setTimeout(captureFrame, 10);
+                        return;
+                    }
+
+                    // Calculate animation progress for this frame (0.0 to 1.0)
+                    const linearProgress = frameNumber / totalFrames;
+                    const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+
+                    // Update textures with the calculated progress
+                    if (currentTexture) {
+                        currentTexture.offset.x = easedProgress;
+                    }
+                    if (currentTextureInside) {
+                        currentTextureInside.offset.x = easedProgress;
+                    }
+
+                    // Render frame
+                    renderer.render(scene, camera);
+
+                    // Create canvas at scaled resolution
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = videoWidth;
+                    tempCanvas.height = videoHeight;
+                    const tempCtx = tempCanvas.getContext('2d');
+                    tempCtx.drawImage(renderer.domElement, 0, 0, videoWidth, videoHeight);
+
+                    const frame = new VideoFrame(tempCanvas, {
+                        timestamp: (frameNumber * 1_000_000) / 60
+                    });
+
+                    videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                    frame.close();
+
+                    frameNumber++;
+
+                    // Render next frame immediately (as fast as possible)
+                    captureFrameId = requestAnimationFrame(captureFrame);
+                };
+
+                captureFrame();
+        });
+
         // Load custom font then initialize
         document.fonts.load('100px Genk').then(() => {
             init();
+            initEasingEditor();
         }).catch(() => {
             // Fallback if font fails to load
             init();
+            initEasingEditor();
         });
     </script>
 </body>
