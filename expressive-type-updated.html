@@ -1132,9 +1132,21 @@
             const toCanvasX = (x) => padding + x * gridSize;
             const toCanvasY = (y) => padding + gridSize - y * gridSize;
 
-            // Draw the cubic bezier curve
+            // Draw handle lines (from origin to control points)
             easingCtx.strokeStyle = '#82CDFF';
             easingCtx.lineWidth = 1;
+            // Line from (0,0) to P1
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
+            easingCtx.lineTo(toCanvasX(state.easingP1.x), toCanvasY(state.easingP1.y));
+            easingCtx.stroke();
+            // Line from (1,1) to P2
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(1), toCanvasY(1));
+            easingCtx.lineTo(toCanvasX(state.easingP2.x), toCanvasY(state.easingP2.y));
+            easingCtx.stroke();
+
+            // Draw the cubic bezier curve
             easingCtx.beginPath();
             easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
             easingCtx.bezierCurveTo(
