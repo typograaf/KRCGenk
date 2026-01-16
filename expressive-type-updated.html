@@ -203,6 +203,15 @@
             transform-origin: center center;
             border-radius: 8px;
         }
+        #grid-overlay {
+            position: absolute;
+            pointer-events: none;
+            display: none;
+            transform-origin: center center;
+        }
+        #grid-overlay.visible {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -308,13 +317,44 @@
             </div>
         </div>
 
+        <div class="control-group">
+            <label class="control-label">Offset X</label>
+            <div class="slider-container">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="offsetXValue" value="0">
+                    <input type="range" class="slider" id="offsetXSlider" min="-500" max="500" value="0">
+                </div>
+                <button class="reset-btn" data-reset="offsetX">↻</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Offset Y</label>
+            <div class="slider-container">
+                <div class="slider-wrapper">
+                    <input type="text" class="slider-value" id="offsetYValue" value="0">
+                    <input type="range" class="slider" id="offsetYSlider" min="-500" max="500" value="0">
+                </div>
+                <button class="reset-btn" data-reset="offsetY">↻</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="gridToggle" style="margin-right: 8px;">
+                Show 3×3 Grid
+            </label>
+        </div>
+
         <div class="export-buttons">
             <button class="export-btn" id="exportPNG">PNG</button>
             <button class="export-btn" id="exportMP4">MP4</button>
         </div>
     </div>
-    
-    <div id="canvas-container"></div>
+
+    <div id="canvas-container">
+        <svg id="grid-overlay"></svg>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script type="module">
@@ -333,7 +373,9 @@
             rotX: -45,
             rotY: 0,
             rotZ: -45,
-            speed: 0.5
+            speed: 0.5,
+            offsetX: 0,
+            offsetY: 0
         };
 
         const state = {
@@ -348,7 +390,10 @@
             speed: 0.5,
             bgColor: '82CDFF',
             fgColor: '001550',
-            zoom: 1
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+            showGrid: false
         };
 
         function scaleCanvasToFit() {
@@ -365,6 +410,9 @@
                 const scale = Math.min(scaleX, scaleY) * 0.9; // 90% to add padding
 
                 canvas.style.transform = `scale(${scale})`;
+
+                // Update grid to match canvas scale
+                updateGrid();
             });
         }
         
@@ -456,14 +504,15 @@
         
         function build() {
             clearGroup();
-            
+
             const s = state.size;
             const r = Math.min(state.radius, s/2 - 5);
-            
+
             // Create the text band around the perimeter (this calculates depth)
             createTextBand(s, s, r);
 
             updateRotation();
+            updateOffset();
         }
         
         function createRoundedRectShape(w, h, r) {
@@ -657,6 +706,60 @@
             group.rotation.y = THREE.MathUtils.degToRad(state.rotY);
             group.rotation.z = THREE.MathUtils.degToRad(state.rotZ);
         }
+
+        function updateOffset() {
+            group.position.set(state.offsetX, state.offsetY, 0);
+        }
+
+        function updateGrid() {
+            const gridOverlay = document.getElementById('grid-overlay');
+            const canvas = renderer.domElement;
+
+            if (state.showGrid) {
+                gridOverlay.classList.add('visible');
+
+                // Match the canvas size and scale
+                const canvasStyle = window.getComputedStyle(canvas);
+                const transform = canvasStyle.transform;
+
+                gridOverlay.setAttribute('width', state.canvasWidth);
+                gridOverlay.setAttribute('height', state.canvasHeight);
+                gridOverlay.style.transform = canvas.style.transform;
+
+                // Clear existing grid
+                gridOverlay.innerHTML = '';
+
+                // Draw 3x3 grid (4 vertical lines, 4 horizontal lines)
+                const cellWidth = state.canvasWidth / 3;
+                const cellHeight = state.canvasHeight / 3;
+
+                // Vertical lines
+                for (let i = 1; i < 3; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', cellWidth * i);
+                    line.setAttribute('y1', 0);
+                    line.setAttribute('x2', cellWidth * i);
+                    line.setAttribute('y2', state.canvasHeight);
+                    line.setAttribute('stroke', 'rgba(130, 205, 255, 0.5)');
+                    line.setAttribute('stroke-width', '2');
+                    gridOverlay.appendChild(line);
+                }
+
+                // Horizontal lines
+                for (let i = 1; i < 3; i++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', 0);
+                    line.setAttribute('y1', cellHeight * i);
+                    line.setAttribute('x2', state.canvasWidth);
+                    line.setAttribute('y2', cellHeight * i);
+                    line.setAttribute('stroke', 'rgba(130, 205, 255, 0.5)');
+                    line.setAttribute('stroke-width', '2');
+                    gridOverlay.appendChild(line);
+                }
+            } else {
+                gridOverlay.classList.remove('visible');
+            }
+        }
         
         function animate() {
             requestAnimationFrame(animate);
@@ -682,7 +785,9 @@
             ['rotXSlider', 'rotXValue', 'rotX', '°'],
             ['rotYSlider', 'rotYValue', 'rotY', '°'],
             ['rotZSlider', 'rotZValue', 'rotZ', '°'],
-            ['speedSlider', 'speedValue', 'speed', '']
+            ['speedSlider', 'speedValue', 'speed', ''],
+            ['offsetXSlider', 'offsetXValue', 'offsetX', ''],
+            ['offsetYSlider', 'offsetYValue', 'offsetY', '']
         ];
         
         sliders.forEach(([id, valId, key, suf]) => {
@@ -694,6 +799,7 @@
                 state[key] = parseFloat(e.target.value);
                 valueInput.value = e.target.value + suf;
                 if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
+                else if (key === 'offsetX' || key === 'offsetY') updateOffset();
                 else if (key !== 'speed') build();
             });
 
@@ -708,6 +814,7 @@
                     slider.value = clampedValue;
                     valueInput.value = clampedValue + suf;
                     if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
+                    else if (key === 'offsetX' || key === 'offsetY') updateOffset();
                     else if (key !== 'speed') build();
                 }
             });
@@ -738,10 +845,18 @@
                 // Trigger appropriate update
                 if (key === 'rotX' || key === 'rotY' || key === 'rotZ') {
                     updateRotation();
+                } else if (key === 'offsetX' || key === 'offsetY') {
+                    updateOffset();
                 } else if (key !== 'speed') {
                     build();
                 }
             });
+        });
+
+        // Grid toggle
+        document.getElementById('gridToggle').addEventListener('change', e => {
+            state.showGrid = e.target.checked;
+            updateGrid();
         });
 
         // Background color swatches
@@ -779,7 +894,7 @@
                 camera.updateProjectionMatrix();
                 renderer.setSize(width, height);
 
-                // Scale canvas to fit new dimensions
+                // Scale canvas to fit new dimensions (also updates grid)
                 scaleCanvasToFit();
             });
         });
