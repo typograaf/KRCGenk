@@ -1253,18 +1253,29 @@
         let muxer;
         let videoEncoder;
         let frameNumber = 0;
+        let totalFrames = 0;
         let captureFrameId = null;
 
         document.getElementById('exportMP4').addEventListener('click', async () => {
             const btn = document.getElementById('exportMP4');
 
-            if (!isRecording) {
-                // Start recording
-                isRecording = true;
-                frameNumber = 0;
-                btn.textContent = 'Stop';
-                btn.style.background = '#82CDFF';
-                btn.style.color = '#001550';
+            if (isRecording) {
+                // Already recording, ignore
+                return;
+            }
+
+            // Start recording one complete cycle
+            isRecording = true;
+            frameNumber = 0;
+
+            // Calculate frames needed for one complete animation cycle
+            const cycleDuration = 2000 / state.speed; // milliseconds
+            totalFrames = Math.ceil((cycleDuration / 1000) * 60); // 60fps
+
+            btn.textContent = 'Exporting...';
+            btn.style.background = '#82CDFF';
+            btn.style.color = '#001550';
+            btn.disabled = true;
 
                 // Wait for mp4-muxer to load
                 await new Promise(resolve => {
@@ -1354,8 +1365,11 @@
                     if (encoderFailed) {
                         return;
                     }
-                    if (!isRecording) {
-                        console.log('Finalizing video...');
+
+                    // Check if we've captured all frames for one complete cycle
+                    if (frameNumber >= totalFrames) {
+                        console.log('Captured all frames, finalizing video...');
+                        isRecording = false;
 
                         // Finalize
                         videoEncoder.flush().then(() => {
@@ -1401,7 +1415,19 @@
                         return;
                     }
 
-                    // Render and capture frame
+                    // Calculate animation progress for this frame (0.0 to 1.0)
+                    const linearProgress = frameNumber / totalFrames;
+                    const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+
+                    // Update textures with the calculated progress
+                    if (currentTexture) {
+                        currentTexture.offset.x = easedProgress;
+                    }
+                    if (currentTextureInside) {
+                        currentTextureInside.offset.x = easedProgress;
+                    }
+
+                    // Render frame
                     renderer.render(scene, camera);
 
                     // Create canvas at scaled resolution
@@ -1425,13 +1451,6 @@
                 };
 
                 captureFrame();
-            } else {
-                // Stop recording
-                console.log('Stop button clicked');
-                isRecording = false;
-                btn.textContent = 'Processing...';
-                btn.disabled = true;
-            }
         });
 
         // Load custom font then initialize
