@@ -1288,21 +1288,11 @@
 
                 const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
 
-                // Scale down resolution for video export (max 720p for AVC level 3.1)
-                const canvasWidth = renderer.domElement.width;
-                const canvasHeight = renderer.domElement.height;
-                const maxPixels = 921600; // 1280x720 = max for AVC level 3.1
+                // Use full canvas resolution for video export
+                const videoWidth = renderer.domElement.width;
+                const videoHeight = renderer.domElement.height;
 
-                let scale = 1;
-                const currentPixels = canvasWidth * canvasHeight;
-                if (currentPixels > maxPixels) {
-                    scale = Math.sqrt(maxPixels / currentPixels);
-                }
-
-                const videoWidth = Math.floor(canvasWidth * scale);
-                const videoHeight = Math.floor(canvasHeight * scale);
-
-                console.log(`Canvas: ${canvasWidth}x${canvasHeight}, Video: ${videoWidth}x${videoHeight} (${videoWidth * videoHeight} pixels)`);
+                console.log(`Video export: ${videoWidth}x${videoHeight} (${videoWidth * videoHeight} pixels)`);
 
                 // Setup muxer
                 const target = new ArrayBufferTarget();
@@ -1335,10 +1325,10 @@
 
                 try {
                     videoEncoder.configure({
-                        codec: 'avc1.42001f', // Baseline profile level 3.1 (widely supported)
+                        codec: 'avc1.640028', // High profile level 4.0 (supports higher resolutions)
                         width: videoWidth,
                         height: videoHeight,
-                        bitrate: 8_000_000,
+                        bitrate: 15_000_000,
                         framerate: 60
                     });
 
