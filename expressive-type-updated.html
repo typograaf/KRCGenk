@@ -505,14 +505,14 @@
                 height: 50vh;
                 flex-shrink: 0;
                 order: -1;
-                border-radius: 0;
+                border-radius: 0 0 6px 6px;
                 position: sticky;
                 top: 0;
                 z-index: 100;
             }
 
             #canvas-container canvas {
-                border-radius: 0;
+                border-radius: 0 0 6px 6px;
             }
 
             .sidebar-left {
@@ -520,6 +520,9 @@
                 height: auto;
                 padding: 16px;
                 flex-shrink: 0;
+                border-radius: 6px 6px 0 0;
+                margin-top: -6px;
+                background: #001550;
             }
 
             .sidebar-left-content {
@@ -631,8 +634,12 @@
         }
 
         @media (max-width: 480px) {
-            .sidebar-left, .sidebar-right {
+            .sidebar-left {
                 padding: 12px;
+            }
+
+            .sidebar-right {
+                padding: 0 12px 12px 12px;
             }
 
             #canvas-container {
