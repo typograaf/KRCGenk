@@ -554,22 +554,85 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .sidebar-left, .sidebar-right {
-                padding: 12px;
+        @media (max-width: 900px) {
+            .control-label,
+            .slider-label,
+            .toggle-label {
+                font-size: 14px;
             }
 
-            .header-title {
-                font-size: 11px;
+            .slider-value {
+                font-size: 12px;
             }
 
             .size-btn {
-                padding: 10px 8px;
-                font-size: 7px;
+                font-size: 11px;
+                padding: 14px 12px;
             }
 
             .output-btn {
-                padding: 10px;
+                font-size: 11px;
+                padding: 14px;
+            }
+
+            .text-input {
+                font-size: 14px;
+                padding: 14px;
+            }
+
+            .easing-input {
+                font-size: 11px;
+                padding: 14px;
+            }
+
+            .color-swatch {
+                width: 32px;
+                height: 32px;
+            }
+
+            .slider {
+                height: 20px;
+            }
+
+            .slider::-webkit-slider-thumb {
+                width: 18px;
+                height: 18px;
+                margin-top: -8px;
+            }
+
+            .reset-btn,
+            .toggle-box {
+                width: 24px;
+                height: 24px;
+            }
+
+            .reset-btn svg {
+                width: 10px;
+                height: 12px;
+            }
+
+            .toggle-box svg {
+                width: 10px;
+                height: 6px;
+            }
+
+            .header-title {
+                font-size: 14px;
+            }
+
+            .header-icon {
+                width: 18px;
+                height: 23px;
+            }
+
+            #easingCanvas {
+                min-height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar-left, .sidebar-right {
+                padding: 12px;
             }
 
             #canvas-container {
@@ -1350,10 +1413,11 @@
             easingCtx.stroke();
 
             // Draw handles
+            const handleRadius = 'ontouchstart' in window ? 6 : 3;
             const drawHandle = (x, y) => {
                 easingCtx.fillStyle = '#82CDFF';
                 easingCtx.beginPath();
-                easingCtx.arc(toCanvasX(x), toCanvasY(y), 3, 0, Math.PI * 2);
+                easingCtx.arc(toCanvasX(x), toCanvasY(y), handleRadius, 0, Math.PI * 2);
                 easingCtx.fill();
             };
 
@@ -1405,8 +1469,11 @@
                 const dist1 = Math.hypot(mouseX - p1Pos.x, mouseY - p1Pos.y);
                 const dist2 = Math.hypot(mouseX - p2Pos.x, mouseY - p2Pos.y);
 
-                if (dist1 < 15) return 'p1';
-                if (dist2 < 15) return 'p2';
+                // Larger hit area for touch devices
+                const hitRadius = 'ontouchstart' in window ? 25 : 15;
+
+                if (dist1 < hitRadius) return 'p1';
+                if (dist2 < hitRadius) return 'p2';
                 return null;
             };
 
@@ -1460,6 +1527,49 @@
             });
 
             document.addEventListener('mouseup', handleMouseUp);
+
+            // Touch support for easing curve
+            easingCanvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = easingCanvas.getBoundingClientRect();
+                const touchX = touch.clientX - rect.left;
+                const touchY = touch.clientY - rect.top;
+                draggingHandle = getHandleAt(touchX, touchY);
+                if (draggingHandle) {
+                    drawEasingCurve();
+                }
+            }, { passive: false });
+
+            easingCanvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!draggingHandle) return;
+
+                const touch = e.touches[0];
+                const rect = easingCanvas.getBoundingClientRect();
+                const touchX = touch.clientX - rect.left;
+                const touchY = touch.clientY - rect.top;
+
+                const normalized = fromCanvasCoords(touchX, touchY);
+
+                if (draggingHandle === 'p1') {
+                    state.easingP1.x = normalized.x;
+                    state.easingP1.y = normalized.y;
+                } else if (draggingHandle === 'p2') {
+                    state.easingP2.x = normalized.x;
+                    state.easingP2.y = normalized.y;
+                }
+
+                updateEasingInput();
+                drawEasingCurve();
+            }, { passive: false });
+
+            easingCanvas.addEventListener('touchend', () => {
+                if (draggingHandle) {
+                    draggingHandle = null;
+                    drawEasingCurve();
+                }
+            });
 
             drawEasingCurve();
         }
