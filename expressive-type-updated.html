@@ -511,9 +511,13 @@
 
             #canvas-container {
                 width: 100%;
-                min-height: 300px;
+                min-height: 250px;
+                max-height: 40vh;
                 aspect-ratio: 16/9;
                 order: -1;
+                position: sticky;
+                top: 0;
+                z-index: 100;
             }
 
             .branding {
@@ -929,6 +933,68 @@
                 prev = {x: e.clientX, y: e.clientY};
             };
             document.onmouseup = () => drag = false;
+
+            // Touch gesture handling
+            let touchState = { active: false, touches: [], initialDist: 0, initialAngle: 0, initialZoom: 1, initialRotZ: 0 };
+
+            const getTouchDistance = (t1, t2) => Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+            const getTouchAngle = (t1, t2) => Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * (180 / Math.PI);
+            const getTouchCenter = (t1, t2) => ({ x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 });
+
+            renderer.domElement.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                touchState.active = true;
+                touchState.touches = Array.from(e.touches);
+
+                if (e.touches.length === 2) {
+                    touchState.initialDist = getTouchDistance(e.touches[0], e.touches[1]);
+                    touchState.initialAngle = getTouchAngle(e.touches[0], e.touches[1]);
+                    touchState.initialZoom = state.zoom;
+                    touchState.initialRotZ = state.rotZ;
+                } else if (e.touches.length === 1) {
+                    prev = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+            }, { passive: false });
+
+            renderer.domElement.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!touchState.active) return;
+
+                if (e.touches.length === 2) {
+                    // Pinch zoom
+                    const currentDist = getTouchDistance(e.touches[0], e.touches[1]);
+                    const scale = currentDist / touchState.initialDist;
+                    state.zoom = Math.max(0.1, Math.min(3, touchState.initialZoom * scale));
+                    group.scale.set(state.zoom, state.zoom, state.zoom);
+
+                    // Two-finger rotation
+                    const currentAngle = getTouchAngle(e.touches[0], e.touches[1]);
+                    const angleDelta = currentAngle - touchState.initialAngle;
+                    state.rotZ = touchState.initialRotZ - angleDelta;
+                    document.getElementById('rotZSlider').value = state.rotZ;
+                    document.getElementById('rotZValue').value = Math.round(state.rotZ);
+                    updateRotation();
+                } else if (e.touches.length === 1) {
+                    // Single finger drag for X/Y rotation
+                    const touch = e.touches[0];
+                    state.rotY += (touch.clientX - prev.x) * 0.5;
+                    state.rotX = Math.max(-90, Math.min(90, state.rotX - (touch.clientY - prev.y) * 0.3));
+                    document.getElementById('rotXSlider').value = state.rotX;
+                    document.getElementById('rotYSlider').value = state.rotY;
+                    document.getElementById('rotXValue').value = Math.round(state.rotX);
+                    document.getElementById('rotYValue').value = Math.round(state.rotY);
+                    updateRotation();
+                    prev = { x: touch.clientX, y: touch.clientY };
+                }
+            }, { passive: false });
+
+            renderer.domElement.addEventListener('touchend', (e) => {
+                if (e.touches.length === 0) {
+                    touchState.active = false;
+                } else if (e.touches.length === 1) {
+                    prev = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+            });
 
             animate();
         }
