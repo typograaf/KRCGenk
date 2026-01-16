@@ -1518,8 +1518,9 @@
 
             const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
 
-            const videoWidth = renderer.domElement.width;
-            const videoHeight = renderer.domElement.height;
+            // Use logical canvas dimensions, not pixel dimensions (which include devicePixelRatio)
+            const videoWidth = state.canvasWidth;
+            const videoHeight = state.canvasHeight;
 
             const target = new ArrayBufferTarget();
             muxer = new Muxer({
