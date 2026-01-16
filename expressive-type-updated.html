@@ -1337,11 +1337,11 @@
             let shapeW, shapeH;
             if (state.verticalMode) {
                 // Vertical mode: tall narrow shape with stacked text moving upward
-                const scale = 6;
-                const numLines = 4; // Only 3-4 words vertically
+                const scale = 2; // Larger scale for bigger shape
+                const numLines = 12; // 3 words per side × 4 sides
 
                 // Calculate shape width based on text width
-                const fontSize = w * 0.3; // Font size relative to shape size
+                const fontSize = w * 0.15; // Font size relative to shape size
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 const metrics = ctx.measureText(text);
                 const singleTextWidth = metrics.width;
