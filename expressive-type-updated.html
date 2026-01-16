@@ -755,7 +755,7 @@
                         <span class="toggle-label">Repeat</span>
                         <div class="repeat-controls">
                             <button class="repeat-btn" id="repeatMinus">−</button>
-                            <span class="repeat-value" id="repeatValue">1×</span>
+                            <span class="repeat-value" id="repeatValue">2×</span>
                             <button class="repeat-btn" id="repeatPlus">+</button>
                         </div>
                     </div>
@@ -996,7 +996,7 @@
             offsetY: 0,
             showGrid: false,
             verticalMode: false,
-            repeat: 1,
+            repeat: 2,
             easingP1: { x: 0.25, y: 0.25 },
             easingP2: { x: 0.75, y: 0.75 }
         };
@@ -1385,7 +1385,7 @@
                 const numLines = wordsPerSide * 4; // 3 words per side × 4 sides
 
                 // Calculate shape width based on text width - use higher resolution
-                const fontSize = w * 2; // Larger font for higher resolution texture
+                const fontSize = w * 4; // Larger font for higher resolution texture
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 const metrics = ctx.measureText(text);
                 const singleTextWidth = metrics.width;
