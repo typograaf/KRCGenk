@@ -1337,11 +1337,11 @@
             let shapeW, shapeH;
             if (state.verticalMode) {
                 // Vertical mode: tall narrow shape with stacked text moving upward
-                const scale = 2; // Larger scale for bigger shape
-                const numLines = 12; // 3 words per side × 4 sides
+                const wordsPerSide = 4;
+                const numLines = wordsPerSide * 4; // 4 words per side × 4 sides
 
                 // Calculate shape width based on text width
-                const fontSize = w * 0.15; // Font size relative to shape size
+                const fontSize = w * 0.5; // Font size relative to shape size
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 const metrics = ctx.measureText(text);
                 const singleTextWidth = metrics.width;
@@ -1349,9 +1349,11 @@
                 const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
                 const lineHeight = (ascent + descent) * 1.15;
 
-                // Shape dimensions: width based on text, height based on number of lines
-                shapeW = singleTextWidth / scale;
-                shapeH = (lineHeight * numLines) / scale;
+                // Shape dimensions: make it roughly square so each side gets equal words
+                // Each side should fit 4 words worth of perimeter
+                const sideLength = lineHeight * wordsPerSide;
+                shapeW = sideLength;
+                shapeH = sideLength;
 
                 const hw = shapeW/2, hh = shapeH/2;
                 const rClamped = Math.max(1, Math.min(r, hw - 5, hh - 5));
@@ -1400,7 +1402,8 @@
 
                 ctx.restore();
 
-                const actualDepth = canvas.width / scale;
+                // Depth is based on text width (thickness of the band)
+                const actualDepth = singleTextWidth / (fontSize / lineHeight);
 
                 return finishVerticalTextBand(points, perimeter, canvas, actualDepth);
             }
