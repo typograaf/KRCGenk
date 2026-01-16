@@ -500,7 +500,7 @@
             }
 
             #canvas-container {
-                width: calc(100% - 32px);
+                width: auto;
                 min-height: 280px;
                 height: 50vh;
                 flex-shrink: 0;
@@ -508,7 +508,6 @@
                 border-radius: 20px;
                 position: sticky;
                 top: 16px;
-                left: 16px;
                 margin: 0 16px;
                 z-index: 200;
                 overflow: visible;
@@ -642,11 +641,9 @@
 
         @media (max-width: 480px) {
             #canvas-container {
-                width: calc(100% - 24px);
                 height: 45vh;
                 min-height: 240px;
                 top: 12px;
-                left: 12px;
                 margin: 0 12px;
             }
 
