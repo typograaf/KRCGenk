@@ -484,20 +484,38 @@
         /* Mobile Responsive */
         @media (max-width: 900px) {
             html, body {
-                height: auto;
-                overflow: auto;
+                height: 100%;
             }
 
             body {
                 flex-direction: column;
-                padding: 16px;
-                gap: 16px;
-                min-height: 100vh;
+                padding: 0;
+                gap: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            #canvas-container {
+                width: 100%;
+                min-height: 200px;
+                height: 35vh;
+                flex-shrink: 0;
+                order: -1;
+                border-radius: 0;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+
+            #canvas-container canvas {
+                border-radius: 0;
             }
 
             .sidebar-left {
                 width: 100%;
                 height: auto;
+                padding: 16px;
+                flex-shrink: 0;
             }
 
             .sidebar-left-content {
@@ -507,17 +525,8 @@
             .sidebar-right {
                 width: 100%;
                 height: auto;
-            }
-
-            #canvas-container {
-                width: 100%;
-                min-height: 250px;
-                max-height: 40vh;
-                aspect-ratio: 16/9;
-                order: -1;
-                position: sticky;
-                top: 0;
-                z-index: 100;
+                padding: 0 16px 16px 16px;
+                flex-shrink: 0;
             }
 
             .branding {
@@ -542,9 +551,8 @@
         }
 
         @media (max-width: 480px) {
-            body {
+            .sidebar-left, .sidebar-right {
                 padding: 12px;
-                gap: 12px;
             }
 
             .header-title {
@@ -561,7 +569,12 @@
             }
 
             #canvas-container {
-                min-height: 200px;
+                height: 30vh;
+                min-height: 180px;
+            }
+
+            .branding {
+                padding: 0 12px 12px 12px;
             }
         }
     </style>
