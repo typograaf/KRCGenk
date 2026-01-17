@@ -1252,6 +1252,7 @@
             geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             geom.setIndex(indices);
             geom.computeVertexNormals();
+            geom.center(); // Ensure geometry is centered
 
             const matOutside = new THREE.MeshBasicMaterial({
                 map: texture,
@@ -1281,6 +1282,7 @@
             geomInside.setAttribute('uv', new THREE.Float32BufferAttribute(uvsInside, 2));
             geomInside.setIndex(indices);
             geomInside.computeVertexNormals();
+            geomInside.center(); // Ensure geometry is centered
 
             const matInside = new THREE.MeshBasicMaterial({
                 map: textureInside,
