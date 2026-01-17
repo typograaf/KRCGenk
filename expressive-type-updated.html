@@ -1460,8 +1460,9 @@
 
                 ctx.restore();
 
-                // Depth is based on text width (thickness of the band)
-                const actualDepth = singleTextWidth / scaleFactor;
+                // Depth is based on canvas width (thickness of the band)
+                // Use canvas.width instead of singleTextWidth for consistent mapping
+                const actualDepth = canvas.width / scaleFactor;
 
                 return finishVerticalTextBand(points, perimeter, canvas, actualDepth);
             }
@@ -1533,9 +1534,7 @@
         }
 
         function updateOffset() {
-            // In vertical mode, apply a small X correction to center the rotated shape
-            const xCorrection = state.verticalMode ? 15 : 0;
-            group.position.set(state.offsetX + xCorrection, state.offsetY, 0);
+            group.position.set(state.offsetX, state.offsetY, 0);
         }
 
         function updateGrid() {
