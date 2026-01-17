@@ -213,22 +213,25 @@
         }
 
         .repeat-btn {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             background: #1a2c62;
             border: 1px solid #334473;
             border-radius: 4px;
-            color: #82CDFF;
-            font-size: 14px;
             cursor: pointer;
+            padding: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0;
         }
 
         .repeat-btn:hover {
             border-color: #82CDFF;
+        }
+
+        .repeat-btn svg {
+            width: 7px;
+            height: 7px;
         }
 
         .repeat-value {
@@ -754,9 +757,17 @@
                     <div class="toggle-row" id="repeatRow">
                         <span class="toggle-label">Repeat</span>
                         <div class="repeat-controls">
-                            <button class="repeat-btn" id="repeatMinus">−</button>
+                            <button class="repeat-btn" id="repeatMinus">
+                                <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.5 0.5H6.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
                             <span class="repeat-value" id="repeatValue">2×</span>
-                            <button class="repeat-btn" id="repeatPlus">+</button>
+                            <button class="repeat-btn" id="repeatPlus">
+                                <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.5 3.5H3.5M3.5 3.5H6.5M3.5 3.5V6.5M3.5 3.5V0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
