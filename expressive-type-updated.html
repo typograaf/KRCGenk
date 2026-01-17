@@ -138,6 +138,12 @@
         .color-section {
             display: flex;
             flex-direction: column;
+            gap: 24px;
+        }
+
+        .toggle-group {
+            display: flex;
+            flex-direction: column;
             gap: 12px;
         }
 
@@ -729,36 +735,38 @@
                             <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
                         </div>
                     </div>
-                    <div class="toggle-row">
-                        <input type="checkbox" class="toggle-checkbox" id="gridToggle">
-                        <label class="toggle-box" for="gridToggle">
-                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </label>
-                        <span class="toggle-label">Show 3×3 Grid</span>
-                    </div>
-                    <div class="toggle-row">
-                        <input type="checkbox" class="toggle-checkbox" id="verticalToggle">
-                        <label class="toggle-box" for="verticalToggle">
-                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </label>
-                        <span class="toggle-label">Vertical Mode</span>
-                    </div>
-                    <div class="toggle-row" id="repeatRow">
-                        <button class="repeat-btn" id="repeatMinus">
-                            <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0.5 0.5H6.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <span class="toggle-label">Repeat</span>
-                        <button class="repeat-btn" id="repeatPlus">
-                            <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0.5 3.5H3.5M3.5 3.5H6.5M3.5 3.5V6.5M3.5 3.5V0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
+                    <div class="toggle-group">
+                        <div class="toggle-row">
+                            <input type="checkbox" class="toggle-checkbox" id="gridToggle">
+                            <label class="toggle-box" for="gridToggle">
+                                <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </label>
+                            <span class="toggle-label">Show 3×3 Grid</span>
+                        </div>
+                        <div class="toggle-row">
+                            <input type="checkbox" class="toggle-checkbox" id="verticalToggle">
+                            <label class="toggle-box" for="verticalToggle">
+                                <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </label>
+                            <span class="toggle-label">Vertical Mode</span>
+                        </div>
+                        <div class="toggle-row" id="repeatRow">
+                            <button class="repeat-btn" id="repeatMinus">
+                                <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.5 0.5H6.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <span class="toggle-label">Repeat</span>
+                            <button class="repeat-btn" id="repeatPlus">
+                                <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.5 3.5H3.5M3.5 3.5H6.5M3.5 3.5V6.5M3.5 3.5V0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
