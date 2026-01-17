@@ -1942,6 +1942,25 @@
                     else if (key !== 'speed') build();
                 }
             });
+
+            // Arrow key support for value inputs
+            valueInput.addEventListener('keydown', e => {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const step = parseFloat(slider.step) || 1;
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    const currentValue = parseFloat(valueInput.value.replace(suf, '')) || 0;
+                    const delta = e.key === 'ArrowUp' ? step : -step;
+                    const newValue = Math.max(min, Math.min(max, currentValue + delta));
+                    state[key] = newValue;
+                    slider.value = newValue;
+                    valueInput.value = newValue + suf;
+                    if (key === 'rotX' || key === 'rotY' || key === 'rotZ') updateRotation();
+                    else if (key === 'offsetX' || key === 'offsetY') updateOffset();
+                    else if (key !== 'speed') build();
+                }
+            });
         });
 
         document.getElementById('textInput').addEventListener('input', e => {
