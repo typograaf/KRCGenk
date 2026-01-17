@@ -1943,11 +1943,12 @@
                 }
             });
 
-            // Arrow key support for value inputs
+            // Arrow key support for value inputs (shift = 10x)
             valueInput.addEventListener('keydown', e => {
                 if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                     e.preventDefault();
-                    const step = parseFloat(slider.step) || 1;
+                    const baseStep = parseFloat(slider.step) || 1;
+                    const step = e.shiftKey ? baseStep * 10 : baseStep;
                     const min = parseFloat(slider.min);
                     const max = parseFloat(slider.max);
                     const currentValue = parseFloat(valueInput.value.replace(suf, '')) || 0;
