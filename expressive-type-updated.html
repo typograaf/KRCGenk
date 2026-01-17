@@ -1929,21 +1929,17 @@
         });
 
         // Safari fix: prevent sliders from sticking to cursor
-        let activeSlider = null;
         document.querySelectorAll('.slider').forEach(slider => {
-            slider.addEventListener('pointerdown', () => { activeSlider = slider; });
-        });
-        document.addEventListener('pointerup', () => {
-            if (activeSlider) {
-                activeSlider.blur();
-                activeSlider = null;
-            }
-        });
-        document.addEventListener('pointercancel', () => {
-            if (activeSlider) {
-                activeSlider.blur();
-                activeSlider = null;
-            }
+            slider.addEventListener('pointerdown', (e) => {
+                slider.setPointerCapture(e.pointerId);
+            });
+            slider.addEventListener('pointerup', (e) => {
+                slider.releasePointerCapture(e.pointerId);
+                slider.blur();
+            });
+            slider.addEventListener('lostpointercapture', () => {
+                slider.blur();
+            });
         });
 
         // Reset buttons
