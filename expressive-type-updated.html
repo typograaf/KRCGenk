@@ -1446,16 +1446,17 @@
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 ctx.fillStyle = '#' + state.fgColor;
                 ctx.textBaseline = 'alphabetic';
+                ctx.textAlign = 'center';
 
                 // Flip horizontally to correct texture orientation
                 ctx.save();
                 ctx.translate(canvas.width, 0);
                 ctx.scale(-1, 1);
 
-                // Draw text stacked vertically
+                // Draw text stacked vertically, centered horizontally
                 for (let i = 0; i < numLines; i++) {
                     const yPos = lineHeight * i + ascent;
-                    ctx.fillText(text, 0, yPos);
+                    ctx.fillText(text, canvas.width / 2, yPos);
                 }
 
                 ctx.restore();
