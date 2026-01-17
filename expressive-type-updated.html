@@ -297,7 +297,6 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            touch-action: manipulation;
         }
 
         .slider::-webkit-slider-runnable-track {
@@ -1072,8 +1071,11 @@
             });
 
             let drag = false, prev = {x:0, y:0};
-            renderer.domElement.onmousedown = e => { drag = true; prev = {x: e.clientX, y: e.clientY}; };
-            document.onmousemove = e => {
+            renderer.domElement.addEventListener('mousedown', e => {
+                drag = true;
+                prev = {x: e.clientX, y: e.clientY};
+            });
+            renderer.domElement.addEventListener('mousemove', e => {
                 if (!drag) return;
                 state.rotY += (e.clientX - prev.x) * 0.5;
                 state.rotX = Math.max(-90, Math.min(90, state.rotX - (e.clientY - prev.y) * 0.3));
@@ -1083,8 +1085,9 @@
                 document.getElementById('rotYValue').value = Math.round(state.rotY);
                 updateRotation();
                 prev = {x: e.clientX, y: e.clientY};
-            };
-            document.onmouseup = () => drag = false;
+            });
+            renderer.domElement.addEventListener('mouseup', () => drag = false);
+            renderer.domElement.addEventListener('mouseleave', () => drag = false);
 
             // Touch gesture handling
             let touchState = { active: false, touches: [], initialDist: 0, initialAngle: 0, initialZoom: 1, initialRotZ: 0 };
@@ -1926,20 +1929,6 @@
         document.getElementById('textInput').addEventListener('input', e => {
             state.text = e.target.value || 'TYPE ';
             build();
-        });
-
-        // Safari fix: prevent sliders from sticking to cursor
-        document.querySelectorAll('.slider').forEach(slider => {
-            slider.addEventListener('pointerdown', (e) => {
-                slider.setPointerCapture(e.pointerId);
-            });
-            slider.addEventListener('pointerup', (e) => {
-                slider.releasePointerCapture(e.pointerId);
-                slider.blur();
-            });
-            slider.addEventListener('lostpointercapture', () => {
-                slider.blur();
-            });
         });
 
         // Reset buttons
