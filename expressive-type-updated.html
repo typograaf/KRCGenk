@@ -415,6 +415,12 @@
         /* Output Buttons */
         .output-buttons {
             display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .output-row {
+            display: flex;
             gap: 6px;
         }
 
@@ -963,8 +969,10 @@
         <div class="panel">
             <span class="control-label">Output</span>
             <div class="output-buttons">
-                <button class="output-btn" id="exportPNG">PNG</button>
-                <button class="output-btn" id="exportMP4">MP4</button>
+                <div class="output-row">
+                    <button class="output-btn" id="exportPNG">PNG</button>
+                    <button class="output-btn" id="exportMP4">MP4</button>
+                </div>
                 <button class="output-btn" id="exportMatID">MAT ID</button>
             </div>
         </div>
