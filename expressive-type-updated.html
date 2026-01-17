@@ -297,6 +297,7 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
+            touch-action: manipulation;
         }
 
         .slider::-webkit-slider-runnable-track {
@@ -1904,6 +1905,10 @@
                 else if (key === 'offsetX' || key === 'offsetY') updateOffset();
                 else if (key !== 'speed') build();
             });
+
+            // Safari fix: blur slider on mouseup to prevent sticking
+            slider.addEventListener('mouseup', () => slider.blur());
+            slider.addEventListener('touchend', () => slider.blur());
 
             valueInput.addEventListener('input', e => {
                 const numValue = parseFloat(e.target.value.replace(suf, ''));
