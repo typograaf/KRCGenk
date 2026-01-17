@@ -209,7 +209,7 @@
         .repeat-controls {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .repeat-btn {
@@ -232,13 +232,6 @@
         .repeat-btn svg {
             width: 7px;
             height: 7px;
-        }
-
-        .repeat-value {
-            font-size: 11px;
-            color: #82CDFF;
-            min-width: 24px;
-            text-align: center;
         }
 
         /* Slider Styles */
@@ -737,38 +730,37 @@
                         </div>
                     </div>
                     <div class="toggle-row">
-                        <span class="toggle-label">Show 3×3 Grid</span>
                         <input type="checkbox" class="toggle-checkbox" id="gridToggle">
                         <label class="toggle-box" for="gridToggle">
                             <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </label>
+                        <span class="toggle-label">Show 3×3 Grid</span>
                     </div>
                     <div class="toggle-row">
-                        <span class="toggle-label">Vertical Mode</span>
                         <input type="checkbox" class="toggle-checkbox" id="verticalToggle">
                         <label class="toggle-box" for="verticalToggle">
                             <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                         </label>
+                        <span class="toggle-label">Vertical Mode</span>
                     </div>
                     <div class="toggle-row" id="repeatRow">
-                        <span class="toggle-label">Repeat</span>
                         <div class="repeat-controls">
                             <button class="repeat-btn" id="repeatMinus">
                                 <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0.5 0.5H6.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </button>
-                            <span class="repeat-value" id="repeatValue">2×</span>
                             <button class="repeat-btn" id="repeatPlus">
                                 <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0.5 3.5H3.5M3.5 3.5H6.5M3.5 3.5V6.5M3.5 3.5V0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </button>
                         </div>
+                        <span class="toggle-label">Repeat</span>
                     </div>
                 </div>
             </div>
@@ -1979,15 +1971,11 @@
                 state.rotX = 0;
                 state.rotY = -90;
                 state.rotZ = 0;
-                // Update repeat display to show vertical repeat value
-                document.getElementById('repeatValue').textContent = state.verticalRepeat + '×';
             } else {
                 // Reset to default rotation for horizontal mode
                 state.rotX = defaultValues.rotX;
                 state.rotY = defaultValues.rotY;
                 state.rotZ = defaultValues.rotZ;
-                // Update repeat display to show horizontal repeat value
-                document.getElementById('repeatValue').textContent = state.repeat + '×';
             }
             // Update slider displays
             document.getElementById('rotXSlider').value = state.rotX;
@@ -2005,14 +1993,12 @@
                 // Vertical mode: min 3
                 if (state.verticalRepeat > 3) {
                     state.verticalRepeat--;
-                    document.getElementById('repeatValue').textContent = state.verticalRepeat + '×';
                     build();
                 }
             } else {
                 // Horizontal mode: min 1
                 if (state.repeat > 1) {
                     state.repeat--;
-                    document.getElementById('repeatValue').textContent = state.repeat + '×';
                     build();
                 }
             }
@@ -2023,14 +2009,12 @@
                 // Vertical mode: max 7
                 if (state.verticalRepeat < 7) {
                     state.verticalRepeat++;
-                    document.getElementById('repeatValue').textContent = state.verticalRepeat + '×';
                     build();
                 }
             } else {
                 // Horizontal mode: max 5
                 if (state.repeat < 5) {
                     state.repeat++;
-                    document.getElementById('repeatValue').textContent = state.repeat + '×';
                     build();
                 }
             }
