@@ -965,6 +965,7 @@
             <div class="output-buttons">
                 <button class="output-btn" id="exportPNG">PNG</button>
                 <button class="output-btn" id="exportMP4">MP4</button>
+                <button class="output-btn" id="exportMatID">MAT ID</button>
             </div>
         </div>
     </div>
@@ -2115,6 +2116,55 @@
             link.download = 'krcg-graphic-' + Date.now() + '.png';
             link.href = dataURL;
             link.click();
+        });
+
+        // Export Material ID Map
+        document.getElementById('exportMatID').addEventListener('click', () => {
+            // Store original state
+            const originalBackground = scene.background.clone();
+            const originalMaterials = [];
+
+            // Store original materials and replace with flat ID colors
+            group.traverse(obj => {
+                if (obj.isMesh) {
+                    originalMaterials.push({ mesh: obj, material: obj.material });
+
+                    // Assign distinct colors based on material side
+                    if (obj.material.side === THREE.FrontSide) {
+                        // Outside face - Red
+                        obj.material = new THREE.MeshBasicMaterial({
+                            color: 0xff0000,
+                            side: THREE.FrontSide
+                        });
+                    } else if (obj.material.side === THREE.BackSide) {
+                        // Inside face - Green
+                        obj.material = new THREE.MeshBasicMaterial({
+                            color: 0x00ff00,
+                            side: THREE.BackSide
+                        });
+                    }
+                }
+            });
+
+            // Set background to Blue
+            scene.background = new THREE.Color(0x0000ff);
+
+            // Render and capture
+            renderer.render(scene, camera);
+
+            const dataURL = renderer.domElement.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'krcg-material-id-' + Date.now() + '.png';
+            link.href = dataURL;
+            link.click();
+
+            // Restore original materials
+            originalMaterials.forEach(({ mesh, material }) => {
+                mesh.material = material;
+            });
+
+            // Restore original background
+            scene.background = originalBackground;
         });
 
         // Export MP4
