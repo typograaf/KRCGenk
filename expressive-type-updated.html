@@ -1906,9 +1906,6 @@
                 else if (key !== 'speed') build();
             });
 
-            // Safari fix: blur slider on mouseup to prevent sticking
-            slider.addEventListener('mouseup', () => slider.blur());
-            slider.addEventListener('touchend', () => slider.blur());
 
             valueInput.addEventListener('input', e => {
                 const numValue = parseFloat(e.target.value.replace(suf, ''));
@@ -1929,6 +1926,24 @@
         document.getElementById('textInput').addEventListener('input', e => {
             state.text = e.target.value || 'TYPE ';
             build();
+        });
+
+        // Safari fix: prevent sliders from sticking to cursor
+        let activeSlider = null;
+        document.querySelectorAll('.slider').forEach(slider => {
+            slider.addEventListener('pointerdown', () => { activeSlider = slider; });
+        });
+        document.addEventListener('pointerup', () => {
+            if (activeSlider) {
+                activeSlider.blur();
+                activeSlider = null;
+            }
+        });
+        document.addEventListener('pointercancel', () => {
+            if (activeSlider) {
+                activeSlider.blur();
+                activeSlider = null;
+            }
         });
 
         // Reset buttons
