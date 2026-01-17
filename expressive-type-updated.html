@@ -1533,7 +1533,9 @@
         }
 
         function updateOffset() {
-            group.position.set(state.offsetX, state.offsetY, 0);
+            // In vertical mode, apply a small X correction to center the rotated shape
+            const xCorrection = state.verticalMode ? 15 : 0;
+            group.position.set(state.offsetX + xCorrection, state.offsetY, 0);
         }
 
         function updateGrid() {
