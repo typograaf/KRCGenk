@@ -1186,6 +1186,13 @@
 
             createTextBand(s, s, r);
 
+            // Compute bounding box and center the group
+            const box = new THREE.Box3().setFromObject(group);
+            const center = box.getCenter(new THREE.Vector3());
+            group.children.forEach(child => {
+                child.position.sub(center);
+            });
+
             updateRotation();
             updateOffset();
         }
