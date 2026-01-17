@@ -1040,6 +1040,7 @@
 
             camera = new THREE.PerspectiveCamera(45, state.canvasWidth / state.canvasHeight, 1, 2000);
             camera.position.set(0, 0, 800);
+            camera.lookAt(0, 0, 0);
 
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(state.canvasWidth, state.canvasHeight);
@@ -1252,7 +1253,6 @@
             geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             geom.setIndex(indices);
             geom.computeVertexNormals();
-            geom.center(); // Ensure geometry is centered
 
             const matOutside = new THREE.MeshBasicMaterial({
                 map: texture,
@@ -1282,7 +1282,6 @@
             geomInside.setAttribute('uv', new THREE.Float32BufferAttribute(uvsInside, 2));
             geomInside.setIndex(indices);
             geomInside.computeVertexNormals();
-            geomInside.center(); // Ensure geometry is centered
 
             const matInside = new THREE.MeshBasicMaterial({
                 map: textureInside,
@@ -1448,17 +1447,16 @@
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 ctx.fillStyle = '#' + state.fgColor;
                 ctx.textBaseline = 'alphabetic';
-                ctx.textAlign = 'center';
 
                 // Flip horizontally to correct texture orientation
                 ctx.save();
                 ctx.translate(canvas.width, 0);
                 ctx.scale(-1, 1);
 
-                // Draw text stacked vertically, centered horizontally
+                // Draw text stacked vertically
                 for (let i = 0; i < numLines; i++) {
                     const yPos = lineHeight * i + ascent;
-                    ctx.fillText(text, canvas.width / 2, yPos);
+                    ctx.fillText(text, 0, yPos);
                 }
 
                 ctx.restore();
