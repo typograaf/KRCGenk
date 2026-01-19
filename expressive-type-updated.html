@@ -2186,26 +2186,15 @@
         document.getElementById('exportMP4').addEventListener('click', async () => {
             const btn = document.getElementById('exportMP4');
 
-            // Check for WebCodecs API support (not fully functional in Safari)
-            if (typeof VideoEncoder === 'undefined') {
-                alert('MP4 export is not supported in this browser. Please use Chrome or Edge.');
+            // Safari has broken WebCodecs support - detect and block
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            if (isSafari) {
+                alert('MP4 export is not supported in Safari. Please use Chrome or Edge.');
                 return;
             }
 
-            // Check if H.264 encoding is actually supported
-            try {
-                const support = await VideoEncoder.isConfigSupported({
-                    codec: 'avc1.640033',
-                    width: 1920,
-                    height: 1080,
-                    bitrate: 15_000_000,
-                    framerate: 60
-                });
-                if (!support.supported) {
-                    alert('H.264 video encoding is not supported in this browser. Please use Chrome or Edge.');
-                    return;
-                }
-            } catch (e) {
+            // Check for WebCodecs API support
+            if (typeof VideoEncoder === 'undefined') {
                 alert('MP4 export is not supported in this browser. Please use Chrome or Edge.');
                 return;
             }
