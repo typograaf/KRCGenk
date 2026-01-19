@@ -1513,19 +1513,26 @@
         function build() {
             clearGroup();
 
+            // Reset group transform before rebuilding to avoid affecting bounding box calculation
+            group.position.set(0, 0, 0);
+            group.rotation.set(0, 0, 0);
+            group.scale.set(1, 1, 1);
+
             const s = state.size;
             const r = Math.min(state.radius, s/2 - 5);
 
             createTextBand(s, s, r);
 
-            // Compute bounding box and center the group
+            // Compute bounding box and center the group (now in local space since transforms are reset)
             const box = new THREE.Box3().setFromObject(group);
             const center = box.getCenter(new THREE.Vector3());
             group.children.forEach(child => {
                 child.position.sub(center);
             });
 
+            // Restore transforms
             updateRotation();
+            group.scale.set(state.zoom, state.zoom, state.zoom);
             updateOffset();
         }
 
