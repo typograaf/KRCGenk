@@ -551,6 +551,11 @@
             margin-bottom: 64px;
         }
 
+        /* Add spacing to right sidebar when timeline is visible */
+        body.timeline-active .sidebar-right {
+            padding-bottom: 64px;
+        }
+
         .timeline-btn {
             width: 16px;
             height: 16px;
@@ -798,6 +803,10 @@
 
             body.timeline-active .branding {
                 margin-bottom: 0;
+            }
+
+            body.timeline-active .sidebar-right {
+                padding-bottom: 0;
             }
         }
 
@@ -1313,8 +1322,8 @@
             keyframePlaying: false,
             keyframeProgress: 0,
             keyframePingPong: false,
-            keyframeStart: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 },
-            keyframeEnd: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 }
+            keyframeStart: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1, offsetX: 0, offsetY: 0 },
+            keyframeEnd: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1, offsetX: 0, offsetY: 0 }
         };
 
         // Easing editor state
@@ -2479,7 +2488,9 @@
                 rotX: state.rotX,
                 rotY: state.rotY,
                 rotZ: state.rotZ,
-                zoom: state.zoom
+                zoom: state.zoom,
+                offsetX: state.offsetX,
+                offsetY: state.offsetY
             };
             document.getElementById('setKeyframeStart').classList.add('active');
             updateKeyframeInfo();
@@ -2490,7 +2501,9 @@
                 rotX: state.rotX,
                 rotY: state.rotY,
                 rotZ: state.rotZ,
-                zoom: state.zoom
+                zoom: state.zoom,
+                offsetX: state.offsetX,
+                offsetY: state.offsetY
             };
             document.getElementById('setKeyframeEnd').classList.add('active');
             updateKeyframeInfo();
@@ -2500,7 +2513,7 @@
             const start = state.keyframeStart;
             const end = state.keyframeEnd;
             const info = document.getElementById('keyframeInfo');
-            info.innerHTML = `Start: rot(${start.rotX}, ${start.rotY}, ${start.rotZ}) zoom(${start.zoom.toFixed(1)})<br>End: rot(${end.rotX}, ${end.rotY}, ${end.rotZ}) zoom(${end.zoom.toFixed(1)})`;
+            info.innerHTML = `Start: rot(${start.rotX}, ${start.rotY}, ${start.rotZ}) zoom(${start.zoom.toFixed(1)}) off(${start.offsetX}, ${start.offsetY})<br>End: rot(${end.rotX}, ${end.rotY}, ${end.rotZ}) zoom(${end.zoom.toFixed(1)}) off(${end.offsetX}, ${end.offsetY})`;
         }
 
         // Timeline helper functions
@@ -2605,11 +2618,16 @@
             const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedRotationProgress;
             const zoom = start.zoom + (end.zoom - start.zoom) * easedRotationProgress;
 
+            // Interpolate offset
+            const offsetX = start.offsetX + (end.offsetX - start.offsetX) * easedRotationProgress;
+            const offsetY = start.offsetY + (end.offsetY - start.offsetY) * easedRotationProgress;
+
             // Apply interpolated values
             group.rotation.x = THREE.MathUtils.degToRad(rotX);
             group.rotation.y = THREE.MathUtils.degToRad(rotY);
             group.rotation.z = THREE.MathUtils.degToRad(rotZ);
             group.scale.set(zoom, zoom, zoom);
+            group.position.set(offsetX, offsetY, 0);
 
             // Update sliders to show current interpolated values
             document.getElementById('rotXSlider').value = rotX;
@@ -2618,6 +2636,10 @@
             document.getElementById('rotYValue').value = Math.round(rotY);
             document.getElementById('rotZSlider').value = rotZ;
             document.getElementById('rotZValue').value = Math.round(rotZ);
+            document.getElementById('offsetXSlider').value = offsetX;
+            document.getElementById('offsetXValue').value = Math.round(offsetX);
+            document.getElementById('offsetYSlider').value = offsetY;
+            document.getElementById('offsetYValue').value = Math.round(offsetY);
 
             // Apply texture offset (keeps moving forward, doesn't reverse in ping-pong)
             applyTextureOffset(easedTextureProgress);
@@ -2975,18 +2997,21 @@
                         }
                     }
 
-                    // Apply keyframe rotation/zoom
+                    // Apply keyframe rotation/zoom/offset
                     const start = state.keyframeStart;
                     const end = state.keyframeEnd;
                     const rotX = start.rotX + (end.rotX - start.rotX) * easedRotationProgress;
                     const rotY = start.rotY + (end.rotY - start.rotY) * easedRotationProgress;
                     const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedRotationProgress;
                     const zoom = start.zoom + (end.zoom - start.zoom) * easedRotationProgress;
+                    const offsetX = start.offsetX + (end.offsetX - start.offsetX) * easedRotationProgress;
+                    const offsetY = start.offsetY + (end.offsetY - start.offsetY) * easedRotationProgress;
 
                     group.rotation.x = THREE.MathUtils.degToRad(rotX);
                     group.rotation.y = THREE.MathUtils.degToRad(rotY);
                     group.rotation.z = THREE.MathUtils.degToRad(rotZ);
                     group.scale.set(zoom, zoom, zoom);
+                    group.position.set(offsetX, offsetY, 0);
 
                     renderer.render(scene, camera);
 
@@ -3267,7 +3292,7 @@
                     }
                 }
 
-                // Apply keyframe interpolation for rotation/zoom during export
+                // Apply keyframe interpolation for rotation/zoom/offset during export
                 if (state.keyframeEnabled) {
                     const start = state.keyframeStart;
                     const end = state.keyframeEnd;
@@ -3276,11 +3301,14 @@
                     const rotY = start.rotY + (end.rotY - start.rotY) * easedRotationProgress;
                     const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedRotationProgress;
                     const zoom = start.zoom + (end.zoom - start.zoom) * easedRotationProgress;
+                    const offsetX = start.offsetX + (end.offsetX - start.offsetX) * easedRotationProgress;
+                    const offsetY = start.offsetY + (end.offsetY - start.offsetY) * easedRotationProgress;
 
                     group.rotation.x = THREE.MathUtils.degToRad(rotX);
                     group.rotation.y = THREE.MathUtils.degToRad(rotY);
                     group.rotation.z = THREE.MathUtils.degToRad(rotZ);
                     group.scale.set(zoom, zoom, zoom);
+                    group.position.set(offsetX, offsetY, 0);
                 }
 
                 renderer.render(scene, camera);
@@ -3477,10 +3505,16 @@
                     }
                     if (preset.keyframeStart !== undefined) {
                         state.keyframeStart = { ...preset.keyframeStart };
+                        // Backward compatibility: default offsets to 0 if not present
+                        if (state.keyframeStart.offsetX === undefined) state.keyframeStart.offsetX = 0;
+                        if (state.keyframeStart.offsetY === undefined) state.keyframeStart.offsetY = 0;
                         document.getElementById('setKeyframeStart').classList.add('active');
                     }
                     if (preset.keyframeEnd !== undefined) {
                         state.keyframeEnd = { ...preset.keyframeEnd };
+                        // Backward compatibility: default offsets to 0 if not present
+                        if (state.keyframeEnd.offsetX === undefined) state.keyframeEnd.offsetX = 0;
+                        if (state.keyframeEnd.offsetY === undefined) state.keyframeEnd.offsetY = 0;
                         document.getElementById('setKeyframeEnd').classList.add('active');
                     }
 
@@ -3489,7 +3523,7 @@
                         const start = state.keyframeStart;
                         const end = state.keyframeEnd;
                         const info = document.getElementById('keyframeInfo');
-                        info.innerHTML = `Start: rot(${start.rotX}, ${start.rotY}, ${start.rotZ}) zoom(${start.zoom.toFixed(1)})<br>End: rot(${end.rotX}, ${end.rotY}, ${end.rotZ}) zoom(${end.zoom.toFixed(1)})`;
+                        info.innerHTML = `Start: rot(${start.rotX}, ${start.rotY}, ${start.rotZ}) zoom(${start.zoom.toFixed(1)}) off(${start.offsetX}, ${start.offsetY})<br>End: rot(${end.rotX}, ${end.rotY}, ${end.rotZ}) zoom(${end.zoom.toFixed(1)}) off(${end.offsetX}, ${end.offsetY})`;
                     }
 
                     // Reset playback state
