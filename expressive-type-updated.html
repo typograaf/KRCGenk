@@ -1216,6 +1216,7 @@
         <!-- Presets -->
         <div class="panel">
             <span class="control-label">Presets</span>
+            <input type="text" class="text-input" id="presetName" placeholder="Preset name..." style="margin-bottom: 8px;">
             <div class="output-buttons">
                 <div class="output-row">
                     <button class="output-btn" id="savePreset">Save</button>
@@ -3317,8 +3318,11 @@
 
         // Save Preset
         document.getElementById('savePreset').addEventListener('click', () => {
+            const presetName = document.getElementById('presetName').value.trim() || 'Untitled';
+
             const preset = {
                 version: 1,
+                name: presetName,
                 text: state.text,
                 canvasWidth: state.canvasWidth,
                 canvasHeight: state.canvasHeight,
@@ -3350,7 +3354,9 @@
             const blob = new Blob([json], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.download = 'krcg-preset-' + Date.now() + '.json';
+            // Use preset name for filename (sanitize for safe filename)
+            const safeFilename = presetName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+            link.download = 'krcg-preset-' + safeFilename + '.json';
             link.href = url;
             link.click();
             URL.revokeObjectURL(url);
@@ -3369,6 +3375,11 @@
             reader.onload = (event) => {
                 try {
                     const preset = JSON.parse(event.target.result);
+
+                    // Set preset name
+                    if (preset.name !== undefined) {
+                        document.getElementById('presetName').value = preset.name;
+                    }
 
                     // Apply preset values to state
                     if (preset.text !== undefined) {
