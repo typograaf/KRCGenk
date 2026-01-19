@@ -2186,6 +2186,12 @@
         document.getElementById('exportMP4').addEventListener('click', async () => {
             const btn = document.getElementById('exportMP4');
 
+            // Check for WebCodecs API support (not available in Safari)
+            if (typeof VideoEncoder === 'undefined') {
+                alert('MP4 export is not supported in this browser. Please use Chrome or Edge.');
+                return;
+            }
+
             if (isRecording) {
                 return;
             }
