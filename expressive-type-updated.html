@@ -1212,6 +1212,18 @@
                 <button class="output-btn" id="exportMatID">MAT ID</button>
             </div>
         </div>
+
+        <!-- Presets -->
+        <div class="panel">
+            <span class="control-label">Presets</span>
+            <div class="output-buttons">
+                <div class="output-row">
+                    <button class="output-btn" id="savePreset">Save</button>
+                    <button class="output-btn" id="loadPreset">Load</button>
+                </div>
+            </div>
+            <input type="file" id="presetFileInput" accept=".json" style="display: none;">
+        </div>
     </div>
 
     <!-- Timeline Editor -->
@@ -3301,6 +3313,207 @@
             };
 
             captureFrame();
+        });
+
+        // Save Preset
+        document.getElementById('savePreset').addEventListener('click', () => {
+            const preset = {
+                version: 1,
+                text: state.text,
+                canvasWidth: state.canvasWidth,
+                canvasHeight: state.canvasHeight,
+                size: state.size,
+                radius: state.radius,
+                rotX: state.rotX,
+                rotY: state.rotY,
+                rotZ: state.rotZ,
+                speed: state.speed,
+                bgColor: state.bgColor,
+                fgColor: state.fgColor,
+                zoom: state.zoom,
+                insideZoom: state.insideZoom,
+                offsetX: state.offsetX,
+                offsetY: state.offsetY,
+                verticalMode: state.verticalMode,
+                insideView: state.insideView,
+                repeat: state.repeat,
+                verticalRepeat: state.verticalRepeat,
+                easingP1: { ...state.easingP1 },
+                easingP2: { ...state.easingP2 },
+                keyframeEnabled: state.keyframeEnabled,
+                keyframePingPong: state.keyframePingPong,
+                keyframeStart: { ...state.keyframeStart },
+                keyframeEnd: { ...state.keyframeEnd }
+            };
+
+            const json = JSON.stringify(preset, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'krcg-preset-' + Date.now() + '.json';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Load Preset
+        document.getElementById('loadPreset').addEventListener('click', () => {
+            document.getElementById('presetFileInput').click();
+        });
+
+        document.getElementById('presetFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const preset = JSON.parse(event.target.result);
+
+                    // Apply preset values to state
+                    if (preset.text !== undefined) {
+                        state.text = preset.text;
+                        document.getElementById('textInput').value = preset.text;
+                    }
+                    if (preset.canvasWidth !== undefined) state.canvasWidth = preset.canvasWidth;
+                    if (preset.canvasHeight !== undefined) state.canvasHeight = preset.canvasHeight;
+                    if (preset.size !== undefined) {
+                        state.size = preset.size;
+                        document.getElementById('sizeSlider').value = preset.size;
+                        document.getElementById('sizeValue').value = preset.size;
+                    }
+                    if (preset.radius !== undefined) {
+                        state.radius = preset.radius;
+                        document.getElementById('radiusSlider').value = preset.radius;
+                        document.getElementById('radiusValue').value = preset.radius;
+                    }
+                    if (preset.rotX !== undefined) {
+                        state.rotX = preset.rotX;
+                        document.getElementById('rotXSlider').value = preset.rotX;
+                        document.getElementById('rotXValue').value = preset.rotX;
+                    }
+                    if (preset.rotY !== undefined) {
+                        state.rotY = preset.rotY;
+                        document.getElementById('rotYSlider').value = preset.rotY;
+                        document.getElementById('rotYValue').value = preset.rotY;
+                    }
+                    if (preset.rotZ !== undefined) {
+                        state.rotZ = preset.rotZ;
+                        document.getElementById('rotZSlider').value = preset.rotZ;
+                        document.getElementById('rotZValue').value = preset.rotZ;
+                    }
+                    if (preset.speed !== undefined) {
+                        state.speed = preset.speed;
+                        document.getElementById('speedSlider').value = preset.speed;
+                        document.getElementById('speedValue').value = preset.speed;
+                    }
+                    if (preset.bgColor !== undefined) {
+                        state.bgColor = preset.bgColor;
+                        document.querySelectorAll('.color-btn[data-type="bg"]').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.color === preset.bgColor);
+                        });
+                    }
+                    if (preset.fgColor !== undefined) {
+                        state.fgColor = preset.fgColor;
+                        document.querySelectorAll('.color-btn[data-type="fg"]').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.color === preset.fgColor);
+                        });
+                    }
+                    if (preset.zoom !== undefined) state.zoom = preset.zoom;
+                    if (preset.insideZoom !== undefined) state.insideZoom = preset.insideZoom;
+                    if (preset.offsetX !== undefined) {
+                        state.offsetX = preset.offsetX;
+                        document.getElementById('offsetXSlider').value = preset.offsetX;
+                        document.getElementById('offsetXValue').value = preset.offsetX;
+                    }
+                    if (preset.offsetY !== undefined) {
+                        state.offsetY = preset.offsetY;
+                        document.getElementById('offsetYSlider').value = preset.offsetY;
+                        document.getElementById('offsetYValue').value = preset.offsetY;
+                    }
+                    if (preset.verticalMode !== undefined) {
+                        state.verticalMode = preset.verticalMode;
+                        document.getElementById('verticalToggle').checked = preset.verticalMode;
+                    }
+                    if (preset.insideView !== undefined) {
+                        state.insideView = preset.insideView;
+                        document.getElementById('insideViewToggle').checked = preset.insideView;
+                    }
+                    if (preset.repeat !== undefined) state.repeat = preset.repeat;
+                    if (preset.verticalRepeat !== undefined) state.verticalRepeat = preset.verticalRepeat;
+                    if (preset.easingP1 !== undefined) {
+                        state.easingP1 = { ...preset.easingP1 };
+                    }
+                    if (preset.easingP2 !== undefined) {
+                        state.easingP2 = { ...preset.easingP2 };
+                    }
+                    updateEasingInput();
+                    drawEasingCurve();
+
+                    // Keyframe settings
+                    if (preset.keyframeEnabled !== undefined) {
+                        state.keyframeEnabled = preset.keyframeEnabled;
+                        document.getElementById('keyframeToggle').checked = preset.keyframeEnabled;
+                        document.getElementById('keyframeControls').style.display = preset.keyframeEnabled ? 'flex' : 'none';
+                        document.getElementById('timelineContainer').classList.toggle('visible', preset.keyframeEnabled);
+                        document.body.classList.toggle('timeline-active', preset.keyframeEnabled);
+                    }
+                    if (preset.keyframePingPong !== undefined) {
+                        state.keyframePingPong = preset.keyframePingPong;
+                        document.getElementById('timelinePingPongBtn').classList.toggle('active', preset.keyframePingPong);
+                    }
+                    if (preset.keyframeStart !== undefined) {
+                        state.keyframeStart = { ...preset.keyframeStart };
+                        document.getElementById('setKeyframeStart').classList.add('active');
+                    }
+                    if (preset.keyframeEnd !== undefined) {
+                        state.keyframeEnd = { ...preset.keyframeEnd };
+                        document.getElementById('setKeyframeEnd').classList.add('active');
+                    }
+
+                    // Update keyframe info display
+                    if (state.keyframeEnabled) {
+                        const start = state.keyframeStart;
+                        const end = state.keyframeEnd;
+                        const info = document.getElementById('keyframeInfo');
+                        info.innerHTML = `Start: rot(${start.rotX}, ${start.rotY}, ${start.rotZ}) zoom(${start.zoom.toFixed(1)})<br>End: rot(${end.rotX}, ${end.rotY}, ${end.rotZ}) zoom(${end.zoom.toFixed(1)})`;
+                    }
+
+                    // Reset playback state
+                    state.keyframePlaying = false;
+                    state.keyframeProgress = 0;
+                    keyframePingPongReverse = false;
+                    updateTimelineUI();
+                    updatePlayPauseButton();
+
+                    // Apply zoom
+                    const currentZoom = state.insideView ? state.insideZoom : state.zoom;
+                    group.scale.set(currentZoom, currentZoom, currentZoom);
+
+                    // Update camera for inside view
+                    updateCameraPosition();
+
+                    // Rebuild the scene
+                    updateRotation();
+                    updateOffset();
+                    scene.background = new THREE.Color('#' + state.bgColor);
+                    build();
+
+                    // Update canvas size buttons
+                    document.querySelectorAll('.size-btn').forEach(btn => {
+                        const w = parseInt(btn.dataset.width);
+                        const h = parseInt(btn.dataset.height);
+                        btn.classList.toggle('active', w === state.canvasWidth && h === state.canvasHeight);
+                    });
+
+                } catch (err) {
+                    alert('Failed to load preset: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+
+            // Reset file input so the same file can be loaded again
+            e.target.value = '';
         });
 
         // Load custom font then initialize
