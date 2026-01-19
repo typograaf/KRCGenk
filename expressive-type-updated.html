@@ -525,6 +525,117 @@
             right: 24px;
         }
 
+        /* Timeline Editor */
+        .timeline-container {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0d2159;
+            border-top: 1px solid #334473;
+            padding: 12px 24px;
+            z-index: 200;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .timeline-container.visible {
+            display: flex;
+        }
+
+        .timeline-btn {
+            width: 32px;
+            height: 32px;
+            background: #1a2c62;
+            border: 1px solid #334473;
+            border-radius: 6px;
+            color: #82CDFF;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .timeline-btn:hover {
+            border-color: #82CDFF;
+        }
+
+        .timeline-btn.active {
+            background: #82CDFF;
+            color: #001550;
+        }
+
+        .timeline-track {
+            flex: 1;
+            height: 8px;
+            background: #1a2c62;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: #334473;
+            border-radius: 4px;
+            width: 0%;
+        }
+
+        .timeline-playhead {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background: #82CDFF;
+            border-radius: 50%;
+            cursor: grab;
+            left: 0%;
+        }
+
+        .timeline-playhead:active {
+            cursor: grabbing;
+        }
+
+        .timeline-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: -4px;
+            bottom: -4px;
+            width: 2px;
+            background: #82CDFF;
+            transform: translateX(-50%);
+        }
+
+        .timeline-marker.start {
+            left: 0%;
+        }
+
+        .timeline-marker.end {
+            left: 100%;
+        }
+
+        .timeline-time {
+            font-size: 10px;
+            color: #82CDFF;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        body.fullscreen-mode .timeline-container {
+            z-index: 200;
+        }
+
         #grid-overlay {
             position: absolute;
             top: 50%;
@@ -1079,6 +1190,35 @@
         </div>
     </div>
 
+    <!-- Timeline Editor -->
+    <div class="timeline-container" id="timelineContainer">
+        <button class="timeline-btn" id="timelinePlayBtn" title="Play/Pause">
+            <svg id="playIcon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M2 1L10 6L2 11V1Z"/>
+            </svg>
+            <svg id="pauseIcon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" style="display: none;">
+                <rect x="2" y="1" width="3" height="10"/>
+                <rect x="7" y="1" width="3" height="10"/>
+            </svg>
+        </button>
+        <span class="timeline-time" id="timelineCurrentTime">0:00</span>
+        <div class="timeline-track" id="timelineTrack">
+            <div class="timeline-progress" id="timelineProgress"></div>
+            <div class="timeline-markers">
+                <div class="timeline-marker start"></div>
+                <div class="timeline-marker end"></div>
+            </div>
+            <div class="timeline-playhead" id="timelinePlayhead"></div>
+        </div>
+        <span class="timeline-time" id="timelineTotalTime">0:00</span>
+        <button class="timeline-btn" id="timelineLoopBtn" title="Loop">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M1 4C1 2.5 2.5 1 4 1H8C9.5 1 11 2.5 11 4V5M11 8C11 9.5 9.5 11 8 11H4C2.5 11 1 9.5 1 8V7"/>
+                <path d="M9 3L11 5L9 7M3 5L1 7L3 9"/>
+            </svg>
+        </button>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script type="module">
         import * as mp4Muxer from 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/+esm';
@@ -1090,6 +1230,8 @@
         let currentTexture = null;
         let currentTextureInside = null;
         let animationStartTime = 0;
+        let keyframePlaybackStart = 0;
+        let isDraggingTimeline = false;
 
         const defaultValues = {
             size: 280,
@@ -1128,6 +1270,9 @@
             easingP2: { x: 0.75, y: 0.75 },
             // Keyframe animation state
             keyframeEnabled: false,
+            keyframePlaying: false,
+            keyframeProgress: 0,
+            keyframeLoop: true,
             keyframeStart: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 },
             keyframeEnd: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 }
         };
@@ -2037,22 +2182,27 @@
                     }
                 }
 
-                // Keyframe interpolation for camera/rotation
-                if (state.keyframeEnabled) {
-                    const start = state.keyframeStart;
-                    const end = state.keyframeEnd;
+                // Keyframe interpolation for camera/rotation (only when playing)
+                if (state.keyframeEnabled && state.keyframePlaying) {
+                    // Calculate progress from playback start time
+                    const elapsed = timestamp - keyframePlaybackStart;
+                    let progress = elapsed / cycleDuration;
 
-                    // Interpolate rotation
-                    const rotX = start.rotX + (end.rotX - start.rotX) * easedProgress;
-                    const rotY = start.rotY + (end.rotY - start.rotY) * easedProgress;
-                    const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedProgress;
-                    const zoom = start.zoom + (end.zoom - start.zoom) * easedProgress;
+                    // Handle loop or stop at end
+                    if (progress >= 1) {
+                        if (state.keyframeLoop) {
+                            keyframePlaybackStart = timestamp;
+                            progress = 0;
+                        } else {
+                            progress = 1;
+                            state.keyframePlaying = false;
+                            updatePlayPauseButton();
+                        }
+                    }
 
-                    // Apply interpolated values
-                    group.rotation.x = THREE.MathUtils.degToRad(rotX);
-                    group.rotation.y = THREE.MathUtils.degToRad(rotY);
-                    group.rotation.z = THREE.MathUtils.degToRad(rotZ);
-                    group.scale.set(zoom, zoom, zoom);
+                    state.keyframeProgress = progress;
+                    updateTimelineUI();
+                    applyKeyframeAtProgress(progress);
                 }
             }
 
@@ -2263,6 +2413,13 @@
         document.getElementById('keyframeToggle').addEventListener('change', e => {
             state.keyframeEnabled = e.target.checked;
             document.getElementById('keyframeControls').style.display = state.keyframeEnabled ? 'flex' : 'none';
+            document.getElementById('timelineContainer').classList.toggle('visible', state.keyframeEnabled);
+
+            // Reset playback state when toggling
+            state.keyframePlaying = false;
+            state.keyframeProgress = 0;
+            updateTimelineUI();
+            updatePlayPauseButton();
         });
 
         document.getElementById('setKeyframeStart').addEventListener('click', () => {
@@ -2293,6 +2450,105 @@
             const info = document.getElementById('keyframeInfo');
             info.innerHTML = `Start: rot(${start.rotX}, ${start.rotY}, ${start.rotZ}) zoom(${start.zoom.toFixed(1)})<br>End: rot(${end.rotX}, ${end.rotY}, ${end.rotZ}) zoom(${end.zoom.toFixed(1)})`;
         }
+
+        // Timeline helper functions
+        function updateTimelineUI() {
+            const progress = state.keyframeProgress;
+            document.getElementById('timelineProgress').style.width = `${progress * 100}%`;
+            document.getElementById('timelinePlayhead').style.left = `${progress * 100}%`;
+
+            // Update time displays based on loop duration
+            const cycleDuration = state.speed > 0 ? 8000 / state.speed : 8000;
+            const currentMs = progress * cycleDuration;
+            const totalMs = cycleDuration;
+
+            document.getElementById('timelineCurrentTime').textContent = formatTime(currentMs);
+            document.getElementById('timelineTotalTime').textContent = formatTime(totalMs);
+        }
+
+        function formatTime(ms) {
+            const seconds = Math.floor(ms / 1000);
+            const frames = Math.floor((ms % 1000) / (1000 / 30));
+            return `${seconds}:${frames.toString().padStart(2, '0')}`;
+        }
+
+        function updatePlayPauseButton() {
+            const playIcon = document.getElementById('playIcon');
+            const pauseIcon = document.getElementById('pauseIcon');
+            if (state.keyframePlaying) {
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            } else {
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            }
+        }
+
+        // Timeline play/pause button
+        document.getElementById('timelinePlayBtn').addEventListener('click', () => {
+            state.keyframePlaying = !state.keyframePlaying;
+            if (state.keyframePlaying) {
+                // Reset animation start time so playback starts from current progress
+                keyframePlaybackStart = performance.now() - (state.keyframeProgress * (8000 / state.speed));
+            }
+            updatePlayPauseButton();
+        });
+
+        // Timeline loop toggle
+        document.getElementById('timelineLoopBtn').addEventListener('click', () => {
+            state.keyframeLoop = !state.keyframeLoop;
+            document.getElementById('timelineLoopBtn').classList.toggle('active', state.keyframeLoop);
+        });
+
+        // Initialize loop button state
+        document.getElementById('timelineLoopBtn').classList.add('active');
+
+        // Timeline scrubbing
+        function handleTimelineScrub(e) {
+            const track = document.getElementById('timelineTrack');
+            const rect = track.getBoundingClientRect();
+            const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+            state.keyframeProgress = x / rect.width;
+            updateTimelineUI();
+            applyKeyframeAtProgress(state.keyframeProgress);
+        }
+
+        function applyKeyframeAtProgress(progress) {
+            // Apply easing to the progress
+            const easedProgress = applyEasing(progress, state.easingP1, state.easingP2);
+
+            const start = state.keyframeStart;
+            const end = state.keyframeEnd;
+
+            // Interpolate rotation
+            const rotX = start.rotX + (end.rotX - start.rotX) * easedProgress;
+            const rotY = start.rotY + (end.rotY - start.rotY) * easedProgress;
+            const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedProgress;
+            const zoom = start.zoom + (end.zoom - start.zoom) * easedProgress;
+
+            // Apply interpolated values
+            group.rotation.x = THREE.MathUtils.degToRad(rotX);
+            group.rotation.y = THREE.MathUtils.degToRad(rotY);
+            group.rotation.z = THREE.MathUtils.degToRad(rotZ);
+            group.scale.set(zoom, zoom, zoom);
+        }
+
+        document.getElementById('timelineTrack').addEventListener('mousedown', (e) => {
+            isDraggingTimeline = true;
+            state.keyframePlaying = false;
+            updatePlayPauseButton();
+            handleTimelineScrub(e);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingTimeline) {
+                handleTimelineScrub(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDraggingTimeline = false;
+        });
 
         // Repeat controls (works for both horizontal and vertical modes)
         document.getElementById('repeatMinus').addEventListener('click', () => {
