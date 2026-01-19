@@ -2196,7 +2196,7 @@
             const cycleDuration = 8000 / state.speed;
             totalFrames = Math.ceil((cycleDuration / 1000) * 60);
 
-            btn.textContent = 'Exporting...';
+            btn.textContent = '0%';
             btn.style.background = '#82CDFF';
             btn.style.color = '#001550';
             btn.disabled = true;
@@ -2356,6 +2356,10 @@
                 frame.close();
 
                 frameNumber++;
+
+                // Update progress
+                const percent = Math.round((frameNumber / totalFrames) * 100);
+                btn.textContent = `${percent}%`;
 
                 captureFrameId = requestAnimationFrame(captureFrame);
             };
