@@ -2337,7 +2337,10 @@
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = videoWidth;
                 tempCanvas.height = videoHeight;
-                const tempCtx = tempCanvas.getContext('2d');
+                const tempCtx = tempCanvas.getContext('2d', { alpha: false });
+                // Fill with background color first to prevent any black areas
+                tempCtx.fillStyle = '#' + state.bgColor;
+                tempCtx.fillRect(0, 0, videoWidth, videoHeight);
                 // Scale from high-DPI source to logical destination
                 tempCtx.drawImage(
                     renderer.domElement,
