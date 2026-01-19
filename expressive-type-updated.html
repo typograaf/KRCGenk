@@ -369,6 +369,12 @@
             color: #001550;
         }
 
+        .size-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         /* Easing Curve Editor */
         .easing-container {
             background: #1a2c62;
@@ -2101,6 +2107,7 @@
         // Preview toggle (switches between canvas preview and fullscreen mode)
         document.getElementById('previewToggle').addEventListener('change', e => {
             state.showPreview = e.target.checked;
+            const sizeButtons = document.querySelectorAll('#sizeButtons .size-btn');
             if (state.showPreview) {
                 // Normal preview mode
                 document.body.classList.remove('fullscreen-mode');
@@ -2108,12 +2115,16 @@
                 camera.aspect = state.canvasWidth / state.canvasHeight;
                 camera.updateProjectionMatrix();
                 scaleCanvasToFit();
+                // Enable canvas size buttons
+                sizeButtons.forEach(btn => btn.classList.remove('disabled'));
             } else {
                 // Fullscreen mode
                 document.body.classList.add('fullscreen-mode');
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
+                // Disable canvas size buttons
+                sizeButtons.forEach(btn => btn.classList.add('disabled'));
             }
             updateHeaderColors();
         });
