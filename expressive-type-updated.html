@@ -435,6 +435,18 @@
             gap: 6px;
         }
 
+        .keyframe-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .keyframe-buttons .output-btn.active {
+            background: #82CDFF;
+            color: #001550;
+        }
+
         .output-btn {
             flex: 1;
             background: #1a2c62;
@@ -1022,6 +1034,29 @@
             </div>
         </div>
 
+        <!-- Camera Keyframes -->
+        <div class="panel">
+            <span class="control-label">Camera Keyframes</span>
+            <div class="toggle-group">
+                <div class="toggle-row">
+                    <input type="checkbox" class="toggle-checkbox" id="keyframeToggle">
+                    <label class="toggle-box" for="keyframeToggle">
+                        <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </label>
+                    <span class="toggle-label">Enable Keyframes</span>
+                </div>
+            </div>
+            <div class="keyframe-buttons" id="keyframeControls" style="display: none;">
+                <button class="output-btn" id="setKeyframeStart">Set Start</button>
+                <button class="output-btn" id="setKeyframeEnd">Set End</button>
+                <div class="keyframe-info" id="keyframeInfo" style="font-size: 9px; margin-top: 8px; color: #82CDFF; opacity: 0.7;">
+                    Start & End not set
+                </div>
+            </div>
+        </div>
+
         <!-- Easing Curve -->
         <div class="panel">
             <span class="control-label">Easing Curve</span>
@@ -1090,7 +1125,11 @@
             repeat: 2,
             verticalRepeat: 3,
             easingP1: { x: 0.25, y: 0.25 },
-            easingP2: { x: 0.75, y: 0.75 }
+            easingP2: { x: 0.75, y: 0.75 },
+            // Keyframe animation state
+            keyframeEnabled: false,
+            keyframeStart: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 },
+            keyframeEnd: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 }
         };
 
         // Easing editor state
@@ -1997,6 +2036,24 @@
                         currentTextureInside.offset.y = 0;
                     }
                 }
+
+                // Keyframe interpolation for camera/rotation
+                if (state.keyframeEnabled) {
+                    const start = state.keyframeStart;
+                    const end = state.keyframeEnd;
+
+                    // Interpolate rotation
+                    const rotX = start.rotX + (end.rotX - start.rotX) * easedProgress;
+                    const rotY = start.rotY + (end.rotY - start.rotY) * easedProgress;
+                    const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedProgress;
+                    const zoom = start.zoom + (end.zoom - start.zoom) * easedProgress;
+
+                    // Apply interpolated values
+                    group.rotation.x = THREE.MathUtils.degToRad(rotX);
+                    group.rotation.y = THREE.MathUtils.degToRad(rotY);
+                    group.rotation.z = THREE.MathUtils.degToRad(rotZ);
+                    group.scale.set(zoom, zoom, zoom);
+                }
             }
 
             renderer.render(scene, camera);
@@ -2200,6 +2257,41 @@
             }
             camera.updateProjectionMatrix();
             camera.lookAt(0, 0, 0);
+        }
+
+        // Keyframe animation controls
+        document.getElementById('keyframeToggle').addEventListener('change', e => {
+            state.keyframeEnabled = e.target.checked;
+            document.getElementById('keyframeControls').style.display = state.keyframeEnabled ? 'flex' : 'none';
+        });
+
+        document.getElementById('setKeyframeStart').addEventListener('click', () => {
+            state.keyframeStart = {
+                rotX: state.rotX,
+                rotY: state.rotY,
+                rotZ: state.rotZ,
+                zoom: state.zoom
+            };
+            document.getElementById('setKeyframeStart').classList.add('active');
+            updateKeyframeInfo();
+        });
+
+        document.getElementById('setKeyframeEnd').addEventListener('click', () => {
+            state.keyframeEnd = {
+                rotX: state.rotX,
+                rotY: state.rotY,
+                rotZ: state.rotZ,
+                zoom: state.zoom
+            };
+            document.getElementById('setKeyframeEnd').classList.add('active');
+            updateKeyframeInfo();
+        });
+
+        function updateKeyframeInfo() {
+            const start = state.keyframeStart;
+            const end = state.keyframeEnd;
+            const info = document.getElementById('keyframeInfo');
+            info.innerHTML = `Start: rot(${start.rotX}, ${start.rotY}, ${start.rotZ}) zoom(${start.zoom.toFixed(1)})<br>End: rot(${end.rotX}, ${end.rotY}, ${end.rotZ}) zoom(${end.zoom.toFixed(1)})`;
         }
 
         // Repeat controls (works for both horizontal and vertical modes)
@@ -2413,7 +2505,9 @@
             }
 
             const cycleDuration = 8000 / state.speed;
-            totalFrames = Math.ceil((cycleDuration / 1000) * 60);
+            // Double the frames when keyframes enabled (for 2 loops: forward + backward)
+            const loopCount = state.keyframeEnabled ? 2 : 1;
+            totalFrames = Math.ceil((cycleDuration / 1000) * 60) * loopCount;
 
             btn.textContent = '0%';
             btn.style.background = '#82CDFF';
@@ -2553,8 +2647,18 @@
                     return;
                 }
 
-                const linearProgress = frameNumber / totalFrames;
-                const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+                // Calculate progress - for keyframes we have 2 loops (forward, then backward)
+                const framesPerLoop = totalFrames / loopCount;
+                const currentLoop = Math.floor(frameNumber / framesPerLoop);
+                const frameInLoop = frameNumber % framesPerLoop;
+                let loopProgress = frameInLoop / framesPerLoop;
+
+                // For second loop with keyframes, reverse direction (ping-pong)
+                if (state.keyframeEnabled && currentLoop === 1) {
+                    loopProgress = 1 - loopProgress;
+                }
+
+                const easedProgress = applyEasing(loopProgress, state.easingP1, state.easingP2);
 
                 if (currentTexture) {
                     if (state.verticalMode) {
@@ -2573,6 +2677,22 @@
                         currentTextureInside.offset.x = easedProgress;
                         currentTextureInside.offset.y = 0;
                     }
+                }
+
+                // Apply keyframe interpolation for rotation/zoom during export
+                if (state.keyframeEnabled) {
+                    const start = state.keyframeStart;
+                    const end = state.keyframeEnd;
+
+                    const rotX = start.rotX + (end.rotX - start.rotX) * easedProgress;
+                    const rotY = start.rotY + (end.rotY - start.rotY) * easedProgress;
+                    const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedProgress;
+                    const zoom = start.zoom + (end.zoom - start.zoom) * easedProgress;
+
+                    group.rotation.x = THREE.MathUtils.degToRad(rotX);
+                    group.rotation.y = THREE.MathUtils.degToRad(rotY);
+                    group.rotation.z = THREE.MathUtils.degToRad(rotZ);
+                    group.scale.set(zoom, zoom, zoom);
                 }
 
                 renderer.render(scene, camera);
