@@ -1211,6 +1211,11 @@
             <div class="timeline-playhead" id="timelinePlayhead"></div>
         </div>
         <span class="timeline-time" id="timelineTotalTime">0:00</span>
+        <button class="timeline-btn" id="timelinePingPongBtn" title="Ping-Pong (back and forth)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M1 6H11M3 3L1 6L3 9M9 3L11 6L9 9"/>
+            </svg>
+        </button>
         <button class="timeline-btn" id="timelineLoopBtn" title="Loop">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M1 4C1 2.5 2.5 1 4 1H8C9.5 1 11 2.5 11 4V5M11 8C11 9.5 9.5 11 8 11H4C2.5 11 1 9.5 1 8V7"/>
@@ -1232,6 +1237,7 @@
         let animationStartTime = 0;
         let keyframePlaybackStart = 0;
         let isDraggingTimeline = false;
+        let keyframePingPongReverse = false;
 
         const defaultValues = {
             size: 280,
@@ -1273,6 +1279,7 @@
             keyframePlaying: false,
             keyframeProgress: 0,
             keyframeLoop: true,
+            keyframePingPong: false,
             keyframeStart: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 },
             keyframeEnd: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1 }
         };
@@ -2156,57 +2163,73 @@
 
             if (state.speed > 0) {
                 const cycleDuration = 8000 / state.speed;
-                const elapsed = (timestamp - animationStartTime) % cycleDuration;
-                const linearProgress = elapsed / cycleDuration;
 
-                const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+                // When keyframes are enabled, texture animation is controlled by keyframe progress
+                if (state.keyframeEnabled) {
+                    if (state.keyframePlaying) {
+                        // Calculate progress from playback start time
+                        const elapsed = timestamp - keyframePlaybackStart;
+                        let progress = elapsed / cycleDuration;
 
-                const offset = easedProgress;
-
-                if (currentTexture) {
-                    if (state.verticalMode) {
-                        currentTexture.offset.y = -offset; // Bottom to top
-                        currentTexture.offset.x = 0;
-                    } else {
-                        currentTexture.offset.x = offset;
-                        currentTexture.offset.y = 0;
-                    }
-                }
-                if (currentTextureInside) {
-                    if (state.verticalMode) {
-                        currentTextureInside.offset.y = -offset; // Bottom to top
-                        currentTextureInside.offset.x = 0;
-                    } else {
-                        currentTextureInside.offset.x = offset;
-                        currentTextureInside.offset.y = 0;
-                    }
-                }
-
-                // Keyframe interpolation for camera/rotation (only when playing)
-                if (state.keyframeEnabled && state.keyframePlaying) {
-                    // Calculate progress from playback start time
-                    const elapsed = timestamp - keyframePlaybackStart;
-                    let progress = elapsed / cycleDuration;
-
-                    // Handle loop or stop at end
-                    if (progress >= 1) {
-                        if (state.keyframeLoop) {
-                            keyframePlaybackStart = timestamp;
-                            progress = 0;
-                        } else {
-                            progress = 1;
-                            state.keyframePlaying = false;
-                            updatePlayPauseButton();
+                        // Handle loop or stop at end
+                        if (progress >= 1) {
+                            if (state.keyframePingPong) {
+                                // Ping-pong: reverse direction
+                                keyframePingPongReverse = !keyframePingPongReverse;
+                                keyframePlaybackStart = timestamp;
+                                progress = 0;
+                            } else if (state.keyframeLoop) {
+                                // Normal loop: restart from beginning
+                                keyframePlaybackStart = timestamp;
+                                progress = 0;
+                            } else {
+                                // No loop: stop at end
+                                progress = 1;
+                                state.keyframePlaying = false;
+                                updatePlayPauseButton();
+                            }
                         }
-                    }
 
-                    state.keyframeProgress = progress;
-                    updateTimelineUI();
-                    applyKeyframeAtProgress(progress);
+                        // Apply ping-pong reversal
+                        const displayProgress = keyframePingPongReverse ? 1 - progress : progress;
+
+                        state.keyframeProgress = displayProgress;
+                        updateTimelineUI();
+                        applyKeyframeAtProgress(displayProgress);
+                    }
+                    // When keyframes enabled but not playing, texture stays at current keyframe position
+                } else {
+                    // Normal mode: texture animation based on timestamp
+                    const elapsed = (timestamp - animationStartTime) % cycleDuration;
+                    const linearProgress = elapsed / cycleDuration;
+                    const easedProgress = applyEasing(linearProgress, state.easingP1, state.easingP2);
+
+                    applyTextureOffset(easedProgress);
                 }
             }
 
             renderer.render(scene, camera);
+        }
+
+        function applyTextureOffset(offset) {
+            if (currentTexture) {
+                if (state.verticalMode) {
+                    currentTexture.offset.y = -offset;
+                    currentTexture.offset.x = 0;
+                } else {
+                    currentTexture.offset.x = offset;
+                    currentTexture.offset.y = 0;
+                }
+            }
+            if (currentTextureInside) {
+                if (state.verticalMode) {
+                    currentTextureInside.offset.y = -offset;
+                    currentTextureInside.offset.x = 0;
+                } else {
+                    currentTextureInside.offset.x = offset;
+                    currentTextureInside.offset.y = 0;
+                }
+            }
         }
 
         // Sliders
@@ -2488,8 +2511,25 @@
         document.getElementById('timelinePlayBtn').addEventListener('click', () => {
             state.keyframePlaying = !state.keyframePlaying;
             if (state.keyframePlaying) {
-                // Reset animation start time so playback starts from current progress
-                keyframePlaybackStart = performance.now() - (state.keyframeProgress * (8000 / state.speed));
+                const cycleDuration = 8000 / state.speed;
+                // Determine direction for ping-pong based on current progress
+                if (state.keyframePingPong) {
+                    // If at end, start going backward; if at start or middle, go forward
+                    if (state.keyframeProgress >= 1) {
+                        keyframePingPongReverse = true;
+                        keyframePlaybackStart = performance.now();
+                    } else if (state.keyframeProgress <= 0) {
+                        keyframePingPongReverse = false;
+                        keyframePlaybackStart = performance.now();
+                    } else {
+                        // Resume from current position
+                        const internalProgress = keyframePingPongReverse ? 1 - state.keyframeProgress : state.keyframeProgress;
+                        keyframePlaybackStart = performance.now() - (internalProgress * cycleDuration);
+                    }
+                } else {
+                    // Normal mode: reset animation start time so playback starts from current progress
+                    keyframePlaybackStart = performance.now() - (state.keyframeProgress * cycleDuration);
+                }
             }
             updatePlayPauseButton();
         });
@@ -2498,6 +2538,12 @@
         document.getElementById('timelineLoopBtn').addEventListener('click', () => {
             state.keyframeLoop = !state.keyframeLoop;
             document.getElementById('timelineLoopBtn').classList.toggle('active', state.keyframeLoop);
+        });
+
+        // Timeline ping-pong toggle
+        document.getElementById('timelinePingPongBtn').addEventListener('click', () => {
+            state.keyframePingPong = !state.keyframePingPong;
+            document.getElementById('timelinePingPongBtn').classList.toggle('active', state.keyframePingPong);
         });
 
         // Initialize loop button state
@@ -2531,6 +2577,9 @@
             group.rotation.y = THREE.MathUtils.degToRad(rotY);
             group.rotation.z = THREE.MathUtils.degToRad(rotZ);
             group.scale.set(zoom, zoom, zoom);
+
+            // Apply texture offset (letter animation tied to keyframe progress)
+            applyTextureOffset(easedProgress);
         }
 
         document.getElementById('timelineTrack').addEventListener('mousedown', (e) => {
