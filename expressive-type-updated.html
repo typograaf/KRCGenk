@@ -2587,6 +2587,14 @@
             group.rotation.z = THREE.MathUtils.degToRad(rotZ);
             group.scale.set(zoom, zoom, zoom);
 
+            // Update sliders to show current interpolated values
+            document.getElementById('rotXSlider').value = rotX;
+            document.getElementById('rotXValue').value = Math.round(rotX);
+            document.getElementById('rotYSlider').value = rotY;
+            document.getElementById('rotYValue').value = Math.round(rotY);
+            document.getElementById('rotZSlider').value = rotZ;
+            document.getElementById('rotZValue').value = Math.round(rotZ);
+
             // Apply texture offset (keeps moving forward, doesn't reverse in ping-pong)
             applyTextureOffset(easedTextureProgress);
         }
