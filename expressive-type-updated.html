@@ -765,6 +765,15 @@
                         </label>
                         <span class="toggle-label">Vertical Mode</span>
                     </div>
+                    <div class="toggle-row">
+                        <input type="checkbox" class="toggle-checkbox" id="insideViewToggle">
+                        <label class="toggle-box" for="insideViewToggle">
+                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </label>
+                        <span class="toggle-label">Inside View</span>
+                    </div>
                     <div class="toggle-row" id="repeatRow">
                         <button class="repeat-btn" id="repeatMinus">
                             <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1018,6 +1027,7 @@
             offsetY: 0,
             showGrid: false,
             verticalMode: false,
+            insideView: false,
             repeat: 2,
             verticalRepeat: 3,
             easingP1: { x: 0.25, y: 0.25 },
@@ -2034,6 +2044,21 @@
             document.getElementById('rotZValue').value = state.rotZ;
             build();
         });
+
+        // Inside view toggle
+        document.getElementById('insideViewToggle').addEventListener('change', e => {
+            state.insideView = e.target.checked;
+            updateCameraPosition();
+        });
+
+        function updateCameraPosition() {
+            if (state.insideView) {
+                camera.position.set(0, 0, 0);
+            } else {
+                camera.position.set(0, 0, 800);
+            }
+            camera.lookAt(0, 0, 0);
+        }
 
         // Repeat controls (works for both horizontal and vertical modes)
         document.getElementById('repeatMinus').addEventListener('click', () => {
