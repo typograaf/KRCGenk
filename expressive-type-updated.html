@@ -1293,6 +1293,22 @@
             offsetY: 0
         };
 
+        // Safe math expression evaluator (supports +, -, *, /, parentheses)
+        function evalMathExpr(expr) {
+            // Remove whitespace and validate characters
+            expr = expr.replace(/\s/g, '');
+            if (!/^[\d.+\-*/()]+$/.test(expr)) return null;
+            if (expr === '') return null;
+
+            try {
+                // Use Function constructor for safe evaluation (no access to global scope)
+                const result = new Function('return ' + expr)();
+                return typeof result === 'number' && isFinite(result) ? result : null;
+            } catch {
+                return null;
+            }
+        }
+
         const state = {
             text: 'KRC GENK  ',
             canvasWidth: 1920,
@@ -2301,12 +2317,14 @@
             });
 
 
-            valueInput.addEventListener('input', e => {
-                const numValue = parseFloat(e.target.value.replace(suf, ''));
-                if (!isNaN(numValue)) {
+            // Evaluate math expression and apply value
+            const evaluateAndApply = () => {
+                const expr = valueInput.value.replace(suf, '').trim();
+                const result = evalMathExpr(expr);
+                if (result !== null) {
                     const min = parseFloat(slider.min);
                     const max = parseFloat(slider.max);
-                    const clampedValue = Math.max(min, Math.min(max, numValue));
+                    const clampedValue = Math.max(min, Math.min(max, result));
                     state[key] = clampedValue;
                     slider.value = clampedValue;
                     valueInput.value = clampedValue + suf;
@@ -2314,11 +2332,18 @@
                     else if (key === 'offsetX' || key === 'offsetY') updateOffset();
                     else if (key !== 'speed') build();
                 }
-            });
+            };
 
-            // Arrow key support for value inputs (shift = 10x)
+            // Evaluate on blur
+            valueInput.addEventListener('blur', evaluateAndApply);
+
+            // Keyboard support: Enter to evaluate, Arrow keys to increment/decrement
             valueInput.addEventListener('keydown', e => {
-                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    evaluateAndApply();
+                    valueInput.blur();
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
                     e.preventDefault();
                     const baseStep = parseFloat(slider.step) || 1;
                     const step = e.shiftKey ? baseStep * 10 : baseStep;
