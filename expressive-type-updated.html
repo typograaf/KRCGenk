@@ -465,6 +465,43 @@
             border-radius: 12px;
         }
 
+        /* Fullscreen mode (preview off) */
+        body.fullscreen-mode {
+            padding: 0;
+        }
+
+        body.fullscreen-mode #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+
+        body.fullscreen-mode #canvas-container canvas {
+            border-radius: 0;
+            width: 100% !important;
+            height: 100% !important;
+            transform: none !important;
+        }
+
+        body.fullscreen-mode .sidebar-left,
+        body.fullscreen-mode .sidebar-right {
+            position: fixed;
+            top: 24px;
+            z-index: 100;
+            height: calc(100vh - 48px);
+        }
+
+        body.fullscreen-mode .sidebar-left {
+            left: 24px;
+        }
+
+        body.fullscreen-mode .sidebar-right {
+            right: 24px;
+        }
+
         #grid-overlay {
             position: absolute;
             top: 50%;
@@ -1121,7 +1158,14 @@
             });
 
             window.addEventListener('resize', () => {
-                scaleCanvasToFit();
+                if (!state.showPreview) {
+                    // Fullscreen mode - resize renderer to window
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                } else {
+                    scaleCanvasToFit();
+                }
             });
 
             let drag = false, prev = {x:0, y:0};
@@ -2036,17 +2080,22 @@
             });
         });
 
-        // Preview toggle
+        // Preview toggle (switches between canvas preview and fullscreen mode)
         document.getElementById('previewToggle').addEventListener('change', e => {
             state.showPreview = e.target.checked;
-            const canvas = renderer.domElement;
-            const container = document.getElementById('canvas-container');
             if (state.showPreview) {
-                canvas.style.visibility = 'visible';
-                container.style.background = '#001550';
+                // Normal preview mode
+                document.body.classList.remove('fullscreen-mode');
+                renderer.setSize(state.canvasWidth, state.canvasHeight);
+                camera.aspect = state.canvasWidth / state.canvasHeight;
+                camera.updateProjectionMatrix();
+                scaleCanvasToFit();
             } else {
-                canvas.style.visibility = 'hidden';
-                container.style.background = '#' + state.bgColor;
+                // Fullscreen mode
+                document.body.classList.add('fullscreen-mode');
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
             }
         });
 
@@ -2153,10 +2202,6 @@
                 swatch.classList.add('active');
                 state.bgColor = swatch.dataset.color;
                 scene.background = new THREE.Color(parseInt(state.bgColor, 16));
-                // Update container background when preview is off
-                if (!state.showPreview) {
-                    document.getElementById('canvas-container').style.background = '#' + state.bgColor;
-                }
                 build();
             });
         });
