@@ -748,6 +748,15 @@
             <div class="panel">
                 <div class="toggle-group">
                     <div class="toggle-row">
+                        <input type="checkbox" class="toggle-checkbox" id="previewToggle" checked>
+                        <label class="toggle-box" for="previewToggle">
+                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </label>
+                        <span class="toggle-label">Show Preview</span>
+                    </div>
+                    <div class="toggle-row">
                         <input type="checkbox" class="toggle-checkbox" id="gridToggle">
                         <label class="toggle-box" for="gridToggle">
                             <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1027,6 +1036,7 @@
             offsetX: 0,
             offsetY: 0,
             showGrid: false,
+            showPreview: true,
             verticalMode: false,
             insideView: false,
             repeat: 2,
@@ -2026,6 +2036,20 @@
             });
         });
 
+        // Preview toggle
+        document.getElementById('previewToggle').addEventListener('change', e => {
+            state.showPreview = e.target.checked;
+            const canvas = renderer.domElement;
+            const container = document.getElementById('canvas-container');
+            if (state.showPreview) {
+                canvas.style.visibility = 'visible';
+                container.style.background = '#001550';
+            } else {
+                canvas.style.visibility = 'hidden';
+                container.style.background = '#' + state.bgColor;
+            }
+        });
+
         // Grid toggle
         document.getElementById('gridToggle').addEventListener('change', e => {
             state.showGrid = e.target.checked;
@@ -2129,6 +2153,10 @@
                 swatch.classList.add('active');
                 state.bgColor = swatch.dataset.color;
                 scene.background = new THREE.Color(parseInt(state.bgColor, 16));
+                // Update container background when preview is off
+                if (!state.showPreview) {
+                    document.getElementById('canvas-container').style.background = '#' + state.bgColor;
+                }
                 build();
             });
         });
