@@ -529,11 +529,12 @@
         .timeline-container {
             display: none;
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
             background: #0d2159;
-            border-top: 1px solid #334473;
+            border: 1px solid #334473;
+            border-radius: 6px;
             padding: 12px;
             z-index: 200;
             gap: 8px;
@@ -542,6 +543,11 @@
 
         .timeline-container.visible {
             display: flex;
+        }
+
+        /* Move branding up when timeline is visible */
+        body.timeline-active .branding {
+            margin-bottom: 52px;
         }
 
         .timeline-btn {
@@ -2428,6 +2434,7 @@
             state.keyframeEnabled = e.target.checked;
             document.getElementById('keyframeControls').style.display = state.keyframeEnabled ? 'flex' : 'none';
             document.getElementById('timelineContainer').classList.toggle('visible', state.keyframeEnabled);
+            document.body.classList.toggle('timeline-active', state.keyframeEnabled);
 
             // Reset playback state when toggling
             state.keyframePlaying = false;
