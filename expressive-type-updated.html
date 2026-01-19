@@ -545,9 +545,9 @@
             display: flex;
         }
 
-        /* Move branding up when timeline is visible */
+        /* Move branding up when timeline is visible (24px gap + ~30px timeline height) */
         body.timeline-active .branding {
-            margin-bottom: 52px;
+            margin-bottom: 54px;
         }
 
         .timeline-btn {
@@ -784,6 +784,18 @@
 
             .size-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+
+            .timeline-container {
+                position: static;
+                margin: 16px;
+                bottom: auto;
+                left: auto;
+                right: auto;
+            }
+
+            body.timeline-active .branding {
+                margin-bottom: 0;
             }
         }
 
@@ -1244,6 +1256,7 @@
         let keyframePlaybackStart = 0;
         let isDraggingTimeline = false;
         let keyframePingPongReverse = false;
+        let keyframeTextureProgress = 0;
 
         const defaultValues = {
             size: 280,
@@ -2179,7 +2192,7 @@
                         // Handle loop at end
                         if (progress >= 1) {
                             if (state.keyframePingPong) {
-                                // Ping-pong: reverse direction
+                                // Ping-pong: reverse direction for rotation
                                 keyframePingPongReverse = !keyframePingPongReverse;
                             }
                             // Always loop: restart from beginning
@@ -2187,12 +2200,15 @@
                             progress = 0;
                         }
 
-                        // Apply ping-pong reversal
+                        // Apply ping-pong reversal for rotation only
                         const displayProgress = keyframePingPongReverse ? 1 - progress : progress;
+
+                        // Texture keeps moving forward (use linear progress, not reversed)
+                        keyframeTextureProgress = progress;
 
                         state.keyframeProgress = displayProgress;
                         updateTimelineUI();
-                        applyKeyframeAtProgress(displayProgress);
+                        applyKeyframeAtProgress(displayProgress, progress);
                     }
                     // When keyframes enabled but not playing, texture stays at current keyframe position
                 } else {
@@ -2548,18 +2564,22 @@
             applyKeyframeAtProgress(state.keyframeProgress);
         }
 
-        function applyKeyframeAtProgress(progress) {
-            // Apply easing to the progress
-            const easedProgress = applyEasing(progress, state.easingP1, state.easingP2);
+        function applyKeyframeAtProgress(rotationProgress, textureProgress) {
+            // If textureProgress not provided, use rotationProgress (for scrubbing)
+            if (textureProgress === undefined) textureProgress = rotationProgress;
+
+            // Apply easing to the progress values
+            const easedRotationProgress = applyEasing(rotationProgress, state.easingP1, state.easingP2);
+            const easedTextureProgress = applyEasing(textureProgress, state.easingP1, state.easingP2);
 
             const start = state.keyframeStart;
             const end = state.keyframeEnd;
 
             // Interpolate rotation
-            const rotX = start.rotX + (end.rotX - start.rotX) * easedProgress;
-            const rotY = start.rotY + (end.rotY - start.rotY) * easedProgress;
-            const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedProgress;
-            const zoom = start.zoom + (end.zoom - start.zoom) * easedProgress;
+            const rotX = start.rotX + (end.rotX - start.rotX) * easedRotationProgress;
+            const rotY = start.rotY + (end.rotY - start.rotY) * easedRotationProgress;
+            const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedRotationProgress;
+            const zoom = start.zoom + (end.zoom - start.zoom) * easedRotationProgress;
 
             // Apply interpolated values
             group.rotation.x = THREE.MathUtils.degToRad(rotX);
@@ -2567,8 +2587,8 @@
             group.rotation.z = THREE.MathUtils.degToRad(rotZ);
             group.scale.set(zoom, zoom, zoom);
 
-            // Apply texture offset (letter animation tied to keyframe progress)
-            applyTextureOffset(easedProgress);
+            // Apply texture offset (keeps moving forward, doesn't reverse in ping-pong)
+            applyTextureOffset(easedTextureProgress);
         }
 
         document.getElementById('timelineTrack').addEventListener('mousedown', (e) => {
@@ -2947,28 +2967,33 @@
                 const frameInLoop = frameNumber % framesPerLoop;
                 let loopProgress = frameInLoop / framesPerLoop;
 
-                // For second loop with keyframes, reverse direction (ping-pong)
+                // Texture progress keeps moving forward (doesn't reverse in ping-pong)
+                const textureProgress = frameNumber / framesPerLoop;
+                const easedTextureProgress = applyEasing(textureProgress % 1, state.easingP1, state.easingP2);
+
+                // For second loop with keyframes, reverse direction for rotation only (ping-pong)
+                let rotationProgress = loopProgress;
                 if (state.keyframeEnabled && currentLoop === 1) {
-                    loopProgress = 1 - loopProgress;
+                    rotationProgress = 1 - loopProgress;
                 }
 
-                const easedProgress = applyEasing(loopProgress, state.easingP1, state.easingP2);
+                const easedRotationProgress = applyEasing(rotationProgress, state.easingP1, state.easingP2);
 
                 if (currentTexture) {
                     if (state.verticalMode) {
-                        currentTexture.offset.y = -easedProgress; // Bottom to top
+                        currentTexture.offset.y = -easedTextureProgress; // Bottom to top
                         currentTexture.offset.x = 0;
                     } else {
-                        currentTexture.offset.x = easedProgress;
+                        currentTexture.offset.x = easedTextureProgress;
                         currentTexture.offset.y = 0;
                     }
                 }
                 if (currentTextureInside) {
                     if (state.verticalMode) {
-                        currentTextureInside.offset.y = -easedProgress; // Bottom to top
+                        currentTextureInside.offset.y = -easedTextureProgress; // Bottom to top
                         currentTextureInside.offset.x = 0;
                     } else {
-                        currentTextureInside.offset.x = easedProgress;
+                        currentTextureInside.offset.x = easedTextureProgress;
                         currentTextureInside.offset.y = 0;
                     }
                 }
@@ -2978,10 +3003,10 @@
                     const start = state.keyframeStart;
                     const end = state.keyframeEnd;
 
-                    const rotX = start.rotX + (end.rotX - start.rotX) * easedProgress;
-                    const rotY = start.rotY + (end.rotY - start.rotY) * easedProgress;
-                    const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedProgress;
-                    const zoom = start.zoom + (end.zoom - start.zoom) * easedProgress;
+                    const rotX = start.rotX + (end.rotX - start.rotX) * easedRotationProgress;
+                    const rotY = start.rotY + (end.rotY - start.rotY) * easedRotationProgress;
+                    const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedRotationProgress;
+                    const zoom = start.zoom + (end.zoom - start.zoom) * easedRotationProgress;
 
                     group.rotation.x = THREE.MathUtils.degToRad(rotX);
                     group.rotation.y = THREE.MathUtils.degToRad(rotY);
