@@ -211,6 +211,11 @@
             opacity: 1;
         }
 
+        .toggle-row.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
         /* Repeat Controls */
         .repeat-controls {
             display: flex;
@@ -2113,6 +2118,7 @@
                 document.getElementById('exportMP4'),
                 document.getElementById('exportMatID')
             ];
+            const gridToggleRow = document.getElementById('gridToggle').closest('.toggle-row');
             if (state.showPreview) {
                 // Normal preview mode
                 document.body.classList.remove('fullscreen-mode');
@@ -2120,18 +2126,24 @@
                 camera.aspect = state.canvasWidth / state.canvasHeight;
                 camera.updateProjectionMatrix();
                 scaleCanvasToFit();
-                // Enable canvas size buttons and export buttons
+                // Enable canvas size buttons, export buttons, and grid toggle
                 sizeButtons.forEach(btn => btn.classList.remove('disabled'));
                 exportButtons.forEach(btn => btn.disabled = false);
+                gridToggleRow.classList.remove('disabled');
             } else {
                 // Fullscreen mode
                 document.body.classList.add('fullscreen-mode');
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
-                // Disable canvas size buttons and export buttons
+                // Disable canvas size buttons, export buttons, and grid toggle
                 sizeButtons.forEach(btn => btn.classList.add('disabled'));
                 exportButtons.forEach(btn => btn.disabled = true);
+                gridToggleRow.classList.add('disabled');
+                // Also hide the grid if it was visible
+                state.showGrid = false;
+                document.getElementById('gridToggle').checked = false;
+                updateGrid();
             }
             updateHeaderColors();
         });
