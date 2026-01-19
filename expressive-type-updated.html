@@ -2108,6 +2108,11 @@
         document.getElementById('previewToggle').addEventListener('change', e => {
             state.showPreview = e.target.checked;
             const sizeButtons = document.querySelectorAll('#sizeButtons .size-btn');
+            const exportButtons = [
+                document.getElementById('exportPNG'),
+                document.getElementById('exportMP4'),
+                document.getElementById('exportMatID')
+            ];
             if (state.showPreview) {
                 // Normal preview mode
                 document.body.classList.remove('fullscreen-mode');
@@ -2115,16 +2120,18 @@
                 camera.aspect = state.canvasWidth / state.canvasHeight;
                 camera.updateProjectionMatrix();
                 scaleCanvasToFit();
-                // Enable canvas size buttons
+                // Enable canvas size buttons and export buttons
                 sizeButtons.forEach(btn => btn.classList.remove('disabled'));
+                exportButtons.forEach(btn => btn.disabled = false);
             } else {
                 // Fullscreen mode
                 document.body.classList.add('fullscreen-mode');
                 renderer.setSize(window.innerWidth, window.innerHeight);
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
-                // Disable canvas size buttons
+                // Disable canvas size buttons and export buttons
                 sizeButtons.forEach(btn => btn.classList.add('disabled'));
+                exportButtons.forEach(btn => btn.disabled = true);
             }
             updateHeaderColors();
         });
