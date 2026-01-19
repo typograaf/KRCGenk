@@ -2255,6 +2255,14 @@
 
         // Export PNG
         document.getElementById('exportPNG').addEventListener('click', () => {
+            // Always export at canvas dimensions regardless of fullscreen mode
+            const wasFullscreen = !state.showPreview;
+            if (wasFullscreen) {
+                renderer.setSize(state.canvasWidth, state.canvasHeight);
+                camera.aspect = state.canvasWidth / state.canvasHeight;
+                camera.updateProjectionMatrix();
+            }
+
             renderer.render(scene, camera);
 
             const dataURL = renderer.domElement.toDataURL('image/png');
@@ -2262,10 +2270,25 @@
             link.download = 'krcg-graphic-' + Date.now() + '.png';
             link.href = dataURL;
             link.click();
+
+            // Restore fullscreen mode if it was active
+            if (wasFullscreen) {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            }
         });
 
         // Export Material ID Map
         document.getElementById('exportMatID').addEventListener('click', () => {
+            // Always export at canvas dimensions regardless of fullscreen mode
+            const wasFullscreen = !state.showPreview;
+            if (wasFullscreen) {
+                renderer.setSize(state.canvasWidth, state.canvasHeight);
+                camera.aspect = state.canvasWidth / state.canvasHeight;
+                camera.updateProjectionMatrix();
+            }
+
             // Store original state
             const originalBackground = scene.background.clone();
             const originalMaterials = [];
@@ -2311,6 +2334,13 @@
 
             // Restore original background
             scene.background = originalBackground;
+
+            // Restore fullscreen mode if it was active
+            if (wasFullscreen) {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            }
         });
 
         // Export MP4
@@ -2343,6 +2373,14 @@
 
             isRecording = true;
             frameNumber = 0;
+
+            // Always export at canvas dimensions regardless of fullscreen mode
+            const wasFullscreen = !state.showPreview;
+            if (wasFullscreen) {
+                renderer.setSize(state.canvasWidth, state.canvasHeight);
+                camera.aspect = state.canvasWidth / state.canvasHeight;
+                camera.updateProjectionMatrix();
+            }
 
             const cycleDuration = 8000 / state.speed;
             totalFrames = Math.ceil((cycleDuration / 1000) * 60);
@@ -2414,6 +2452,12 @@
                 btn.textContent = 'MP4';
                 btn.style.background = '';
                 btn.style.color = '';
+                // Restore fullscreen mode if it was active
+                if (wasFullscreen) {
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                }
                 return;
             }
 
@@ -2440,6 +2484,12 @@
                         btn.style.background = '';
                         btn.style.color = '';
                         btn.disabled = false;
+                        // Restore fullscreen mode if it was active
+                        if (wasFullscreen) {
+                            renderer.setSize(window.innerWidth, window.innerHeight);
+                            camera.aspect = window.innerWidth / window.innerHeight;
+                            camera.updateProjectionMatrix();
+                        }
                     }).catch(e => {
                         console.error('Error finalizing video:', e);
                         alert('Error creating video: ' + e.message);
@@ -2447,12 +2497,24 @@
                         btn.style.background = '';
                         btn.style.color = '';
                         btn.disabled = false;
+                        // Restore fullscreen mode if it was active
+                        if (wasFullscreen) {
+                            renderer.setSize(window.innerWidth, window.innerHeight);
+                            camera.aspect = window.innerWidth / window.innerHeight;
+                            camera.updateProjectionMatrix();
+                        }
                     });
                     return;
                 }
 
                 if (videoEncoder.state !== 'configured') {
                     isRecording = false;
+                    // Restore fullscreen mode if it was active
+                    if (wasFullscreen) {
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                    }
                     return;
                 }
 
