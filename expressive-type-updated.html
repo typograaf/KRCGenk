@@ -1138,7 +1138,7 @@
 
         <!-- Branding Footer -->
         <div class="branding">
-            <img src="Assets/graphic%20tool%20by%20typograaf.svg" alt="A Graphic Tool by Typograaf" style="height: 21px;">
+            <img id="brandingImg" src="Assets/graphic%20tool%20by%20typograaf.svg" alt="A Graphic Tool by Typograaf" style="height: 21px;">
         </div>
     </div>
 
@@ -2390,10 +2390,11 @@
             });
         });
 
-        // Update header colors based on background (only in fullscreen mode)
+        // Update header and branding colors based on background (only in fullscreen mode)
         function updateHeaderColors() {
             const headerIcon = document.getElementById('headerIconPath');
             const headerTitle = document.getElementById('headerTitle');
+            const brandingImg = document.getElementById('brandingImg');
             const lightBgs = ['82cdff', 'ffffff'];
             const isLightBg = lightBgs.includes(state.bgColor.toLowerCase());
 
@@ -2401,10 +2402,13 @@
                 // Dark text for light backgrounds in fullscreen mode
                 headerIcon.setAttribute('fill', '#07144a');
                 headerTitle.style.color = '#07144a';
+                // Filter to convert light blue SVG to dark blue (#07144a)
+                brandingImg.style.filter = 'brightness(0) saturate(100%) invert(8%) sepia(45%) saturate(4848%) hue-rotate(220deg) brightness(96%) contrast(104%)';
             } else {
                 // Default light text
                 headerIcon.setAttribute('fill', '#86D9FF');
                 headerTitle.style.color = '#82cdff';
+                brandingImg.style.filter = 'none';
             }
         }
 
