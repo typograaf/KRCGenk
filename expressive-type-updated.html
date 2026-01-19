@@ -2732,8 +2732,43 @@
             }
         });
 
-        // Export Material ID Map
-        document.getElementById('exportMatID').addEventListener('click', () => {
+        // Export Material ID Map (PNG for static, MP4 for keyframe mode)
+        document.getElementById('exportMatID').addEventListener('click', async () => {
+            const btn = document.getElementById('exportMatID');
+
+            // Helper to apply ID materials
+            function applyIDMaterials() {
+                const originalMaterials = [];
+                const originalBackground = scene.background.clone();
+
+                group.traverse(obj => {
+                    if (obj.isMesh) {
+                        originalMaterials.push({ mesh: obj, material: obj.material });
+                        if (obj.material.side === THREE.FrontSide) {
+                            obj.material = new THREE.MeshBasicMaterial({
+                                color: 0xff0000,
+                                side: THREE.FrontSide
+                            });
+                        } else if (obj.material.side === THREE.BackSide) {
+                            obj.material = new THREE.MeshBasicMaterial({
+                                color: 0x00ff00,
+                                side: THREE.BackSide
+                            });
+                        }
+                    }
+                });
+                scene.background = new THREE.Color(0x0000ff);
+
+                return { originalMaterials, originalBackground };
+            }
+
+            function restoreMaterials(originalMaterials, originalBackground) {
+                originalMaterials.forEach(({ mesh, material }) => {
+                    mesh.material = material;
+                });
+                scene.background = originalBackground;
+            }
+
             // Always export at canvas dimensions regardless of fullscreen mode
             const wasFullscreen = !state.showPreview;
             if (wasFullscreen) {
@@ -2742,57 +2777,249 @@
                 camera.updateProjectionMatrix();
             }
 
-            // Store original state
-            const originalBackground = scene.background.clone();
-            const originalMaterials = [];
-
-            // Store original materials and replace with flat ID colors
-            group.traverse(obj => {
-                if (obj.isMesh) {
-                    originalMaterials.push({ mesh: obj, material: obj.material });
-
-                    // Assign distinct colors based on material side
-                    if (obj.material.side === THREE.FrontSide) {
-                        // Outside face - Red
-                        obj.material = new THREE.MeshBasicMaterial({
-                            color: 0xff0000,
-                            side: THREE.FrontSide
-                        });
-                    } else if (obj.material.side === THREE.BackSide) {
-                        // Inside face - Green
-                        obj.material = new THREE.MeshBasicMaterial({
-                            color: 0x00ff00,
-                            side: THREE.BackSide
-                        });
+            // If keyframes enabled, export as MP4
+            if (state.keyframeEnabled) {
+                // Safari check
+                const isSafari = navigator.vendor && navigator.vendor.includes('Apple');
+                if (isSafari) {
+                    alert('MP4 export is not supported in Safari. Please use Chrome or Edge.');
+                    if (wasFullscreen) {
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
                     }
+                    return;
                 }
-            });
 
-            // Set background to Blue
-            scene.background = new THREE.Color(0x0000ff);
+                if (typeof VideoEncoder === 'undefined') {
+                    alert('MP4 export is not supported in this browser. Please use Chrome or Edge.');
+                    if (wasFullscreen) {
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                    }
+                    return;
+                }
 
-            // Render and capture
-            renderer.render(scene, camera);
+                if (isRecording) return;
 
-            const dataURL = renderer.domElement.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.download = 'krcg-material-id-' + Date.now() + '.png';
-            link.href = dataURL;
-            link.click();
+                isRecording = true;
+                frameNumber = 0;
 
-            // Restore original materials
-            originalMaterials.forEach(({ mesh, material }) => {
-                mesh.material = material;
-            });
+                const cycleDuration = 8000 / state.speed;
+                const loopCount = 2; // Always 2 loops for keyframe (ping-pong)
+                totalFrames = Math.ceil((cycleDuration / 1000) * 60) * loopCount;
 
-            // Restore original background
-            scene.background = originalBackground;
+                btn.textContent = '0%';
+                btn.style.background = '#82CDFF';
+                btn.style.color = '#001550';
+                btn.disabled = true;
 
-            // Restore fullscreen mode if it was active
-            if (wasFullscreen) {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
+                await new Promise(resolve => {
+                    const check = () => {
+                        if (window.mp4Muxer) resolve();
+                        else setTimeout(check, 50);
+                    };
+                    check();
+                });
+
+                const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
+                const videoWidth = state.canvasWidth;
+                const videoHeight = state.canvasHeight;
+
+                const target = new ArrayBufferTarget();
+                const matMuxer = new Muxer({
+                    target,
+                    video: { codec: 'avc', width: videoWidth, height: videoHeight },
+                    fastStart: 'in-memory',
+                    firstTimestampBehavior: 'offset'
+                });
+
+                let encoderFailed = false;
+                const matEncoder = new VideoEncoder({
+                    output: (chunk, meta) => matMuxer.addVideoChunk(chunk, meta),
+                    error: e => {
+                        console.error('Encoder error:', e);
+                        encoderFailed = true;
+                        isRecording = false;
+                        btn.textContent = 'MAT ID';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.disabled = false;
+                    }
+                });
+
+                try {
+                    matEncoder.configure({
+                        codec: 'avc1.640033',
+                        width: videoWidth,
+                        height: videoHeight,
+                        bitrate: 15_000_000,
+                        framerate: 60
+                    });
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    if (encoderFailed || matEncoder.state !== 'configured') {
+                        throw new Error('Encoder failed to configure.');
+                    }
+                } catch (e) {
+                    alert('Failed to start video export: ' + e.message);
+                    isRecording = false;
+                    btn.textContent = 'MAT ID';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.disabled = false;
+                    if (wasFullscreen) {
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                    }
+                    return;
+                }
+
+                // Apply ID materials for the entire export
+                const { originalMaterials, originalBackground } = applyIDMaterials();
+
+                const captureMatFrame = () => {
+                    if (encoderFailed) {
+                        restoreMaterials(originalMaterials, originalBackground);
+                        return;
+                    }
+
+                    if (frameNumber >= totalFrames) {
+                        isRecording = false;
+                        matEncoder.flush().then(() => {
+                            matEncoder.close();
+                            matMuxer.finalize();
+                            const { buffer } = matMuxer.target;
+                            const blob = new Blob([buffer], { type: 'video/mp4' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.download = 'krcg-material-id-' + Date.now() + '.mp4';
+                            link.href = url;
+                            link.click();
+                            URL.revokeObjectURL(url);
+                            btn.textContent = 'MAT ID';
+                            btn.style.background = '';
+                            btn.style.color = '';
+                            btn.disabled = false;
+                            restoreMaterials(originalMaterials, originalBackground);
+                            if (wasFullscreen) {
+                                renderer.setSize(window.innerWidth, window.innerHeight);
+                                camera.aspect = window.innerWidth / window.innerHeight;
+                                camera.updateProjectionMatrix();
+                            }
+                        });
+                        return;
+                    }
+
+                    if (matEncoder.encodeQueueSize > 30) {
+                        setTimeout(captureMatFrame, 10);
+                        return;
+                    }
+
+                    // Calculate progress with keyframe animation
+                    const framesPerLoop = totalFrames / loopCount;
+                    const currentLoop = Math.floor(frameNumber / framesPerLoop);
+                    const frameInLoop = frameNumber % framesPerLoop;
+                    const loopProgress = frameInLoop / framesPerLoop;
+
+                    const textureProgress = frameNumber / framesPerLoop;
+                    const textureProgressInLoop = textureProgress % 1;
+                    const isReversePhase = currentLoop === 1;
+
+                    let easedTextureProgress;
+                    if (isReversePhase) {
+                        easedTextureProgress = 1 - applyEasing(1 - textureProgressInLoop, state.easingP1, state.easingP2);
+                    } else {
+                        easedTextureProgress = applyEasing(textureProgressInLoop, state.easingP1, state.easingP2);
+                    }
+
+                    let rotationProgress = loopProgress;
+                    if (isReversePhase) {
+                        rotationProgress = 1 - loopProgress;
+                    }
+                    const easedRotationProgress = applyEasing(rotationProgress, state.easingP1, state.easingP2);
+
+                    // Apply texture offset
+                    if (currentTexture) {
+                        if (state.verticalMode) {
+                            currentTexture.offset.y = -easedTextureProgress;
+                            currentTexture.offset.x = 0;
+                        } else {
+                            currentTexture.offset.x = easedTextureProgress;
+                            currentTexture.offset.y = 0;
+                        }
+                    }
+                    if (currentTextureInside) {
+                        if (state.verticalMode) {
+                            currentTextureInside.offset.y = -easedTextureProgress;
+                            currentTextureInside.offset.x = 0;
+                        } else {
+                            currentTextureInside.offset.x = easedTextureProgress;
+                            currentTextureInside.offset.y = 0;
+                        }
+                    }
+
+                    // Apply keyframe rotation/zoom
+                    const start = state.keyframeStart;
+                    const end = state.keyframeEnd;
+                    const rotX = start.rotX + (end.rotX - start.rotX) * easedRotationProgress;
+                    const rotY = start.rotY + (end.rotY - start.rotY) * easedRotationProgress;
+                    const rotZ = start.rotZ + (end.rotZ - start.rotZ) * easedRotationProgress;
+                    const zoom = start.zoom + (end.zoom - start.zoom) * easedRotationProgress;
+
+                    group.rotation.x = THREE.MathUtils.degToRad(rotX);
+                    group.rotation.y = THREE.MathUtils.degToRad(rotY);
+                    group.rotation.z = THREE.MathUtils.degToRad(rotZ);
+                    group.scale.set(zoom, zoom, zoom);
+
+                    renderer.render(scene, camera);
+
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = videoWidth;
+                    tempCanvas.height = videoHeight;
+                    const tempCtx = tempCanvas.getContext('2d', { alpha: false });
+                    tempCtx.fillStyle = '#0000ff';
+                    tempCtx.fillRect(0, 0, videoWidth, videoHeight);
+                    tempCtx.drawImage(
+                        renderer.domElement,
+                        0, 0, renderer.domElement.width, renderer.domElement.height,
+                        0, 0, videoWidth, videoHeight
+                    );
+
+                    const frame = new VideoFrame(tempCanvas, {
+                        timestamp: (frameNumber * 1_000_000) / 60
+                    });
+                    matEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                    frame.close();
+
+                    frameNumber++;
+                    const percent = Math.round((frameNumber / totalFrames) * 100);
+                    btn.textContent = `${percent}%`;
+
+                    requestAnimationFrame(captureMatFrame);
+                };
+
+                captureMatFrame();
+            } else {
+                // Static PNG export (no keyframes)
+                const { originalMaterials, originalBackground } = applyIDMaterials();
+
+                renderer.render(scene, camera);
+
+                const dataURL = renderer.domElement.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = 'krcg-material-id-' + Date.now() + '.png';
+                link.href = dataURL;
+                link.click();
+
+                restoreMaterials(originalMaterials, originalBackground);
+
+                if (wasFullscreen) {
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                }
             }
         });
 
