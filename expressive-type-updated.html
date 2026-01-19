@@ -2208,7 +2208,7 @@
 
                         state.keyframeProgress = displayProgress;
                         updateTimelineUI();
-                        applyKeyframeAtProgress(displayProgress, progress);
+                        applyKeyframeAtProgress(displayProgress, progress, keyframePingPongReverse);
                     }
                     // When keyframes enabled but not playing, texture stays at current keyframe position
                 } else {
@@ -2564,13 +2564,22 @@
             applyKeyframeAtProgress(state.keyframeProgress);
         }
 
-        function applyKeyframeAtProgress(rotationProgress, textureProgress) {
+        function applyKeyframeAtProgress(rotationProgress, textureProgress, reverseEasing) {
             // If textureProgress not provided, use rotationProgress (for scrubbing)
             if (textureProgress === undefined) textureProgress = rotationProgress;
+            if (reverseEasing === undefined) reverseEasing = false;
 
             // Apply easing to the progress values
             const easedRotationProgress = applyEasing(rotationProgress, state.easingP1, state.easingP2);
-            const easedTextureProgress = applyEasing(textureProgress, state.easingP1, state.easingP2);
+
+            // For texture in reverse ping-pong phase, use reversed easing
+            // Reversed easing: 1 - f(1 - t) gives the mirrored curve
+            let easedTextureProgress;
+            if (reverseEasing) {
+                easedTextureProgress = 1 - applyEasing(1 - textureProgress, state.easingP1, state.easingP2);
+            } else {
+                easedTextureProgress = applyEasing(textureProgress, state.easingP1, state.easingP2);
+            }
 
             const start = state.keyframeStart;
             const end = state.keyframeEnd;
@@ -2977,11 +2986,21 @@
 
                 // Texture progress keeps moving forward (doesn't reverse in ping-pong)
                 const textureProgress = frameNumber / framesPerLoop;
-                const easedTextureProgress = applyEasing(textureProgress % 1, state.easingP1, state.easingP2);
+                const textureProgressInLoop = textureProgress % 1;
+
+                // For second loop with keyframes, use reversed easing for texture
+                // Reversed easing: 1 - f(1 - t) gives the mirrored curve
+                const isReversePhase = state.keyframeEnabled && currentLoop === 1;
+                let easedTextureProgress;
+                if (isReversePhase) {
+                    easedTextureProgress = 1 - applyEasing(1 - textureProgressInLoop, state.easingP1, state.easingP2);
+                } else {
+                    easedTextureProgress = applyEasing(textureProgressInLoop, state.easingP1, state.easingP2);
+                }
 
                 // For second loop with keyframes, reverse direction for rotation only (ping-pong)
                 let rotationProgress = loopProgress;
-                if (state.keyframeEnabled && currentLoop === 1) {
+                if (isReversePhase) {
                     rotationProgress = 1 - loopProgress;
                 }
 
