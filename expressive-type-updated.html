@@ -1023,6 +1023,7 @@
             bgColor: '82CDFF',
             fgColor: '07144a',
             zoom: 1,
+            insideZoom: 1,
             offsetX: 0,
             offsetY: 0,
             showGrid: false,
@@ -1087,25 +1088,25 @@
             container.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 const delta = e.deltaY * -0.001;
-                state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
 
                 if (state.insideView) {
-                    // Inside view: adjust FOV (smaller = zoom in, larger = zoom out)
-                    // Map zoom 0.1-3 to FOV 120-15 (inverted: higher zoom = lower FOV)
-                    const fov = 120 - (state.zoom - 0.1) * (105 / 2.9);
+                    // Inside view: use separate zoom state and adjust FOV
+                    state.insideZoom = Math.max(0.1, Math.min(3, state.insideZoom + delta));
+                    const fov = 120 - (state.insideZoom - 0.1) * (105 / 2.9);
                     camera.fov = Math.max(15, Math.min(120, fov));
                     camera.updateProjectionMatrix();
                 } else {
-                    // Outside view: scale the group
+                    // Outside view: use main zoom state and scale the group
+                    state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
                     group.scale.set(state.zoom, state.zoom, state.zoom);
-                }
 
-                const basePixelRatio = window.devicePixelRatio || 1;
-                if (state.zoom > 1) {
-                    const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2);
-                    renderer.setPixelRatio(zoomPixelRatio);
-                } else {
-                    renderer.setPixelRatio(basePixelRatio);
+                    const basePixelRatio = window.devicePixelRatio || 1;
+                    if (state.zoom > 1) {
+                        const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2);
+                        renderer.setPixelRatio(zoomPixelRatio);
+                    } else {
+                        renderer.setPixelRatio(basePixelRatio);
+                    }
                 }
             });
 
@@ -2064,8 +2065,8 @@
         function updateCameraPosition() {
             if (state.insideView) {
                 camera.position.set(0, 0, 0);
-                // Apply FOV-based zoom for inside view
-                const fov = 120 - (state.zoom - 0.1) * (105 / 2.9);
+                // Apply FOV-based zoom for inside view using insideZoom
+                const fov = 120 - (state.insideZoom - 0.1) * (105 / 2.9);
                 camera.fov = Math.max(15, Math.min(120, fov));
                 // Reset group scale
                 group.scale.set(1, 1, 1);
