@@ -2622,6 +2622,14 @@
             const offsetX = start.offsetX + (end.offsetX - start.offsetX) * easedRotationProgress;
             const offsetY = start.offsetY + (end.offsetY - start.offsetY) * easedRotationProgress;
 
+            // Update state with interpolated values (so build() uses correct values)
+            state.rotX = rotX;
+            state.rotY = rotY;
+            state.rotZ = rotZ;
+            state.zoom = zoom;
+            state.offsetX = offsetX;
+            state.offsetY = offsetY;
+
             // Apply interpolated values
             group.rotation.x = THREE.MathUtils.degToRad(rotX);
             group.rotation.y = THREE.MathUtils.degToRad(rotY);
