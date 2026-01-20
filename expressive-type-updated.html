@@ -3650,6 +3650,7 @@
                     renderer.setSize(state.canvasWidth, state.canvasHeight);
                     camera.aspect = state.canvasWidth / state.canvasHeight;
                     camera.updateProjectionMatrix();
+                    scaleCanvasToFit();
 
                     // Update canvas size buttons
                     document.querySelectorAll('.size-btn').forEach(btn => {
