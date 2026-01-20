@@ -580,7 +580,8 @@
             color: #001550;
         }
 
-        .timeline-btn svg {
+        .timeline-btn svg,
+        .timeline-btn img {
             width: 8px;
             height: 8px;
         }
@@ -1241,10 +1242,8 @@
     <!-- Timeline Editor -->
     <div class="timeline-container" id="timelineContainer">
         <button class="timeline-btn" id="timelinePlayBtn" title="Play/Pause">
-            <svg id="playIcon" viewBox="0 0 12 12" fill="currentColor">
-                <path d="M2 1L10 6L2 11V1Z"/>
-            </svg>
-            <img id="pauseIcon" src="Assets/pause.svg" style="display: none; width: 12px; height: 12px;">
+            <img id="playIcon" src="Assets/play.svg">
+            <img id="pauseIcon" src="Assets/pause.svg" style="display: none;">
         </button>
         <span class="timeline-time" id="timelineCurrentTime">0:00</span>
         <div class="timeline-track" id="timelineTrack">
