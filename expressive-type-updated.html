@@ -3646,10 +3646,14 @@
                     scene.background = new THREE.Color('#' + state.bgColor);
                     build();
 
+                    // Update canvas size and renderer
+                    renderer.setSize(state.canvasWidth, state.canvasHeight);
+                    camera.aspect = state.canvasWidth / state.canvasHeight;
+                    camera.updateProjectionMatrix();
+
                     // Update canvas size buttons
                     document.querySelectorAll('.size-btn').forEach(btn => {
-                        const w = parseInt(btn.dataset.width);
-                        const h = parseInt(btn.dataset.height);
+                        const [w, h] = btn.dataset.size.split('x').map(Number);
                         btn.classList.toggle('active', w === state.canvasWidth && h === state.canvasHeight);
                     });
 
