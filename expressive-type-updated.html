@@ -1284,7 +1284,7 @@
                     <button class="output-btn" id="loadPreset">Load</button>
                 </div>
             </div>
-            <input type="file" id="presetFileInput" accept=".gxg,.json" style="display: none;">
+            <input type="file" id="presetFileInput" accept=".gxg.png,.gxg,.json,.png" style="display: none;">
         </div>
 
         <!-- Install App -->
@@ -3620,7 +3620,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             const safeFilename = presetName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-            link.download = safeFilename + '.gxg';
+            link.download = safeFilename + '.gxg.png';
             link.href = url;
             link.click();
             URL.revokeObjectURL(url);
@@ -3867,7 +3867,7 @@
         document.addEventListener('drop', (e) => {
             e.preventDefault();
             const file = e.dataTransfer.files[0];
-            if (file && (file.name.endsWith('.gxg') || file.name.endsWith('.json'))) {
+            if (file && (file.name.endsWith('.gxg.png') || file.name.endsWith('.gxg') || file.name.endsWith('.json'))) {
                 const input = document.getElementById('presetFileInput');
                 const dt = new DataTransfer();
                 dt.items.add(file);
