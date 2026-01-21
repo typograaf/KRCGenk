@@ -1286,6 +1286,12 @@
             </div>
             <input type="file" id="presetFileInput" accept=".json" style="display: none;">
         </div>
+
+        <!-- Install App -->
+        <div class="panel">
+            <span class="control-label">Desktop Shortcut</span>
+            <button class="output-btn" id="installApp" style="width: 100%;">Add to Desktop</button>
+        </div>
     </div>
 
     <!-- Timeline Editor -->
@@ -3711,6 +3717,25 @@
 
             // Reset file input so the same file can be loaded again
             e.target.value = '';
+        });
+
+        // Install App / Desktop Shortcut
+        document.getElementById('installApp').addEventListener('click', () => {
+            const webloc = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>URL</key>
+    <string>https://typograaf.github.io/KRCGenk/expressive-type-updated.html</string>
+</dict>
+</plist>`;
+            const blob = new Blob([webloc], { type: 'application/x-apple-plist' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'KRCG Graphics Generator.webloc';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
         });
 
         // Loading progress
