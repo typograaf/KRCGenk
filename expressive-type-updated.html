@@ -3493,6 +3493,67 @@
             captureFrame();
         });
 
+        // CRC32 for PNG chunks
+        const crc32Table = (() => {
+            const table = new Uint32Array(256);
+            for (let i = 0; i < 256; i++) {
+                let c = i;
+                for (let j = 0; j < 8; j++) {
+                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                }
+                table[i] = c;
+            }
+            return table;
+        })();
+
+        function crc32(data) {
+            let crc = 0xFFFFFFFF;
+            for (let i = 0; i < data.length; i++) {
+                crc = crc32Table[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+            }
+            return (crc ^ 0xFFFFFFFF) >>> 0;
+        }
+
+        // Create PNG tEXt chunk
+        function createTextChunk(keyword, text) {
+            const keywordBytes = new TextEncoder().encode(keyword);
+            const textBytes = new TextEncoder().encode(text);
+            const chunkData = new Uint8Array(keywordBytes.length + 1 + textBytes.length);
+            chunkData.set(keywordBytes, 0);
+            chunkData[keywordBytes.length] = 0; // null separator
+            chunkData.set(textBytes, keywordBytes.length + 1);
+
+            const chunkType = new TextEncoder().encode('tEXt');
+            const typeAndData = new Uint8Array(4 + chunkData.length);
+            typeAndData.set(chunkType, 0);
+            typeAndData.set(chunkData, 4);
+
+            const crcValue = crc32(typeAndData);
+            const chunk = new Uint8Array(4 + 4 + chunkData.length + 4);
+            const view = new DataView(chunk.buffer);
+            view.setUint32(0, chunkData.length, false); // length (big-endian)
+            chunk.set(chunkType, 4);
+            chunk.set(chunkData, 8);
+            view.setUint32(chunk.length - 4, crcValue, false); // CRC
+
+            return chunk;
+        }
+
+        // Insert chunk into PNG before IEND
+        function insertPngChunk(pngArray, chunk) {
+            const png = new Uint8Array(pngArray);
+            // Find IEND chunk (last 12 bytes: 4 length + 4 "IEND" + 4 CRC)
+            const iendPos = png.length - 12;
+
+            // Create new array with chunk inserted
+            const newPng = new Uint8Array(png.length + chunk.length);
+            newPng.set(png.subarray(0, iendPos), 0);
+            newPng.set(chunk, iendPos);
+            newPng.set(png.subarray(iendPos), iendPos + chunk.length);
+
+            return newPng;
+        }
+
         // Save Preset
         document.getElementById('savePreset').addEventListener('click', async () => {
             const presetName = document.getElementById('presetName').value.trim() || 'Untitled';
@@ -3546,18 +3607,16 @@
 
             // Convert thumbnail to blob
             const thumbnailBlob = await new Promise(resolve => thumbnailCanvas.toBlob(resolve, 'image/png'));
-            const thumbnailArray = await thumbnailBlob.arrayBuffer();
+            const pngArray = await thumbnailBlob.arrayBuffer();
 
-            // Create combined file: PNG + separator + JSON
-            const separator = new TextEncoder().encode('\n---GXGPRESET---\n');
-            const jsonData = new TextEncoder().encode(JSON.stringify(preset, null, 2));
+            // Create tEXt chunk with JSON data
+            const jsonString = JSON.stringify(preset);
+            const textChunk = createTextChunk('GXGPreset', jsonString);
 
-            const combined = new Uint8Array(thumbnailArray.byteLength + separator.byteLength + jsonData.byteLength);
-            combined.set(new Uint8Array(thumbnailArray), 0);
-            combined.set(separator, thumbnailArray.byteLength);
-            combined.set(jsonData, thumbnailArray.byteLength + separator.byteLength);
+            // Insert chunk into PNG
+            const pngWithData = insertPngChunk(pngArray, textChunk);
 
-            const blob = new Blob([combined], { type: 'image/png' });
+            const blob = new Blob([pngWithData], { type: 'image/png' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             const safeFilename = presetName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
@@ -3572,6 +3631,39 @@
             document.getElementById('presetFileInput').click();
         });
 
+        // Extract JSON from PNG tEXt chunk
+        function extractPresetFromPng(arrayBuffer) {
+            const data = new Uint8Array(arrayBuffer);
+            const view = new DataView(arrayBuffer);
+
+            // Skip PNG signature (8 bytes)
+            let pos = 8;
+
+            while (pos < data.length) {
+                const length = view.getUint32(pos, false);
+                const type = String.fromCharCode(data[pos + 4], data[pos + 5], data[pos + 6], data[pos + 7]);
+
+                if (type === 'tEXt') {
+                    // Read chunk data
+                    const chunkData = data.subarray(pos + 8, pos + 8 + length);
+                    // Find null separator between keyword and text
+                    let nullPos = 0;
+                    while (nullPos < chunkData.length && chunkData[nullPos] !== 0) {
+                        nullPos++;
+                    }
+                    const keyword = new TextDecoder().decode(chunkData.subarray(0, nullPos));
+                    if (keyword === 'GXGPreset') {
+                        const text = new TextDecoder().decode(chunkData.subarray(nullPos + 1));
+                        return text;
+                    }
+                }
+
+                if (type === 'IEND') break;
+                pos += 12 + length; // 4 length + 4 type + length data + 4 CRC
+            }
+            return null;
+        }
+
         document.getElementById('presetFileInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -3579,13 +3671,23 @@
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
-                    let jsonStr = event.target.result;
+                    let jsonStr;
+                    const arrayBuffer = event.target.result;
 
-                    // Check for new format with PNG thumbnail
-                    const separator = '---GXGPRESET---';
-                    const sepIndex = jsonStr.indexOf(separator);
-                    if (sepIndex !== -1) {
-                        jsonStr = jsonStr.substring(sepIndex + separator.length + 1);
+                    // Try to extract from PNG tEXt chunk first
+                    const pngJson = extractPresetFromPng(arrayBuffer);
+                    if (pngJson) {
+                        jsonStr = pngJson;
+                    } else {
+                        // Fallback: try reading as text (old format or plain JSON)
+                        const textContent = new TextDecoder().decode(new Uint8Array(arrayBuffer));
+                        const separator = '---GXGPRESET---';
+                        const sepIndex = textContent.indexOf(separator);
+                        if (sepIndex !== -1) {
+                            jsonStr = textContent.substring(sepIndex + separator.length + 1);
+                        } else {
+                            jsonStr = textContent;
+                        }
                     }
 
                     const preset = JSON.parse(jsonStr);
@@ -3750,7 +3852,7 @@
                     alert('Failed to load preset: ' + err.message);
                 }
             };
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
 
             // Reset file input so the same file can be loaded again
             e.target.value = '';
