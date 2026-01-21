@@ -3494,7 +3494,7 @@
         });
 
         // Save Preset
-        document.getElementById('savePreset').addEventListener('click', () => {
+        document.getElementById('savePreset').addEventListener('click', async () => {
             const presetName = document.getElementById('presetName').value.trim() || 'Untitled';
 
             const preset = {
@@ -3527,11 +3527,39 @@
                 keyframeEnd: { ...state.keyframeEnd }
             };
 
-            const json = JSON.stringify(preset, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
+            // Capture thumbnail from canvas
+            const thumbnailCanvas = document.createElement('canvas');
+            thumbnailCanvas.width = 512;
+            thumbnailCanvas.height = 512;
+            const thumbCtx = thumbnailCanvas.getContext('2d');
+
+            // Draw current renderer output scaled to thumbnail
+            const srcCanvas = renderer.domElement;
+            const scale = Math.min(512 / srcCanvas.width, 512 / srcCanvas.height);
+            const w = srcCanvas.width * scale;
+            const h = srcCanvas.height * scale;
+            const x = (512 - w) / 2;
+            const y = (512 - h) / 2;
+            thumbCtx.fillStyle = '#' + state.bgColor;
+            thumbCtx.fillRect(0, 0, 512, 512);
+            thumbCtx.drawImage(srcCanvas, x, y, w, h);
+
+            // Convert thumbnail to blob
+            const thumbnailBlob = await new Promise(resolve => thumbnailCanvas.toBlob(resolve, 'image/png'));
+            const thumbnailArray = await thumbnailBlob.arrayBuffer();
+
+            // Create combined file: PNG + separator + JSON
+            const separator = new TextEncoder().encode('\n---GXGPRESET---\n');
+            const jsonData = new TextEncoder().encode(JSON.stringify(preset, null, 2));
+
+            const combined = new Uint8Array(thumbnailArray.byteLength + separator.byteLength + jsonData.byteLength);
+            combined.set(new Uint8Array(thumbnailArray), 0);
+            combined.set(separator, thumbnailArray.byteLength);
+            combined.set(jsonData, thumbnailArray.byteLength + separator.byteLength);
+
+            const blob = new Blob([combined], { type: 'image/png' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            // Use preset name for filename (sanitize for safe filename)
             const safeFilename = presetName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
             link.download = safeFilename + '.gxg';
             link.href = url;
@@ -3551,7 +3579,16 @@
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
-                    const preset = JSON.parse(event.target.result);
+                    let jsonStr = event.target.result;
+
+                    // Check for new format with PNG thumbnail
+                    const separator = '---GXGPRESET---';
+                    const sepIndex = jsonStr.indexOf(separator);
+                    if (sepIndex !== -1) {
+                        jsonStr = jsonStr.substring(sepIndex + separator.length + 1);
+                    }
+
+                    const preset = JSON.parse(jsonStr);
 
                     // Set preset name
                     if (preset.name !== undefined) {
