@@ -3719,6 +3719,24 @@
             e.target.value = '';
         });
 
+        // Drag and drop preset files
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file && (file.name.endsWith('.gxg') || file.name.endsWith('.json'))) {
+                const input = document.getElementById('presetFileInput');
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+                input.dispatchEvent(new Event('change'));
+            }
+        });
+
         // Install App / Desktop Shortcut - hide if in iframe (app mode)
         if (window.self !== window.top) {
             document.getElementById('installPanel').style.display = 'none';
