@@ -1,0 +1,92 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "image-name" : "BDG text.svg",
+          "name" : "BDG text",
+          "position" : {
+            "scale" : 0.6,
+            "translation-in-points" : [
+              0.2681999999999789,
+              -0.1934000000001106
+            ]
+          }
+        },
+        {
+          "image-name" : "bdg shield.svg",
+          "name" : "bdg shield",
+          "position" : {
+            "scale" : 0.6,
+            "translation-in-points" : [
+              0,
+              -0.2644999999999982
+            ]
+          }
+        },
+        {
+          "image-name" : "bdg back.svg",
+          "name" : "bdg back"
+        }
+      ],
+      "name" : "BDG",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "hidden" : true,
+      "layers" : [
+        {
+          "image-name" : "GXG text.svg",
+          "name" : "GXG text",
+          "position" : {
+            "scale" : 0.6,
+            "translation-in-points" : [
+              0.2681999999999789,
+              0.2900999999999385
+            ]
+          }
+        },
+        {
+          "image-name" : "gxc shield.svg",
+          "name" : "gxc shield",
+          "position" : {
+            "scale" : 0.6,
+            "translation-in-points" : [
+              0,
+              0.21899999999993724
+            ]
+          }
+        },
+        {
+          "image-name" : "gxc back.svg",
+          "name" : "gxc back"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
