@@ -1284,7 +1284,7 @@
                     <button class="output-btn" id="loadPreset">Load</button>
                 </div>
             </div>
-            <input type="file" id="presetFileInput" accept=".json" style="display: none;">
+            <input type="file" id="presetFileInput" accept=".gxg,.json" style="display: none;">
         </div>
 
         <!-- Install App -->
@@ -3533,7 +3533,7 @@
             const link = document.createElement('a');
             // Use preset name for filename (sanitize for safe filename)
             const safeFilename = presetName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-            link.download = 'krcg-preset-' + safeFilename + '.json';
+            link.download = safeFilename + '.gxg';
             link.href = url;
             link.click();
             URL.revokeObjectURL(url);
