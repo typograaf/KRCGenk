@@ -1692,6 +1692,34 @@
         }
 
         const fontVariantCache = {};
+        // Detect if FontFace variationSettings actually works (Chrome)
+        // by checking if a test font with variationSettings differs from one without
+        let useFontFaceVariations = null; // null = not tested yet
+        async function testFontFaceVariations() {
+            if (useFontFaceVariations !== null) return useFontFaceVariations;
+            try {
+                const testFont = 'Assets/KRCGenkVariable-UprightVF.ttf';
+                const base = new FontFace('_testBase', `url(${testFont})`);
+                const varied = new FontFace('_testVar', `url(${testFont})`, {
+                    variationSettings: "'YTAS' 100"
+                });
+                const [baseLoaded, varLoaded] = await Promise.all([base.load(), varied.load()]);
+                document.fonts.add(baseLoaded);
+                document.fonts.add(varLoaded);
+                const c = document.createElement('canvas');
+                const x = c.getContext('2d');
+                x.font = '100px "_testBase"';
+                const w1 = x.measureText('A').actualBoundingBoxAscent || 0;
+                x.font = '100px "_testVar"';
+                const w2 = x.measureText('A').actualBoundingBoxAscent || 0;
+                document.fonts.delete(baseLoaded);
+                document.fonts.delete(varLoaded);
+                useFontFaceVariations = (w1 !== w2 && w2 > 0);
+            } catch (e) {
+                useFontFaceVariations = false;
+            }
+            return useFontFaceVariations;
+        }
 
         async function getGenkFamily(styleOverride = null) {
             const h = Math.round(state.typeHeight);
@@ -1699,32 +1727,38 @@
             const baseFamily = style === 'Obl' ? 'GenkOblique'
                              : style === 'Bsl' ? 'GenkBackslanted'
                              : 'Genk';
-            const fontFile = style === 'Obl' ? 'Assets/KRCGenkVariable-ObliqueVF.ttf'
-                           : style === 'Bsl' ? 'Assets/KRCGenkVariable-BackslantedVF.ttf'
-                           : 'Assets/KRCGenkVariable-UprightVF.ttf';
             if (h === 0) {
                 await document.fonts.load(`100px "${baseFamily}"`);
                 return baseFamily;
             }
-            // Chrome: FontFace variationSettings bakes the axis value into the font instance
-            // Safari: variationSettings is ignored, so we fall back to ctx.fontVariationSettings
-            const name = `Genk${style}H${h}`;
-            if (!fontVariantCache[name]) {
-                const face = new FontFace(name, `url(${fontFile})`, {
-                    variationSettings: `'YTAS' ${h}`
-                });
-                fontVariantCache[name] = await face.load();
-                document.fonts.add(fontVariantCache[name]);
+            const fontFaceWorks = await testFontFaceVariations();
+            if (fontFaceWorks) {
+                // Chrome: FontFace variationSettings bakes the axis into the font instance
+                const fontFile = style === 'Obl' ? 'Assets/KRCGenkVariable-ObliqueVF.ttf'
+                               : style === 'Bsl' ? 'Assets/KRCGenkVariable-BackslantedVF.ttf'
+                               : 'Assets/KRCGenkVariable-UprightVF.ttf';
+                const name = `Genk${style}H${h}`;
+                if (!fontVariantCache[name]) {
+                    const face = new FontFace(name, `url(${fontFile})`, {
+                        variationSettings: `'YTAS' ${h}`
+                    });
+                    fontVariantCache[name] = await face.load();
+                    document.fonts.add(fontVariantCache[name]);
+                }
+                return name;
+            } else {
+                // Safari: return base CSS @font-face family, rely on ctx.fontVariationSettings
+                await document.fonts.load(`100px "${baseFamily}"`);
+                return baseFamily;
             }
-            return name;
         }
 
-        // Safari fallback: apply YTAS via canvas context (Safari 17.4+)
+        // Apply YTAS variation to canvas context (Safari fallback, harmless on Chrome)
         function applyTypeHeight(ctx, h) {
-            if (ctx.fontVariationSettings !== undefined) {
-                const val = Math.round(h);
+            const val = Math.round(h);
+            try {
                 ctx.fontVariationSettings = val === 0 ? 'normal' : `'YTAS' ${val}`;
-            }
+            } catch (e) { /* unsupported */ }
         }
 
         async function build() {
