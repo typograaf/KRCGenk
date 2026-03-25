@@ -13,10 +13,32 @@
         }
 
         @font-face {
+            font-family: 'GenkOblique';
+            src: url('Assets/KRCGenkVariable-ObliqueVF.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'GenkBackslanted';
+            src: url('Assets/KRCGenkVariable-BackslantedVF.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
             font-family: 'ABC Arizona Sans';
             src: url('Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Regular-Trial.woff2') format('woff2'),
                  url('Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Regular-Trial.woff') format('woff');
             font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'ABC Arizona Sans';
+            src: url('Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Medium-Trial.woff2') format('woff2'),
+                 url('Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Medium-Trial.woff') format('woff');
+            font-weight: 500;
             font-style: normal;
         }
 
@@ -38,7 +60,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #001550;
+            background: #001450;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -73,12 +95,13 @@
             height: 100%;
             overflow: hidden;
             font-family: 'ABC Arizona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 500;
         }
         body {
-            background: #001550;
+            background: #001450;
             color: #82CDFF;
             display: flex;
-            gap: 12px;
+            gap: 24px;
             padding: 24px;
         }
 
@@ -132,15 +155,15 @@
 
         /* Panel Styles */
         .panel {
-            background: #0d2159;
-            border: 1px solid #334473;
+            background: #001963;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
         }
 
         .panel-dark {
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
         }
@@ -148,13 +171,14 @@
         /* Text Input */
         .text-input {
             width: 100%;
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
             color: #82CDFF;
             font-family: inherit;
             font-size: 12px;
+            font-weight: 500;
             letter-spacing: 0.12px;
         }
         .text-input:focus {
@@ -169,16 +193,42 @@
         /* Control Labels */
         .control-label {
             font-size: 12px;
+            font-weight: 500;
             color: #82CDFF;
             margin-bottom: 12px;
             display: block;
         }
 
         /* Color Swatches */
-        .color-section {
+        .color-combos {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .color-combo {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            box-sizing: border-box;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .color-combo svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .color-combo:hover { border-color: rgba(255,255,255,0.45); }
+        .color-combo.active { border-color: rgba(255,255,255,0.9); }
+
+        .color-group-label {
+            display: none;
         }
 
         .toggle-group {
@@ -203,7 +253,7 @@
 
         .color-swatch:hover,
         .color-swatch.active {
-            border-color: #334473;
+            border-color: #0a2373;
         }
 
         /* Grid Toggle */
@@ -211,7 +261,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 12px;
+            gap: 6px;
         }
 
         .toggle-label {
@@ -226,9 +276,9 @@
         .toggle-box {
             width: 16px;
             height: 16px;
-            background: #1a2c62;
-            border: 1px solid #334473;
-            border-radius: 4px;
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -260,14 +310,14 @@
         .repeat-controls {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .repeat-btn {
             width: 16px;
             height: 16px;
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 4px;
             cursor: pointer;
             padding: 0;
@@ -305,7 +355,7 @@
 
         .slider-value {
             font-size: 8px;
-            font-weight: bold;
+            font-weight: 500;
             color: #82CDFF;
             background: transparent;
             border: none;
@@ -327,7 +377,7 @@
         .slider-track {
             flex: 1;
             height: 2px;
-            background: #1a2c62;
+            background: #001450;
             border-radius: 12px;
             position: relative;
             display: flex;
@@ -348,7 +398,7 @@
 
         .slider::-webkit-slider-runnable-track {
             height: 2px;
-            background: #1a2c62;
+            background: #001450;
             border-radius: 12px;
         }
 
@@ -365,8 +415,8 @@
         .reset-btn {
             width: 16px;
             height: 16px;
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 4px;
             cursor: pointer;
             padding: 0;
@@ -393,13 +443,13 @@
         }
 
         .size-btn {
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
             color: #82CDFF;
             font-size: 8px;
-            font-weight: bold;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -411,7 +461,7 @@
         .size-btn.active {
             border-color: #82CDFF;
             background: #82CDFF;
-            color: #001550;
+            color: #001450;
         }
 
         .size-btn.disabled {
@@ -420,10 +470,34 @@
             pointer-events: none;
         }
 
+        /* Easing Curve Presets */
+        .easing-presets {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .easing-preset-btn {
+            flex: 1;
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            color: #82cdff;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 8px;
+            padding: 12px 2px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.15s, color 0.15s;
+        }
+        .easing-preset-btn:hover {
+            border-color: #82CDFF;
+        }
+
         /* Easing Curve Editor */
         .easing-container {
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001963;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
             position: relative;
@@ -447,13 +521,14 @@
 
         .easing-input {
             width: 100%;
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
             color: #82CDFF;
+            font-family: inherit;
             font-size: 8px;
-            font-weight: bold;
+            font-weight: 500;
             text-align: center;
             margin-top: 12px;
         }
@@ -484,25 +559,25 @@
 
         .keyframe-buttons .output-btn.active {
             background: #82CDFF;
-            color: #001550;
+            color: #001450;
         }
 
         .output-btn {
             flex: 1;
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
             color: #82CDFF;
+            font-family: inherit;
             font-size: 8px;
-            font-weight: bold;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .output-btn:hover {
-            background: #82CDFF;
-            color: #001550;
+            border-color: #82CDFF;
         }
 
         .output-btn:disabled {
@@ -519,13 +594,17 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
-            background: #001550;
+            background: #001450;
         }
 
         #canvas-container canvas {
             display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             transform-origin: center center;
             border-radius: 12px;
+            border: 1px solid #0a2373;
         }
 
         /* Fullscreen mode (preview off) */
@@ -544,6 +623,8 @@
 
         body.fullscreen-mode #canvas-container canvas {
             border-radius: 0;
+            top: 0 !important;
+            left: 0 !important;
             width: 100% !important;
             height: 100% !important;
             transform: none !important;
@@ -572,8 +653,8 @@
             bottom: 24px;
             left: 24px;
             right: 24px;
-            background: #0d2159;
-            border: 1px solid #334473;
+            background: #001963;
+            border: 1px solid #0a2373;
             border-radius: 6px;
             padding: 12px;
             z-index: 200;
@@ -598,8 +679,8 @@
         .timeline-btn {
             width: 16px;
             height: 16px;
-            background: #1a2c62;
-            border: 1px solid #334473;
+            background: #001450;
+            border: 1px solid #0a2373;
             border-radius: 4px;
             color: #82CDFF;
             cursor: pointer;
@@ -616,7 +697,7 @@
 
         .timeline-btn.active {
             background: #82CDFF;
-            color: #001550;
+            color: #001450;
         }
 
         .timeline-btn svg,
@@ -628,7 +709,7 @@
         .timeline-track {
             flex: 1;
             height: 8px;
-            background: #1a2c62;
+            background: #001450;
             border-radius: 4px;
             position: relative;
             cursor: pointer;
@@ -636,7 +717,7 @@
 
         .timeline-progress {
             height: 100%;
-            background: #334473;
+            background: #0a2373;
             border-radius: 4px;
             width: 0%;
         }
@@ -753,7 +834,7 @@
         .slider-panel {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 24px;
         }
 
         /* Mobile Responsive */
@@ -976,51 +1057,55 @@
             <!-- Text Input -->
             <input type="text" class="text-input" id="textInput" value="KRC GENK  " placeholder="TEXT GOES HERE...">
 
-            <!-- Colors Panel -->
+            <!-- Type Controls: Type Height + Repeat + Oblique -->
             <div class="panel">
-                <div class="color-section">
-                    <div>
-                        <span class="control-label">Background Colour</span>
-                        <div class="color-swatches" id="bgColorSwatches">
-                            <div class="color-swatch active" data-color="82CDFF" style="background-color: #82CDFF;"></div>
-                            <div class="color-swatch" data-color="07144a" style="background-color: #07144a;"></div>
-                            <div class="color-swatch" data-color="1f3ab6" style="background-color: #1f3ab6;"></div>
-                            <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+                <div class="slider-panel">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Type Height</span>
+                            <input type="text" class="slider-value" id="typeHeightValue" value="0">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="typeHeightSlider" min="0" max="100" value="0">
+                            </div>
+                            <button class="reset-btn" data-reset="typeHeight">
+                                <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
-                    <div>
-                        <span class="control-label">Text Colour</span>
-                        <div class="color-swatches" id="fgColorSwatches">
-                            <div class="color-swatch" data-color="82CDFF" style="background-color: #82CDFF;"></div>
-                            <div class="color-swatch active" data-color="07144a" style="background-color: #07144a;"></div>
-                            <div class="color-swatch" data-color="1f3ab6" style="background-color: #1f3ab6;"></div>
-                            <div class="color-swatch" data-color="FFFFFF" style="background-color: #FFFFFF;"></div>
+                    <div class="toggle-group" style="gap:6px;">
+                        <div class="toggle-row" id="repeatRow">
+                            <button class="repeat-btn" id="repeatMinus">
+                                <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.5 0.5H6.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <span class="toggle-label">Repeat</span>
+                            <button class="repeat-btn" id="repeatPlus">
+                                <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M0.5 3.5H3.5M3.5 3.5H6.5M3.5 3.5V6.5M3.5 3.5V0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="toggle-row">
+                            <input type="checkbox" class="toggle-checkbox" id="obliqueToggle">
+                            <label class="toggle-box" for="obliqueToggle">
+                                <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </label>
+                            <span class="toggle-label">Oblique</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Options Panel -->
+            <!-- View Options: Vertical Mode + Inside View -->
             <div class="panel">
-                <div class="toggle-group">
-                    <div class="toggle-row">
-                        <input type="checkbox" class="toggle-checkbox" id="previewToggle" checked>
-                        <label class="toggle-box" for="previewToggle">
-                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </label>
-                        <span class="toggle-label">Show Preview</span>
-                    </div>
-                    <div class="toggle-row">
-                        <input type="checkbox" class="toggle-checkbox" id="gridToggle">
-                        <label class="toggle-box" for="gridToggle">
-                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </label>
-                        <span class="toggle-label">Show 3×3 Grid</span>
-                    </div>
+                <div class="toggle-group" style="gap:6px;">
                     <div class="toggle-row">
                         <input type="checkbox" class="toggle-checkbox" id="verticalToggle">
                         <label class="toggle-box" for="verticalToggle">
@@ -1039,30 +1124,30 @@
                         </label>
                         <span class="toggle-label">Inside View</span>
                     </div>
-                    <div class="toggle-row">
-                        <input type="checkbox" class="toggle-checkbox" id="debugModeToggle">
-                        <label class="toggle-box" for="debugModeToggle">
-                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </label>
-                        <span class="toggle-label">Debug Caps</span>
+                </div>
+            </div>
+
+            <!-- Colours Panel -->
+            <div class="panel">
+                <span class="control-label">Colour</span>
+                <div id="colorCombosWrapper" style="display:flex; flex-direction:column; gap:6px;">
+                    <div class="color-combos" style="flex-wrap:nowrap;">
+                        <div class="color-combo" data-bg="001450" data-fg="003CC3" title="Smurf Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                        <div class="color-combo" data-bg="001450" data-fg="82CDFF" title="Sky Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                        <div class="color-combo" data-bg="FFFFFF" data-fg="003CC3" title="Smurf Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
+                        <div class="color-combo" data-bg="82CDFF" data-fg="003CC3" title="Smurf Blue on Sky Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#82CDFF"/></svg></div>
                     </div>
-                    <div class="toggle-row" id="repeatRow">
-                        <button class="repeat-btn" id="repeatMinus">
-                            <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0.5 0.5H6.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                        <span class="toggle-label">Repeat</span>
-                        <button class="repeat-btn" id="repeatPlus">
-                            <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M0.5 3.5H3.5M3.5 3.5H6.5M3.5 3.5V6.5M3.5 3.5V0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
+                    <div class="color-combos" style="flex-wrap:nowrap;">
+                        <div class="color-combo active" data-bg="003CC3" data-fg="001450" title="Royal Blue on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#001450"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                        <div class="color-combo" data-bg="9BD7FF" data-fg="003CC3" title="Smurf Blue on Sky Blue 80"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#9BD7FF"/></svg></div>
+                        <div class="color-combo" data-bg="003CC3" data-fg="FFFFFF" title="White on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FFFFFF"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                        <div class="color-combo" data-bg="FFFFFF" data-fg="82CDFF" title="Sky Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
                     </div>
                 </div>
             </div>
+
+            <!-- Reset All -->
+            <button class="output-btn" id="resetAll" style="background:#001450; border-color:#0a2373; font-size:12px; font-weight:500; text-align:left;">Reset all</button>
 
             <!-- Shape Size & Corner Radius -->
             <div class="panel">
@@ -1093,22 +1178,6 @@
                                 <input type="range" class="slider" id="radiusSlider" min="15" max="130" value="60">
                             </div>
                             <button class="reset-btn" data-reset="radius">
-                                <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="slider-group">
-                        <div class="slider-header">
-                            <span class="slider-label">Type Height</span>
-                            <input type="text" class="slider-value" id="typeHeightValue" value="0">
-                        </div>
-                        <div class="slider-row">
-                            <div class="slider-track">
-                                <input type="range" class="slider" id="typeHeightSlider" min="0" max="100" value="0">
-                            </div>
-                            <button class="reset-btn" data-reset="typeHeight">
                                 <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
@@ -1222,16 +1291,26 @@
         <svg id="grid-overlay"></svg>
     </div>
 
+    <!-- Hidden: Show Preview toggle (functional, not in Figma design) -->
+    <input type="checkbox" class="toggle-checkbox" id="previewToggle" checked style="display:none;">
+
     <!-- Right Sidebar -->
     <div class="sidebar-right">
-        <!-- Canvas Size -->
-        <div class="panel">
-            <span class="control-label">Canvas Size</span>
-            <div class="size-grid" id="sizeButtons">
-                <button class="size-btn active" data-size="1920x1080">1920×1080</button>
-                <button class="size-btn" data-size="1080x1350">1080×1350</button>
-                <button class="size-btn" data-size="1080x1920">1080×1920</button>
-                <button class="size-btn" data-size="1920x1920">1920×1920</button>
+        <!-- Canvas Size + Grid Toggle -->
+        <div class="panel" style="display:flex; flex-direction:column; gap:12px;">
+            <span class="control-label" style="margin-bottom:0;">Canvas Size</span>
+            <div style="display:flex; gap:6px;">
+                <input type="text" class="text-input" id="canvasWidthInput" value="1920" style="flex:1; text-align:center; padding:12px;">
+                <input type="text" class="text-input" id="canvasHeightInput" value="1080" style="flex:1; text-align:center; padding:12px;">
+            </div>
+            <div class="toggle-row">
+                <input type="checkbox" class="toggle-checkbox" id="gridToggle">
+                <label class="toggle-box" for="gridToggle">
+                    <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </label>
+                <span class="toggle-label">Show 3×3 Grid</span>
             </div>
         </div>
 
@@ -1256,18 +1335,16 @@
         </div>
 
         <!-- Camera Keyframes -->
-        <div class="panel">
-            <span class="control-label">Camera Keyframes</span>
-            <div class="toggle-group">
-                <div class="toggle-row">
-                    <input type="checkbox" class="toggle-checkbox" id="keyframeToggle">
-                    <label class="toggle-box" for="keyframeToggle">
-                        <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </label>
-                    <span class="toggle-label">Enable Keyframes</span>
-                </div>
+        <div class="panel" style="display:flex; flex-direction:column; gap:12px;">
+            <span class="control-label" style="margin-bottom:0;">Camera Keyframes</span>
+            <div class="toggle-row">
+                <input type="checkbox" class="toggle-checkbox" id="keyframeToggle">
+                <label class="toggle-box" for="keyframeToggle">
+                    <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </label>
+                <span class="toggle-label">Enable Keyframes</span>
             </div>
             <div class="keyframe-buttons" id="keyframeControls" style="display: none;">
                 <button class="output-btn" id="setKeyframeStart">Set Start</button>
@@ -1279,31 +1356,38 @@
         </div>
 
         <!-- Easing Curve -->
-        <div class="panel">
-            <span class="control-label">Easing Curve</span>
+        <div class="panel" style="display:flex; flex-direction:column; gap:12px;">
+            <span class="control-label" style="margin-bottom:0;">Easing Curve</span>
             <div class="easing-container">
                 <canvas id="easingCanvas" width="152" height="152"></canvas>
             </div>
-            <input type="text" class="easing-input" id="easingInput" value="0.25, 0.25, 0.75, 0.75">
+            <div style="display:flex; flex-direction:column; gap:6px;">
+                <input type="text" class="easing-input" id="easingInput" value="0.25, 0.25, 0.75, 0.75" style="margin-top:0;">
+                <div class="easing-presets" style="margin-top:0;">
+                    <button class="easing-preset-btn" onclick="applyEasingPreset(0.75,0,0.25,1)">Smooth</button>
+                    <button class="easing-preset-btn" onclick="applyEasingPreset(0,0.75,1,0.25)">Pop</button>
+                    <button class="easing-preset-btn" onclick="applyEasingPreset(0.1,0.6,0.3,0.9)">Ease</button>
+                </div>
+            </div>
         </div>
 
         <!-- Output -->
-        <div class="panel">
-            <span class="control-label">Output</span>
+        <div class="panel" style="display:flex; flex-direction:column; gap:12px;">
+            <span class="control-label" style="margin-bottom:0;">Output</span>
             <div class="output-buttons">
                 <div class="output-row">
                     <button class="output-btn" id="exportPNG">PNG</button>
                     <button class="output-btn" id="exportMP4">MP4</button>
                 </div>
-                <button class="output-btn" id="exportMatID">MAT ID</button>
+                <button class="output-btn" id="exportMatID">Mat ID</button>
             </div>
         </div>
 
         <!-- Presets -->
-        <div class="panel">
-            <span class="control-label">Presets</span>
-            <input type="text" class="text-input" id="presetName" placeholder="Preset name..." style="margin-bottom: 8px;">
+        <div class="panel" style="display:flex; flex-direction:column; gap:12px;">
+            <span class="control-label" style="margin-bottom:0;">Presets</span>
             <div class="output-buttons">
+                <input type="text" class="text-input" id="presetName" placeholder="PRESET NAME">
                 <div class="output-row">
                     <button class="output-btn" id="savePreset">Save</button>
                     <button class="output-btn" id="loadPreset">Load</button>
@@ -1346,6 +1430,7 @@
     <script>
         let scene, camera, renderer, group;
         let textureOffset = 0;
+        let textureQualityMultiplier = 1;
         let currentTexture = null;
         let currentTextureInside = null;
         let animationStartTime = 0;
@@ -1392,8 +1477,8 @@
             rotY: 0,
             rotZ: -45,
             speed: 0.5,
-            bgColor: '82CDFF',
-            fgColor: '07144a',
+            bgColor: '003CC3',
+            fgColor: '001450',
             zoom: 1,
             insideZoom: 1,
             offsetX: 0,
@@ -1402,7 +1487,7 @@
             showPreview: true,
             verticalMode: false,
             insideView: false,
-            debugMode: false,
+            oblique: false,
             repeat: 2,
             verticalRepeat: 3,
             typeHeight: 0,
@@ -1413,8 +1498,8 @@
             keyframePlaying: false,
             keyframeProgress: 0,
             keyframePingPong: false,
-            keyframeStart: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1, offsetX: 0, offsetY: 0, size: 280, radius: 60 },
-            keyframeEnd: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1, offsetX: 0, offsetY: 0, size: 280, radius: 60 }
+            keyframeStart: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1, offsetX: 0, offsetY: 0, size: 280, radius: 60, typeHeight: 0 },
+            keyframeEnd: { rotX: -45, rotY: 0, rotZ: -45, zoom: 1, offsetX: 0, offsetY: 0, size: 280, radius: 60, typeHeight: 0 }
         };
 
         // Easing editor state
@@ -1433,7 +1518,8 @@
                 const scaleY = containerHeight / state.canvasHeight;
                 const scale = Math.min(scaleX, scaleY) * 0.9;
 
-                canvas.style.transform = `scale(${scale})`;
+                // translate(-50%, -50%) centres the element, then scale around that centre
+                canvas.style.transform = `translate(-50%, -50%) scale(${scale})`;
                 updateGrid();
             });
         }
@@ -1481,14 +1567,6 @@
                     // Outside view: use main zoom state and scale the group
                     state.zoom = Math.max(0.1, Math.min(3, state.zoom + delta));
                     group.scale.set(state.zoom, state.zoom, state.zoom);
-
-                    const basePixelRatio = window.devicePixelRatio || 1;
-                    if (state.zoom > 1) {
-                        const zoomPixelRatio = Math.min(basePixelRatio * state.zoom, basePixelRatio * 2);
-                        renderer.setPixelRatio(zoomPixelRatio);
-                    } else {
-                        renderer.setPixelRatio(basePixelRatio);
-                    }
                 }
             });
 
@@ -1510,13 +1588,25 @@
             });
             renderer.domElement.addEventListener('mousemove', e => {
                 if (!drag) return;
-                state.rotY += (e.clientX - prev.x) * 0.5;
-                state.rotX = Math.max(-90, Math.min(90, state.rotX - (e.clientY - prev.y) * 0.3));
-                document.getElementById('rotXSlider').value = state.rotX;
-                document.getElementById('rotYSlider').value = state.rotY;
-                document.getElementById('rotXValue').value = Math.round(state.rotX);
-                document.getElementById('rotYValue').value = Math.round(state.rotY);
-                updateRotation();
+                const dx = e.clientX - prev.x;
+                const dy = e.clientY - prev.y;
+                if (e.shiftKey) {
+                    state.offsetX += dx * 0.5;
+                    state.offsetY -= dy * 0.5;
+                    document.getElementById('offsetXSlider').value = state.offsetX;
+                    document.getElementById('offsetYSlider').value = state.offsetY;
+                    document.getElementById('offsetXValue').value = Math.round(state.offsetX);
+                    document.getElementById('offsetYValue').value = Math.round(state.offsetY);
+                    group.position.set(state.offsetX, state.offsetY, 0);
+                } else {
+                    state.rotY += dx * 0.5;
+                    state.rotX = Math.max(-90, Math.min(90, state.rotX - dy * 0.3));
+                    document.getElementById('rotXSlider').value = state.rotX;
+                    document.getElementById('rotYSlider').value = state.rotY;
+                    document.getElementById('rotXValue').value = Math.round(state.rotX);
+                    document.getElementById('rotYValue').value = Math.round(state.rotY);
+                    updateRotation();
+                }
                 prev = {x: e.clientX, y: e.clientY};
             });
             renderer.domElement.addEventListener('mouseup', () => drag = false);
@@ -1601,18 +1691,46 @@
             }
         }
 
-        function build() {
-            clearGroup();
+        const fontVariantCache = {};
 
-            // Reset group transform before rebuilding to avoid affecting bounding box calculation
+        async function getGenkFamily(styleOverride = null) {
+            const h = Math.round(state.typeHeight);
+            const style = styleOverride || (state.oblique ? 'Obl' : 'Upr');
+            const baseFamily = style === 'Obl' ? 'GenkOblique'
+                             : style === 'Bsl' ? 'GenkBackslanted'
+                             : 'Genk';
+            const fontFile = style === 'Obl' ? 'Assets/KRCGenkVariable-ObliqueVF.ttf'
+                           : style === 'Bsl' ? 'Assets/KRCGenkVariable-BackslantedVF.ttf'
+                           : 'Assets/KRCGenkVariable-UprightVF.ttf';
+            if (h === 0) {
+                await document.fonts.load(`100px "${baseFamily}"`);
+                return baseFamily;
+            }
+            const name = `Genk${style}H${h}`;
+            if (!fontVariantCache[name]) {
+                const face = new FontFace(name, `url(${fontFile})`, {
+                    variationSettings: `'YTAS' ${h}`
+                });
+                fontVariantCache[name] = await face.load();
+                document.fonts.add(fontVariantCache[name]);
+            }
+            return name;
+        }
+
+        async function build() {
+            const s = state.size;
+            const r = Math.min(state.radius, s/2 - 5);
+            const genkFamily = await getGenkFamily();
+            // Inside face uses backslanted when oblique is on (text moves left on the inside)
+            const insideFamily = state.oblique ? await getGenkFamily('Bsl') : genkFamily;
+
+            // Clear and reset only after font is ready, so there's no empty frame
+            clearGroup();
             group.position.set(0, 0, 0);
             group.rotation.set(0, 0, 0);
             group.scale.set(1, 1, 1);
 
-            const s = state.size;
-            const r = Math.min(state.radius, s/2 - 5);
-
-            createTextBand(s, s, r);
+            createTextBand(s, s, r, genkFamily, insideFamily);
 
             // Compute bounding box and center the group (now in local space since transforms are reset)
             const box = new THREE.Box3().setFromObject(group);
@@ -1728,21 +1846,11 @@
             const bandMeshInside = new THREE.Mesh(geomInside, matInside);
             group.add(bandMeshInside);
 
-            if (state.debugMode) {
-                const capShape = new THREE.Shape(points.map(p => new THREE.Vector2(p.x, p.y)));
-                const capGeom = new THREE.ShapeGeometry(capShape);
-                const frontCap = new THREE.Mesh(capGeom, new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.FrontSide, transparent: true, opacity: 0.5 }));
-                frontCap.position.z = halfD;
-                group.add(frontCap);
-                const backCap = new THREE.Mesh(capGeom.clone(), new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.BackSide, transparent: true, opacity: 0.5 }));
-                backCap.position.z = -halfD;
-                group.add(backCap);
-            }
 
             return actualDepth;
         }
 
-        function finishTextBand(points, perimeter, canvas, actualDepth) {
+        function finishTextBand(points, perimeter, canvas, actualDepth, insideCanvas = null) {
             const texture = new THREE.CanvasTexture(canvas);
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -1795,7 +1903,15 @@
             const bandMeshOutside = new THREE.Mesh(geom, matOutside);
             group.add(bandMeshOutside);
 
-            const textureInside = texture.clone();
+            let textureInside;
+            if (insideCanvas) {
+                textureInside = new THREE.CanvasTexture(insideCanvas);
+                textureInside.wrapS = THREE.RepeatWrapping;
+                textureInside.wrapT = THREE.ClampToEdgeWrapping;
+                textureInside.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            } else {
+                textureInside = texture.clone();
+            }
             textureInside.needsUpdate = true;
             currentTextureInside = textureInside;
 
@@ -1824,32 +1940,20 @@
             const bandMeshInside = new THREE.Mesh(geomInside, matInside);
             group.add(bandMeshInside);
 
-            if (state.debugMode) {
-                const capShape = new THREE.Shape(points.map(p => new THREE.Vector2(p.x, p.y)));
-                const capGeom = new THREE.ShapeGeometry(capShape);
-                const frontCap = new THREE.Mesh(capGeom, new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.FrontSide, transparent: true, opacity: 0.5 }));
-                frontCap.position.z = halfD;
-                group.add(frontCap);
-                const backCap = new THREE.Mesh(capGeom.clone(), new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.BackSide, transparent: true, opacity: 0.5 }));
-                backCap.position.z = -halfD;
-                group.add(backCap);
-            }
 
             return actualDepth;
         }
 
-        function createTextBand(w, h, r) {
+        function createTextBand(w, h, r, genkFamily = 'Genk', insideFamily = null) {
             const canvas = document.createElement('canvas');
-            canvas.style.fontVariationSettings = `'YTAS' ${state.typeHeight}`;
             const ctx = canvas.getContext('2d');
             const baseText = state.text.trim() + ' ';
             // Apply repeat for horizontal mode only
             const text = state.verticalMode ? baseText : baseText.repeat(state.repeat);
-            const fontFamily = 'Genk, Arial Black, sans-serif';
+            const fontFamily = `"${genkFamily}", Arial Black, sans-serif`;
 
             // Measure text to determine aspect ratio
             const refFontSize = 100;
-            ctx.fontVariationSettings = `'YTAS' ${state.typeHeight}`;
             ctx.font = `${refFontSize}px ${fontFamily}`;
             const textWidth = ctx.measureText(text).width;
             const textAspect = textWidth / refFontSize;
@@ -1861,8 +1965,7 @@
                 const numLines = wordsPerSide * 4; // words per side × 4 sides
 
                 // Calculate shape width based on text width - use higher resolution
-                const fontSize = w * 4; // Larger font for higher resolution texture
-                ctx.fontVariationSettings = `'YTAS' ${state.typeHeight}`;
+                const fontSize = w * 4 * textureQualityMultiplier;
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 const metrics = ctx.measureText(text);
                 const singleTextWidth = metrics.width;
@@ -1900,13 +2003,14 @@
                 perimeter += points[points.length - 1].distanceTo(points[0]);
 
                 // Create texture with vertically stacked text
-                canvas.width = Math.ceil(singleTextWidth);
+                // Use ink right bound so oblique/backslanted glyphs aren't clipped
+                const inkRightVert = metrics.actualBoundingBoxRight || singleTextWidth;
+                canvas.width = Math.ceil(Math.max(singleTextWidth, inkRightVert));
                 canvas.height = Math.ceil(lineHeight * numLines);
 
                 ctx.fillStyle = '#' + state.bgColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                ctx.fontVariationSettings = `'YTAS' ${state.typeHeight}`;
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 ctx.fillStyle = '#' + state.fgColor;
                 ctx.textBaseline = 'alphabetic';
@@ -1961,10 +2065,9 @@
             // textAspect already calculated at top of function
             const depth = perimeter / textAspect;
 
-            const scale = 6;
+            const scale = 6 * textureQualityMultiplier;
             const fontSize = depth * scale * 0.75;
 
-            ctx.fontVariationSettings = `'YTAS' ${state.typeHeight}`;
             ctx.font = `${fontSize}px ${fontFamily}`;
             const metrics = ctx.measureText(text);
             const actualTextWidth = metrics.width;
@@ -1973,15 +2076,24 @@
             const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
             const textHeight = ascent + descent;
 
+            // Measure padding at YTAS=0 so it stays fixed regardless of axis value
+            const baseFamily = genkFamily.includes('Bsl') ? 'GenkBackslanted'
+                             : genkFamily.includes('Obl') ? 'GenkOblique'
+                             : 'Genk';
+            ctx.font = `${fontSize}px "${baseFamily}", Arial Black, sans-serif`;
+            const baseMetrics = ctx.measureText(text);
+            const baseTextHeight = (baseMetrics.actualBoundingBoxAscent || fontSize * 0.8)
+                                 + (baseMetrics.actualBoundingBoxDescent || fontSize * 0.2);
+            const fixedPadding = baseTextHeight * 0.1;
+
             canvas.width = Math.ceil(actualTextWidth);
-            canvas.height = Math.ceil(textHeight * 1.1);
+            canvas.height = Math.ceil(textHeight + fixedPadding);
 
             const actualDepth = canvas.height / (scale * 0.75);
 
             ctx.fillStyle = '#' + state.bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fontVariationSettings = `'YTAS' ${state.typeHeight}`;
             ctx.font = `${fontSize}px ${fontFamily}`;
             ctx.fillStyle = '#' + state.fgColor;
             ctx.textBaseline = 'alphabetic';
@@ -1989,8 +2101,40 @@
             const yPos = (canvas.height + ascent - descent) / 2;
 
             ctx.fillText(text, 0, yPos);
+            // Second draw shifted left by one advance period so oblique overhang wraps seamlessly
+            const inkRight = metrics.actualBoundingBoxRight || 0;
+            if (inkRight > actualTextWidth) {
+                ctx.fillText(text, -actualTextWidth, yPos);
+            }
 
-            return finishTextBand(points, perimeter, canvas, actualDepth);
+            // Generate separate inside canvas if inside font differs from outside
+            let insideCanvas = null;
+            if (insideFamily && insideFamily !== genkFamily) {
+                insideCanvas = document.createElement('canvas');
+                insideCanvas.width = canvas.width;
+                insideCanvas.height = canvas.height;
+                const insideCtx = insideCanvas.getContext('2d');
+                insideCtx.font = `${fontSize}px "${insideFamily}", Arial Black, sans-serif`;
+                insideCtx.textBaseline = 'alphabetic';
+                // Measure first so we know overhang direction before drawing
+                const insideMetrics = insideCtx.measureText(text);
+                const insideInkLeft  = insideMetrics.actualBoundingBoxLeft  || 0;
+                const insideInkRight = insideMetrics.actualBoundingBoxRight || 0;
+                insideCtx.fillStyle = '#' + state.bgColor;
+                insideCtx.fillRect(0, 0, insideCanvas.width, insideCanvas.height);
+                insideCtx.fillStyle = '#' + state.fgColor;
+                insideCtx.fillText(text, 0, yPos);
+                // Backslanted: ink overhangs LEFT (before x=0) — wrap by drawing one period to the right
+                if (insideInkLeft > 0) {
+                    insideCtx.fillText(text, insideCanvas.width, yPos);
+                }
+                // Also handle any right overhang (oblique-style) — draw one period to the left
+                if (insideInkRight > insideCanvas.width) {
+                    insideCtx.fillText(text, -insideCanvas.width, yPos);
+                }
+            }
+
+            return finishTextBand(points, perimeter, canvas, actualDepth, insideCanvas);
         }
 
         function updateRotation() {
@@ -2015,8 +2159,7 @@
                 gridOverlay.setAttribute('width', state.canvasWidth);
                 gridOverlay.setAttribute('height', state.canvasHeight);
 
-                const canvasTransform = canvas.style.transform || 'scale(1)';
-                gridOverlay.style.transform = `translate(-50%, -50%) ${canvasTransform}`;
+                gridOverlay.style.transform = canvas.style.transform || 'translate(-50%, -50%) scale(1)';
 
                 gridOverlay.innerHTML = '';
 
@@ -2096,7 +2239,7 @@
             easingCtx.clearRect(0, 0, easingCanvas.width, easingCanvas.height);
 
             // Draw grid
-            easingCtx.strokeStyle = '#334473';
+            easingCtx.strokeStyle = '#0a2373';
             easingCtx.lineWidth = 1;
             for (let i = 0; i <= 4; i++) {
                 const x = padding + (gridSize / 4) * i;
@@ -2309,6 +2452,13 @@
             input.value = `${p1x}, ${p1y}, ${p2x}, ${p2y}`;
         }
 
+        function applyEasingPreset(p1x, p1y, p2x, p2y) {
+            state.easingP1.x = p1x; state.easingP1.y = p1y;
+            state.easingP2.x = p2x; state.easingP2.y = p2y;
+            updateEasingInput();
+            drawEasingCurve();
+        }
+
         function parseEasingInput() {
             const input = document.getElementById('easingInput');
             const parts = input.value.split(',').map(s => parseFloat(s.trim()));
@@ -2499,7 +2649,7 @@
             const headerIcon = document.getElementById('headerIconPath');
             const headerTitle = document.getElementById('headerTitle');
             const brandingImg = document.getElementById('brandingImg');
-            const lightBgs = ['82cdff', 'ffffff'];
+            const lightBgs = ['82cdff', '9bd7ff', 'b4e1ff', 'ffffff'];
             const isLightBg = lightBgs.includes(state.bgColor.toLowerCase());
 
             if (!state.showPreview && isLightBg) {
@@ -2591,10 +2741,11 @@
             updateCameraPosition();
         });
 
-        document.getElementById('debugModeToggle').addEventListener('change', e => {
-            state.debugMode = e.target.checked;
+        document.getElementById('obliqueToggle').addEventListener('change', e => {
+            state.oblique = e.target.checked;
             build();
         });
+
 
         function updateCameraPosition() {
             if (state.insideView) {
@@ -2637,7 +2788,8 @@
                 offsetX: state.offsetX,
                 offsetY: state.offsetY,
                 size: state.size,
-                radius: state.radius
+                radius: state.radius,
+                typeHeight: state.typeHeight
             };
             document.getElementById('setKeyframeStart').classList.add('active');
             updateKeyframeInfo();
@@ -2652,7 +2804,8 @@
                 offsetX: state.offsetX,
                 offsetY: state.offsetY,
                 size: state.size,
-                radius: state.radius
+                radius: state.radius,
+                typeHeight: state.typeHeight
             };
             document.getElementById('setKeyframeEnd').classList.add('active');
             updateKeyframeInfo();
@@ -2771,12 +2924,14 @@
             const offsetX = start.offsetX + (end.offsetX - start.offsetX) * easedRotationProgress;
             const offsetY = start.offsetY + (end.offsetY - start.offsetY) * easedRotationProgress;
 
-            // Interpolate size and radius
+            // Interpolate size, radius, and typeHeight
             const size = start.size + (end.size - start.size) * easedRotationProgress;
             const radius = start.radius + (end.radius - start.radius) * easedRotationProgress;
+            const typeHeight = (start.typeHeight || 0) + ((end.typeHeight || 0) - (start.typeHeight || 0)) * easedRotationProgress;
 
             // Check if geometry needs rebuilding
-            const needsRebuild = Math.abs(state.size - size) > 0.1 || Math.abs(state.radius - radius) > 0.1;
+            const needsRebuild = Math.abs(state.size - size) > 0.1 || Math.abs(state.radius - radius) > 0.1
+                || Math.round(state.typeHeight) !== Math.round(typeHeight);
 
             // Update state with interpolated values (so build() uses correct values)
             state.rotX = rotX;
@@ -2787,8 +2942,9 @@
             state.offsetY = offsetY;
             state.size = size;
             state.radius = radius;
+            state.typeHeight = typeHeight;
 
-            // Rebuild geometry if size or radius changed
+            // Rebuild geometry if size, radius, or typeHeight changed
             if (needsRebuild) {
                 build();
             } else {
@@ -2815,6 +2971,8 @@
             document.getElementById('sizeValue').value = Math.round(size);
             document.getElementById('radiusSlider').value = radius;
             document.getElementById('radiusValue').value = Math.round(radius);
+            document.getElementById('typeHeightSlider').value = typeHeight;
+            document.getElementById('typeHeightValue').value = Math.round(typeHeight);
 
             // Apply texture offset (keeps moving forward, doesn't reverse in ping-pong)
             applyTextureOffset(easedTextureProgress);
@@ -2879,27 +3037,32 @@
             }
         });
 
-        // Background color swatches
-        document.querySelectorAll('#bgColorSwatches .color-swatch').forEach(swatch => {
-            swatch.addEventListener('click', e => {
-                document.querySelectorAll('#bgColorSwatches .color-swatch').forEach(s => s.classList.remove('active'));
+        // Colour combination swatches
+        document.querySelectorAll('#colorCombosWrapper .color-combo').forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                document.querySelectorAll('#colorCombosWrapper .color-combo').forEach(s => s.classList.remove('active'));
                 swatch.classList.add('active');
-                state.bgColor = swatch.dataset.color;
+                state.bgColor = swatch.dataset.bg;
+                state.fgColor = swatch.dataset.fg;
                 scene.background = new THREE.Color(parseInt(state.bgColor, 16));
                 updateHeaderColors();
                 build();
             });
         });
 
-        // Foreground color swatches
-        document.querySelectorAll('#fgColorSwatches .color-swatch').forEach(swatch => {
-            swatch.addEventListener('click', e => {
-                document.querySelectorAll('#fgColorSwatches .color-swatch').forEach(s => s.classList.remove('active'));
-                swatch.classList.add('active');
-                state.fgColor = swatch.dataset.color;
-                build();
-            });
-        });
+        function applyCanvasSize(width, height) {
+            // H.264 requires even dimensions
+            width = Math.max(2, Math.min(7680, Math.round(width / 2) * 2));
+            height = Math.max(2, Math.min(7680, Math.round(height / 2) * 2));
+            state.canvasWidth = width;
+            state.canvasHeight = height;
+            document.getElementById('canvasWidthInput').value = width;
+            document.getElementById('canvasHeightInput').value = height;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            scaleCanvasToFit();
+        }
 
         // Canvas size buttons
         document.querySelectorAll('#sizeButtons .size-btn').forEach(btn => {
@@ -2907,27 +3070,119 @@
                 document.querySelectorAll('#sizeButtons .size-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 const [width, height] = btn.dataset.size.split('x').map(Number);
-                state.canvasWidth = width;
-                state.canvasHeight = height;
-
-                camera.aspect = width / height;
-                camera.updateProjectionMatrix();
-                renderer.setSize(width, height);
-
-                scaleCanvasToFit();
+                applyCanvasSize(width, height);
             });
         });
 
-        // Export PNG
-        document.getElementById('exportPNG').addEventListener('click', () => {
-            // Always export at canvas dimensions regardless of fullscreen mode
-            const wasFullscreen = !state.showPreview;
-            if (wasFullscreen) {
+        // Custom canvas size inputs
+        function applyCustomSize() {
+            const w = parseInt(document.getElementById('canvasWidthInput').value) || state.canvasWidth;
+            const h = parseInt(document.getElementById('canvasHeightInput').value) || state.canvasHeight;
+            document.querySelectorAll('#sizeButtons .size-btn').forEach(b => b.classList.remove('active'));
+            applyCanvasSize(w, h);
+        }
+        ['canvasWidthInput', 'canvasHeightInput'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('blur', applyCustomSize);
+            el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.target.blur(); } });
+        });
+
+        function prepareExportRenderer() {
+            renderer.setPixelRatio(1);
+            renderer.setSize(state.canvasWidth, state.canvasHeight);
+            camera.aspect = state.canvasWidth / state.canvasHeight;
+            camera.updateProjectionMatrix();
+        }
+
+        function restoreRenderer() {
+            renderer.setPixelRatio(window.devicePixelRatio || 1);
+            if (!state.showPreview) {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+            } else {
                 renderer.setSize(state.canvasWidth, state.canvasHeight);
                 camera.aspect = state.canvasWidth / state.canvasHeight;
-                camera.updateProjectionMatrix();
+                scaleCanvasToFit();
             }
+            camera.updateProjectionMatrix();
+        }
 
+        // Reset All
+        document.getElementById('resetAll').addEventListener('click', () => {
+            state.text = 'KRC GENK  ';
+            state.size = defaultValues.size;
+            state.radius = defaultValues.radius;
+            state.typeHeight = defaultValues.typeHeight;
+            state.rotX = defaultValues.rotX;
+            state.rotY = defaultValues.rotY;
+            state.rotZ = defaultValues.rotZ;
+            state.speed = defaultValues.speed;
+            state.offsetX = 0;
+            state.offsetY = 0;
+            state.zoom = 1;
+            state.bgColor = '003CC3';
+            state.fgColor = '001450';
+            state.verticalMode = false;
+            state.insideView = false;
+            state.oblique = false;
+            state.repeat = 2;
+            state.verticalRepeat = 3;
+
+            document.getElementById('textInput').value = state.text;
+            document.getElementById('sizeSlider').value = state.size;
+            document.getElementById('sizeValue').value = state.size;
+            document.getElementById('radiusSlider').value = state.radius;
+            document.getElementById('radiusValue').value = state.radius;
+            document.getElementById('typeHeightSlider').value = state.typeHeight;
+            document.getElementById('typeHeightValue').value = state.typeHeight;
+            document.getElementById('rotXSlider').value = state.rotX;
+            document.getElementById('rotXValue').value = state.rotX;
+            document.getElementById('rotYSlider').value = state.rotY;
+            document.getElementById('rotYValue').value = state.rotY;
+            document.getElementById('rotZSlider').value = state.rotZ;
+            document.getElementById('rotZValue').value = state.rotZ;
+            document.getElementById('speedSlider').value = state.speed;
+            document.getElementById('speedValue').value = state.speed;
+            document.getElementById('offsetXSlider').value = 0;
+            document.getElementById('offsetXValue').value = 0;
+            document.getElementById('offsetYSlider').value = 0;
+            document.getElementById('offsetYValue').value = 0;
+            document.getElementById('verticalToggle').checked = false;
+            document.getElementById('insideViewToggle').checked = false;
+            document.getElementById('obliqueToggle').checked = false;
+            document.querySelectorAll('#colorCombosWrapper .color-combo').forEach(s => s.classList.toggle('active', s.dataset.bg === '003CC3' && s.dataset.fg === '001450'));
+            scene.background = new THREE.Color(parseInt('003CC3', 16));
+            updateCameraPosition();
+            build();
+        });
+
+        // Scales bitrate with resolution — minimum 50 Mbps, capped at 200 Mbps
+        function exportBitrate(width, height) {
+            return Math.min(200_000_000, Math.max(50_000_000,
+                Math.round(width * height / (1920 * 1080) * 50_000_000)));
+        }
+
+        // Returns the correct AVC codec string for the given dimensions, or null if too large for H.264
+        function avcCodecString(width, height) {
+            const codedArea = Math.ceil(width / 16) * 16 * Math.ceil(height / 16) * 16;
+            if (codedArea <= 9437184)  return 'avc1.640033'; // Level 5.1 — up to ~3840×2160
+            if (codedArea <= 35651584) return 'avc1.64003c'; // Level 6.0 — up to ~7680×4640
+            return null; // Exceeds H.264 maximum
+        }
+
+        function exportQualityScale() {
+            const dimFactor = Math.max(state.canvasWidth, state.canvasHeight) / 1920;
+            const zoomFactor = Math.max(1, state.zoom);
+            return Math.min(6, Math.ceil(dimFactor * zoomFactor));
+        }
+
+        // Export PNG
+        document.getElementById('exportPNG').addEventListener('click', async () => {
+            textureQualityMultiplier = exportQualityScale();
+            await build();
+            textureQualityMultiplier = 1;
+
+            prepareExportRenderer();
             renderer.render(scene, camera);
 
             const dataURL = renderer.domElement.toDataURL('image/png');
@@ -2936,12 +3191,7 @@
             link.href = dataURL;
             link.click();
 
-            // Restore fullscreen mode if it was active
-            if (wasFullscreen) {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-            }
+            restoreRenderer();
         });
 
         // Export Material ID Map (PNG for static, MP4 for keyframe mode)
@@ -2981,13 +3231,7 @@
                 scene.background = originalBackground;
             }
 
-            // Always export at canvas dimensions regardless of fullscreen mode
-            const wasFullscreen = !state.showPreview;
-            if (wasFullscreen) {
-                renderer.setSize(state.canvasWidth, state.canvasHeight);
-                camera.aspect = state.canvasWidth / state.canvasHeight;
-                camera.updateProjectionMatrix();
-            }
+            prepareExportRenderer();
 
             // If keyframes enabled, export as MP4
             if (state.keyframeEnabled) {
@@ -2995,21 +3239,13 @@
                 const isSafari = navigator.vendor && navigator.vendor.includes('Apple');
                 if (isSafari) {
                     alert('MP4 export is not supported in Safari. Please use Chrome or Edge.');
-                    if (wasFullscreen) {
-                        renderer.setSize(window.innerWidth, window.innerHeight);
-                        camera.aspect = window.innerWidth / window.innerHeight;
-                        camera.updateProjectionMatrix();
-                    }
+                    restoreRenderer();
                     return;
                 }
 
                 if (typeof VideoEncoder === 'undefined') {
                     alert('MP4 export is not supported in this browser. Please use Chrome or Edge.');
-                    if (wasFullscreen) {
-                        renderer.setSize(window.innerWidth, window.innerHeight);
-                        camera.aspect = window.innerWidth / window.innerHeight;
-                        camera.updateProjectionMatrix();
-                    }
+                    restoreRenderer();
                     return;
                 }
 
@@ -3024,7 +3260,7 @@
 
                 btn.textContent = '0%';
                 btn.style.background = '#82CDFF';
-                btn.style.color = '#001550';
+                btn.style.color = '#001450';
                 btn.disabled = true;
 
                 await new Promise(resolve => {
@@ -3036,8 +3272,14 @@
                 });
 
                 const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
-                const videoWidth = state.canvasWidth;
-                const videoHeight = state.canvasHeight;
+                const videoWidth = Math.round(state.canvasWidth / 2) * 2;
+                const videoHeight = Math.round(state.canvasHeight / 2) * 2;
+                const matCodec = avcCodecString(videoWidth, videoHeight);
+                if (!matCodec) {
+                    alert(`Resolution ${videoWidth}×${videoHeight} exceeds the maximum H.264 can encode (~5960×5960). Please reduce the canvas size.`);
+                    isRecording = false; btn.textContent = 'MAT ID'; btn.style.background = ''; btn.style.color = ''; btn.disabled = false;
+                    restoreRenderer(); return;
+                }
 
                 const target = new ArrayBufferTarget();
                 const matMuxer = new Muxer({
@@ -3063,10 +3305,10 @@
 
                 try {
                     matEncoder.configure({
-                        codec: 'avc1.640033',
+                        codec: matCodec,
                         width: videoWidth,
                         height: videoHeight,
-                        bitrate: 15_000_000,
+                        bitrate: exportBitrate(videoWidth, videoHeight),
                         framerate: 60
                     });
                     await new Promise(resolve => setTimeout(resolve, 100));
@@ -3080,25 +3322,25 @@
                     btn.style.background = '';
                     btn.style.color = '';
                     btn.disabled = false;
-                    if (wasFullscreen) {
-                        renderer.setSize(window.innerWidth, window.innerHeight);
-                        camera.aspect = window.innerWidth / window.innerHeight;
-                        camera.updateProjectionMatrix();
-                    }
+                    restoreRenderer();
                     return;
                 }
 
                 // Apply ID materials for the entire export
+                textureQualityMultiplier = exportQualityScale();
+                await build();
                 const { originalMaterials, originalBackground } = applyIDMaterials();
 
                 const captureMatFrame = () => {
                     if (encoderFailed) {
+                        textureQualityMultiplier = 1;
                         restoreMaterials(originalMaterials, originalBackground);
                         return;
                     }
 
                     if (frameNumber >= totalFrames) {
                         isRecording = false;
+                        textureQualityMultiplier = 1;
                         matEncoder.flush().then(() => {
                             matEncoder.close();
                             matMuxer.finalize();
@@ -3115,11 +3357,7 @@
                             btn.style.color = '';
                             btn.disabled = false;
                             restoreMaterials(originalMaterials, originalBackground);
-                            if (wasFullscreen) {
-                                renderer.setSize(window.innerWidth, window.innerHeight);
-                                camera.aspect = window.innerWidth / window.innerHeight;
-                                camera.updateProjectionMatrix();
-                            }
+                            restoreRenderer();
                         });
                         return;
                     }
@@ -3183,11 +3421,14 @@
                     const offsetY = start.offsetY + (end.offsetY - start.offsetY) * easedRotationProgress;
                     const size = start.size + (end.size - start.size) * easedRotationProgress;
                     const radius = start.radius + (end.radius - start.radius) * easedRotationProgress;
+                    const typeHeight = (start.typeHeight || 0) + ((end.typeHeight || 0) - (start.typeHeight || 0)) * easedRotationProgress;
 
-                    // Rebuild if size/radius changed
-                    if (Math.abs(state.size - size) > 0.1 || Math.abs(state.radius - radius) > 0.1) {
+                    // Rebuild if size/radius/typeHeight changed
+                    if (Math.abs(state.size - size) > 0.1 || Math.abs(state.radius - radius) > 0.1
+                        || Math.round(state.typeHeight) !== Math.round(typeHeight)) {
                         state.size = size;
                         state.radius = radius;
+                        state.typeHeight = typeHeight;
                         state.rotX = rotX;
                         state.rotY = rotY;
                         state.rotZ = rotZ;
@@ -3220,7 +3461,7 @@
                     const frame = new VideoFrame(tempCanvas, {
                         timestamp: (frameNumber * 1_000_000) / 60
                     });
-                    matEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                    matEncoder.encode(frame, { keyFrame: frameNumber % 15 === 0 });
                     frame.close();
 
                     frameNumber++;
@@ -3245,11 +3486,7 @@
 
                 restoreMaterials(originalMaterials, originalBackground);
 
-                if (wasFullscreen) {
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                }
+                restoreRenderer();
             }
         });
 
@@ -3285,12 +3522,7 @@
             frameNumber = 0;
 
             // Always export at canvas dimensions regardless of fullscreen mode
-            const wasFullscreen = !state.showPreview;
-            if (wasFullscreen) {
-                renderer.setSize(state.canvasWidth, state.canvasHeight);
-                camera.aspect = state.canvasWidth / state.canvasHeight;
-                camera.updateProjectionMatrix();
-            }
+            prepareExportRenderer();
 
             const cycleDuration = 8000 / state.speed;
             // Double the frames when keyframes enabled (for 2 loops: forward + backward)
@@ -3299,7 +3531,7 @@
 
             btn.textContent = '0%';
             btn.style.background = '#82CDFF';
-            btn.style.color = '#001550';
+            btn.style.color = '#001450';
             btn.disabled = true;
 
             await new Promise(resolve => {
@@ -3313,8 +3545,14 @@
             const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
 
             // Use logical canvas dimensions, not pixel dimensions (which include devicePixelRatio)
-            const videoWidth = state.canvasWidth;
-            const videoHeight = state.canvasHeight;
+            const videoWidth = Math.round(state.canvasWidth / 2) * 2;
+            const videoHeight = Math.round(state.canvasHeight / 2) * 2;
+            const mp4Codec = avcCodecString(videoWidth, videoHeight);
+            if (!mp4Codec) {
+                alert(`Resolution ${videoWidth}×${videoHeight} exceeds the maximum H.264 can encode (~5960×5960). Please reduce the canvas size.`);
+                isRecording = false; btn.textContent = 'MP4'; btn.style.background = ''; btn.style.color = ''; btn.disabled = false;
+                restoreRenderer(); return;
+            }
 
             const target = new ArrayBufferTarget();
             muxer = new Muxer({
@@ -3345,10 +3583,10 @@
 
             try {
                 videoEncoder.configure({
-                    codec: 'avc1.640033',
+                    codec: mp4Codec,
                     width: videoWidth,
                     height: videoHeight,
-                    bitrate: 15_000_000,
+                    bitrate: exportBitrate(videoWidth, videoHeight),
                     framerate: 60
                 });
 
@@ -3365,21 +3603,22 @@
                 btn.style.background = '';
                 btn.style.color = '';
                 // Restore fullscreen mode if it was active
-                if (wasFullscreen) {
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                }
+                restoreRenderer();
                 return;
             }
 
+            textureQualityMultiplier = exportQualityScale();
+            await build();
+
             const captureFrame = () => {
                 if (encoderFailed) {
+                    textureQualityMultiplier = 1;
                     return;
                 }
 
                 if (frameNumber >= totalFrames) {
                     isRecording = false;
+                    textureQualityMultiplier = 1;
 
                     videoEncoder.flush().then(() => {
                         videoEncoder.close();
@@ -3397,11 +3636,7 @@
                         btn.style.color = '';
                         btn.disabled = false;
                         // Restore fullscreen mode if it was active
-                        if (wasFullscreen) {
-                            renderer.setSize(window.innerWidth, window.innerHeight);
-                            camera.aspect = window.innerWidth / window.innerHeight;
-                            camera.updateProjectionMatrix();
-                        }
+                        restoreRenderer();
                     }).catch(e => {
                         console.error('Error finalizing video:', e);
                         alert('Error creating video: ' + e.message);
@@ -3410,11 +3645,7 @@
                         btn.style.color = '';
                         btn.disabled = false;
                         // Restore fullscreen mode if it was active
-                        if (wasFullscreen) {
-                            renderer.setSize(window.innerWidth, window.innerHeight);
-                            camera.aspect = window.innerWidth / window.innerHeight;
-                            camera.updateProjectionMatrix();
-                        }
+                        restoreRenderer();
                     });
                     return;
                 }
@@ -3422,11 +3653,7 @@
                 if (videoEncoder.state !== 'configured') {
                     isRecording = false;
                     // Restore fullscreen mode if it was active
-                    if (wasFullscreen) {
-                        renderer.setSize(window.innerWidth, window.innerHeight);
-                        camera.aspect = window.innerWidth / window.innerHeight;
-                        camera.updateProjectionMatrix();
-                    }
+                    restoreRenderer();
                     return;
                 }
 
@@ -3495,11 +3722,14 @@
                     const offsetY = start.offsetY + (end.offsetY - start.offsetY) * easedRotationProgress;
                     const size = start.size + (end.size - start.size) * easedRotationProgress;
                     const radius = start.radius + (end.radius - start.radius) * easedRotationProgress;
+                    const typeHeight = (start.typeHeight || 0) + ((end.typeHeight || 0) - (start.typeHeight || 0)) * easedRotationProgress;
 
-                    // Rebuild if size/radius changed
-                    if (Math.abs(state.size - size) > 0.1 || Math.abs(state.radius - radius) > 0.1) {
+                    // Rebuild if size/radius/typeHeight changed
+                    if (Math.abs(state.size - size) > 0.1 || Math.abs(state.radius - radius) > 0.1
+                        || Math.round(state.typeHeight) !== Math.round(typeHeight)) {
                         state.size = size;
                         state.radius = radius;
+                        state.typeHeight = typeHeight;
                         state.rotX = rotX;
                         state.rotY = rotY;
                         state.rotZ = rotZ;
@@ -3536,7 +3766,7 @@
                     timestamp: (frameNumber * 1_000_000) / 60
                 });
 
-                videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                videoEncoder.encode(frame, { keyFrame: frameNumber % 15 === 0 });
                 frame.close();
 
                 frameNumber++;
@@ -3616,36 +3846,12 @@
         document.getElementById('savePreset').addEventListener('click', async () => {
             const presetName = document.getElementById('presetName').value.trim() || 'Untitled';
 
-            const preset = {
-                version: 1,
-                name: presetName,
-                text: state.text,
-                canvasWidth: state.canvasWidth,
-                canvasHeight: state.canvasHeight,
-                size: state.size,
-                radius: state.radius,
-                typeHeight: state.typeHeight,
-                rotX: state.rotX,
-                rotY: state.rotY,
-                rotZ: state.rotZ,
-                speed: state.speed,
-                bgColor: state.bgColor,
-                fgColor: state.fgColor,
-                zoom: state.zoom,
-                insideZoom: state.insideZoom,
-                offsetX: state.offsetX,
-                offsetY: state.offsetY,
-                verticalMode: state.verticalMode,
-                insideView: state.insideView,
-                repeat: state.repeat,
-                verticalRepeat: state.verticalRepeat,
-                easingP1: { ...state.easingP1 },
-                easingP2: { ...state.easingP2 },
-                keyframeEnabled: state.keyframeEnabled,
-                keyframePingPong: state.keyframePingPong,
-                keyframeStart: { ...state.keyframeStart },
-                keyframeEnd: { ...state.keyframeEnd }
-            };
+            const PRESET_TRANSIENT = new Set(['keyframePlaying', 'keyframeProgress']);
+            const preset = { version: 1, name: presetName };
+            for (const [k, v] of Object.entries(state)) {
+                if (PRESET_TRANSIENT.has(k)) continue;
+                preset[k] = (v !== null && typeof v === 'object') ? { ...v } : v;
+            }
 
             // Capture thumbnail from canvas with correct aspect ratio
             const thumbnailCanvas = document.createElement('canvas');
@@ -3755,121 +3961,107 @@
                         document.getElementById('presetName').value = preset.name;
                     }
 
-                    // Apply preset values to state
+                    // Broad merge: apply all state keys from preset automatically (future-proof)
+                    const LOAD_META = new Set(['version', 'name', 'thumbnail']);
+                    const LOAD_TRANSIENT = new Set(['keyframePlaying', 'keyframeProgress']);
+                    for (const [k, v] of Object.entries(preset)) {
+                        if (LOAD_META.has(k) || LOAD_TRANSIENT.has(k)) continue;
+                        if (k in state) {
+                            state[k] = (v !== null && typeof v === 'object') ? { ...v } : v;
+                        }
+                    }
+
+                    // Apply preset values to state + sync DOM controls
                     if (preset.text !== undefined) {
-                        state.text = preset.text;
                         document.getElementById('textInput').value = preset.text;
                     }
-                    if (preset.canvasWidth !== undefined) state.canvasWidth = preset.canvasWidth;
-                    if (preset.canvasHeight !== undefined) state.canvasHeight = preset.canvasHeight;
+                    if (preset.canvasWidth !== undefined) {
+                        document.getElementById('canvasWidthInput').value = preset.canvasWidth;
+                    }
+                    if (preset.canvasHeight !== undefined) {
+                        document.getElementById('canvasHeightInput').value = preset.canvasHeight;
+                    }
+                    // Sync slider/input DOM controls
                     if (preset.size !== undefined) {
-                        state.size = preset.size;
-                        document.getElementById('sizeSlider').value = preset.size;
-                        document.getElementById('sizeValue').value = preset.size;
+                        document.getElementById('sizeSlider').value = state.size;
+                        document.getElementById('sizeValue').value = state.size;
                     }
                     if (preset.radius !== undefined) {
-                        state.radius = preset.radius;
-                        document.getElementById('radiusSlider').value = preset.radius;
-                        document.getElementById('radiusValue').value = preset.radius;
+                        document.getElementById('radiusSlider').value = state.radius;
+                        document.getElementById('radiusValue').value = state.radius;
                     }
                     if (preset.typeHeight !== undefined) {
-                        state.typeHeight = preset.typeHeight;
-                        document.getElementById('typeHeightSlider').value = preset.typeHeight;
-                        document.getElementById('typeHeightValue').value = preset.typeHeight;
+                        document.getElementById('typeHeightSlider').value = state.typeHeight;
+                        document.getElementById('typeHeightValue').value = state.typeHeight;
                     }
                     if (preset.rotX !== undefined) {
-                        state.rotX = preset.rotX;
-                        document.getElementById('rotXSlider').value = preset.rotX;
-                        document.getElementById('rotXValue').value = preset.rotX;
+                        document.getElementById('rotXSlider').value = state.rotX;
+                        document.getElementById('rotXValue').value = state.rotX;
                     }
                     if (preset.rotY !== undefined) {
-                        state.rotY = preset.rotY;
-                        document.getElementById('rotYSlider').value = preset.rotY;
-                        document.getElementById('rotYValue').value = preset.rotY;
+                        document.getElementById('rotYSlider').value = state.rotY;
+                        document.getElementById('rotYValue').value = state.rotY;
                     }
                     if (preset.rotZ !== undefined) {
-                        state.rotZ = preset.rotZ;
-                        document.getElementById('rotZSlider').value = preset.rotZ;
-                        document.getElementById('rotZValue').value = preset.rotZ;
+                        document.getElementById('rotZSlider').value = state.rotZ;
+                        document.getElementById('rotZValue').value = state.rotZ;
                     }
                     if (preset.speed !== undefined) {
-                        state.speed = preset.speed;
-                        document.getElementById('speedSlider').value = preset.speed;
-                        document.getElementById('speedValue').value = preset.speed;
+                        document.getElementById('speedSlider').value = state.speed;
+                        document.getElementById('speedValue').value = state.speed;
                     }
-                    if (preset.bgColor !== undefined) {
-                        state.bgColor = preset.bgColor;
-                        document.querySelectorAll('.color-btn[data-type="bg"]').forEach(btn => {
-                            btn.classList.toggle('active', btn.dataset.color === preset.bgColor);
-                        });
-                    }
-                    if (preset.fgColor !== undefined) {
-                        state.fgColor = preset.fgColor;
-                        document.querySelectorAll('.color-btn[data-type="fg"]').forEach(btn => {
-                            btn.classList.toggle('active', btn.dataset.color === preset.fgColor);
-                        });
-                    }
-                    if (preset.zoom !== undefined) state.zoom = preset.zoom;
-                    if (preset.insideZoom !== undefined) state.insideZoom = preset.insideZoom;
+                    document.querySelectorAll('#colorCombosWrapper .color-combo').forEach(s => {
+                        s.classList.toggle('active', s.dataset.bg.toLowerCase() === state.bgColor.toLowerCase() && s.dataset.fg.toLowerCase() === state.fgColor.toLowerCase());
+                    });
                     if (preset.offsetX !== undefined) {
-                        state.offsetX = preset.offsetX;
-                        document.getElementById('offsetXSlider').value = preset.offsetX;
-                        document.getElementById('offsetXValue').value = preset.offsetX;
+                        document.getElementById('offsetXSlider').value = state.offsetX;
+                        document.getElementById('offsetXValue').value = state.offsetX;
                     }
                     if (preset.offsetY !== undefined) {
-                        state.offsetY = preset.offsetY;
-                        document.getElementById('offsetYSlider').value = preset.offsetY;
-                        document.getElementById('offsetYValue').value = preset.offsetY;
+                        document.getElementById('offsetYSlider').value = state.offsetY;
+                        document.getElementById('offsetYValue').value = state.offsetY;
                     }
                     if (preset.verticalMode !== undefined) {
-                        state.verticalMode = preset.verticalMode;
-                        document.getElementById('verticalToggle').checked = preset.verticalMode;
+                        document.getElementById('verticalToggle').checked = state.verticalMode;
                     }
                     if (preset.insideView !== undefined) {
-                        state.insideView = preset.insideView;
-                        document.getElementById('insideViewToggle').checked = preset.insideView;
+                        document.getElementById('insideViewToggle').checked = state.insideView;
                     }
-                    if (preset.repeat !== undefined) state.repeat = preset.repeat;
-                    if (preset.verticalRepeat !== undefined) state.verticalRepeat = preset.verticalRepeat;
-                    if (preset.easingP1 !== undefined) {
-                        state.easingP1 = { ...preset.easingP1 };
+                    if (preset.oblique !== undefined) {
+                        document.getElementById('obliqueToggle').checked = state.oblique;
                     }
-                    if (preset.easingP2 !== undefined) {
-                        state.easingP2 = { ...preset.easingP2 };
+                    if (preset.showPreview !== undefined) {
+                        document.getElementById('previewToggle').checked = state.showPreview;
+                    }
+                    if (preset.showGrid !== undefined) {
+                        document.getElementById('gridToggle').checked = state.showGrid;
                     }
                     updateEasingInput();
                     drawEasingCurve();
 
                     // Keyframe settings
                     if (preset.keyframeEnabled !== undefined) {
-                        state.keyframeEnabled = preset.keyframeEnabled;
-                        document.getElementById('keyframeToggle').checked = preset.keyframeEnabled;
-                        document.getElementById('keyframeControls').style.display = preset.keyframeEnabled ? 'flex' : 'none';
-                        document.getElementById('timelineContainer').classList.toggle('visible', preset.keyframeEnabled);
-                        document.body.classList.toggle('timeline-active', preset.keyframeEnabled);
+                        document.getElementById('keyframeToggle').checked = state.keyframeEnabled;
+                        document.getElementById('keyframeControls').style.display = state.keyframeEnabled ? 'flex' : 'none';
+                        document.getElementById('timelineContainer').classList.toggle('visible', state.keyframeEnabled);
+                        document.body.classList.toggle('timeline-active', state.keyframeEnabled);
                     }
                     if (preset.keyframePingPong !== undefined) {
-                        state.keyframePingPong = preset.keyframePingPong;
-                        document.getElementById('timelinePingPongBtn').classList.toggle('active', preset.keyframePingPong);
+                        document.getElementById('timelinePingPongBtn').classList.toggle('active', state.keyframePingPong);
                     }
-                    if (preset.keyframeStart !== undefined) {
-                        state.keyframeStart = { ...preset.keyframeStart };
-                        // Backward compatibility: default values if not present
-                        if (state.keyframeStart.offsetX === undefined) state.keyframeStart.offsetX = 0;
-                        if (state.keyframeStart.offsetY === undefined) state.keyframeStart.offsetY = 0;
-                        if (state.keyframeStart.size === undefined) state.keyframeStart.size = state.size;
-                        if (state.keyframeStart.radius === undefined) state.keyframeStart.radius = state.radius;
-                        document.getElementById('setKeyframeStart').classList.add('active');
-                    }
-                    if (preset.keyframeEnd !== undefined) {
-                        state.keyframeEnd = { ...preset.keyframeEnd };
-                        // Backward compatibility: default values if not present
-                        if (state.keyframeEnd.offsetX === undefined) state.keyframeEnd.offsetX = 0;
-                        if (state.keyframeEnd.offsetY === undefined) state.keyframeEnd.offsetY = 0;
-                        if (state.keyframeEnd.size === undefined) state.keyframeEnd.size = state.size;
-                        if (state.keyframeEnd.radius === undefined) state.keyframeEnd.radius = state.radius;
-                        document.getElementById('setKeyframeEnd').classList.add('active');
-                    }
+                    // Backward compatibility: fill missing keyframe sub-keys
+                    if (state.keyframeStart.offsetX === undefined) state.keyframeStart.offsetX = 0;
+                    if (state.keyframeStart.offsetY === undefined) state.keyframeStart.offsetY = 0;
+                    if (state.keyframeStart.size === undefined) state.keyframeStart.size = state.size;
+                    if (state.keyframeStart.radius === undefined) state.keyframeStart.radius = state.radius;
+                    if (state.keyframeStart.typeHeight === undefined) state.keyframeStart.typeHeight = 0;
+                    if (state.keyframeEnd.offsetX === undefined) state.keyframeEnd.offsetX = 0;
+                    if (state.keyframeEnd.offsetY === undefined) state.keyframeEnd.offsetY = 0;
+                    if (state.keyframeEnd.size === undefined) state.keyframeEnd.size = state.size;
+                    if (state.keyframeEnd.radius === undefined) state.keyframeEnd.radius = state.radius;
+                    if (state.keyframeEnd.typeHeight === undefined) state.keyframeEnd.typeHeight = 0;
+                    if (preset.keyframeStart !== undefined) document.getElementById('setKeyframeStart').classList.add('active');
+                    if (preset.keyframeEnd !== undefined) document.getElementById('setKeyframeEnd').classList.add('active');
 
                     // Update keyframe info display
                     if (state.keyframeEnabled) {
