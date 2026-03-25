@@ -1397,7 +1397,7 @@
         </div>
 
 
-        <div id="versionLabel" style="font-size:8px; color:#0a2373; text-align:right; margin-top:auto; padding-top:12px;">v1.0.3</div>
+        <div id="versionLabel" style="font-size:8px; color:#0a2373; text-align:right; margin-top:auto; padding-top:12px;">v1.0.4</div>
     </div>
 
     <!-- Timeline Editor -->
@@ -1693,45 +1693,45 @@
         }
 
         const fontVariantCache = {};
-        const fontDataCache = {}; // raw ArrayBuffer per font file URL
 
-        // Fetch and cache font file as ArrayBuffer
-        async function getFontData(url) {
-            if (!fontDataCache[url]) {
-                const resp = await fetch(url);
-                fontDataCache[url] = await resp.arrayBuffer();
+        // Detect Chrome's non-standard FontFace variationSettings support
+        let _useVariationSettings = null;
+        async function supportsVariationSettings() {
+            if (_useVariationSettings !== null) return _useVariationSettings;
+            try {
+                const f = new FontFace('_vtest', 'url(Assets/KRCGenkVariable-UprightVF.ttf)', {
+                    variationSettings: "'YTAS' 100"
+                });
+                const loaded = await f.load();
+                document.fonts.add(loaded);
+                const c = document.createElement('canvas').getContext('2d');
+                await document.fonts.load('100px "Genk"');
+                c.font = '100px "Genk"';
+                const a1 = c.measureText('K').actualBoundingBoxAscent;
+                c.font = '100px "_vtest"';
+                const a2 = c.measureText('K').actualBoundingBoxAscent;
+                document.fonts.delete(loaded);
+                _useVariationSettings = (a1 !== a2);
+            } catch (e) {
+                _useVariationSettings = false;
             }
-            return fontDataCache[url];
+            return _useVariationSettings;
         }
 
-        // Clone a font's binary data with a different fvar axis default value.
-        // This makes the browser render the font at the specified axis position
-        // without needing non-standard FontFace options or ctx.fontVariationSettings.
-        function patchFvarDefault(srcBuffer, axisTag, value) {
-            const buf = srcBuffer.slice(0); // clone
-            const dv = new DataView(buf);
-            // Read table directory
-            const numTables = dv.getUint16(4);
-            let fvarOff = 0;
-            for (let i = 0; i < numTables; i++) {
-                const rec = 12 + i * 16;
-                const tag = String.fromCharCode(dv.getUint8(rec), dv.getUint8(rec+1), dv.getUint8(rec+2), dv.getUint8(rec+3));
-                if (tag === 'fvar') { fvarOff = dv.getUint32(rec + 8); break; }
+        // Static font steps: snap to nearest available static instance
+        const STATIC_STEPS = [0, 20, 40, 60, 80, 100];
+        function nearestStep(h) {
+            let best = 0, bestDist = Infinity;
+            for (const s of STATIC_STEPS) {
+                const d = Math.abs(h - s);
+                if (d < bestDist) { bestDist = d; best = s; }
             }
-            if (!fvarOff) return buf;
-            const axesOffset = dv.getUint16(fvarOff + 4);
-            const axisCount = dv.getUint16(fvarOff + 8);
-            const axisSize = dv.getUint16(fvarOff + 10);
-            for (let i = 0; i < axisCount; i++) {
-                const ao = fvarOff + axesOffset + i * axisSize;
-                const t = String.fromCharCode(dv.getUint8(ao), dv.getUint8(ao+1), dv.getUint8(ao+2), dv.getUint8(ao+3));
-                if (t === axisTag) {
-                    // defaultValue is Fixed 16.16 at offset +8 in the axis record
-                    dv.setInt32(ao + 8, Math.round(value * 65536));
-                    break;
-                }
-            }
-            return buf;
+            return best;
+        }
+
+        function staticFontFile(style, step) {
+            const suffix = style === 'Obl' ? 'Oblique' : style === 'Bsl' ? 'Backslanted' : '';
+            return `Assets/Static/KRCGenkVariable260325e-${step}${suffix}.otf`;
         }
 
         async function getGenkFamily(styleOverride = null) {
@@ -1744,39 +1744,41 @@
                 await document.fonts.load(`100px "${baseFamily}"`);
                 return baseFamily;
             }
-            const fontFile = style === 'Obl' ? 'Assets/KRCGenkVariable-ObliqueVF.ttf'
-                           : style === 'Bsl' ? 'Assets/KRCGenkVariable-BackslantedVF.ttf'
-                           : 'Assets/KRCGenkVariable-UprightVF.ttf';
-            const name = `Genk${style}H${h}`;
-            if (!fontVariantCache[name]) {
-                const srcData = await getFontData(fontFile);
-                const patched = patchFvarDefault(srcData, 'YTAS', h);
-                // Use Blob URL for maximum browser compatibility
-                const blob = new Blob([patched], { type: 'font/ttf' });
-                const blobUrl = URL.createObjectURL(blob);
-                try {
-                    const face = new FontFace(name, `url(${blobUrl})`);
+
+            const useVar = await supportsVariationSettings();
+
+            if (useVar) {
+                // Chrome: FontFace variationSettings bakes the axis value in
+                const fontFile = style === 'Obl' ? 'Assets/KRCGenkVariable-ObliqueVF.ttf'
+                               : style === 'Bsl' ? 'Assets/KRCGenkVariable-BackslantedVF.ttf'
+                               : 'Assets/KRCGenkVariable-UprightVF.ttf';
+                const name = `Genk${style}H${h}`;
+                if (!fontVariantCache[name]) {
+                    const face = new FontFace(name, `url(${fontFile})`, {
+                        variationSettings: `'YTAS' ${h}`
+                    });
                     fontVariantCache[name] = await face.load();
                     document.fonts.add(fontVariantCache[name]);
-                } finally {
-                    URL.revokeObjectURL(blobUrl);
                 }
-                // Debug: verify the patched font differs from base
-                if (!window._fvarDebugDone) {
-                    window._fvarDebugDone = true;
-                    const tc = document.createElement('canvas').getContext('2d');
-                    tc.font = `100px "${baseFamily}"`;
-                    const baseAsc = tc.measureText('K').actualBoundingBoxAscent;
-                    tc.font = `100px "${name}"`;
-                    const varAsc = tc.measureText('K').actualBoundingBoxAscent;
-                    document.getElementById('versionLabel').textContent =
-                        `v1.0.3 base=${Math.round(baseAsc)} var=${Math.round(varAsc)} h=${h}`;
+                return name;
+            } else {
+                // Safari fallback: use nearest static font instance
+                const step = nearestStep(h);
+                if (step === 0) {
+                    await document.fonts.load(`100px "${baseFamily}"`);
+                    return baseFamily;
                 }
+                const name = `GenkStatic${style}H${step}`;
+                if (!fontVariantCache[name]) {
+                    const file = staticFontFile(style, step);
+                    const face = new FontFace(name, `url(${file})`);
+                    fontVariantCache[name] = await face.load();
+                    document.fonts.add(fontVariantCache[name]);
+                }
+                return name;
             }
-            return name;
         }
 
-        // No-op — variation is baked into font binary
         function applyTypeHeight(ctx, h) {}
 
         async function build() {
