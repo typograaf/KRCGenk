@@ -1039,6 +1039,15 @@
                         </label>
                         <span class="toggle-label">Inside View</span>
                     </div>
+                    <div class="toggle-row">
+                        <input type="checkbox" class="toggle-checkbox" id="debugModeToggle">
+                        <label class="toggle-box" for="debugModeToggle">
+                            <svg viewBox="0 0 7 4" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.5 0.5L3.5 3.5L0.5 0.5" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </label>
+                        <span class="toggle-label">Debug Caps</span>
+                    </div>
                     <div class="toggle-row" id="repeatRow">
                         <button class="repeat-btn" id="repeatMinus">
                             <svg width="7" height="1" viewBox="0 0 7 1" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1393,6 +1402,7 @@
             showPreview: true,
             verticalMode: false,
             insideView: false,
+            debugMode: false,
             repeat: 2,
             verticalRepeat: 3,
             typeHeight: 0,
@@ -1718,6 +1728,17 @@
             const bandMeshInside = new THREE.Mesh(geomInside, matInside);
             group.add(bandMeshInside);
 
+            if (state.debugMode) {
+                const capShape = new THREE.Shape(points.map(p => new THREE.Vector2(p.x, p.y)));
+                const capGeom = new THREE.ShapeGeometry(capShape);
+                const frontCap = new THREE.Mesh(capGeom, new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.FrontSide, transparent: true, opacity: 0.5 }));
+                frontCap.position.z = halfD;
+                group.add(frontCap);
+                const backCap = new THREE.Mesh(capGeom.clone(), new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.BackSide, transparent: true, opacity: 0.5 }));
+                backCap.position.z = -halfD;
+                group.add(backCap);
+            }
+
             return actualDepth;
         }
 
@@ -1803,11 +1824,23 @@
             const bandMeshInside = new THREE.Mesh(geomInside, matInside);
             group.add(bandMeshInside);
 
+            if (state.debugMode) {
+                const capShape = new THREE.Shape(points.map(p => new THREE.Vector2(p.x, p.y)));
+                const capGeom = new THREE.ShapeGeometry(capShape);
+                const frontCap = new THREE.Mesh(capGeom, new THREE.MeshBasicMaterial({ color: 0xff0000, side: THREE.FrontSide, transparent: true, opacity: 0.5 }));
+                frontCap.position.z = halfD;
+                group.add(frontCap);
+                const backCap = new THREE.Mesh(capGeom.clone(), new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.BackSide, transparent: true, opacity: 0.5 }));
+                backCap.position.z = -halfD;
+                group.add(backCap);
+            }
+
             return actualDepth;
         }
 
         function createTextBand(w, h, r) {
             const canvas = document.createElement('canvas');
+            canvas.style.fontVariationSettings = `'YTAS' ${state.typeHeight}`;
             const ctx = canvas.getContext('2d');
             const baseText = state.text.trim() + ' ';
             // Apply repeat for horizontal mode only
@@ -2556,6 +2589,11 @@
         document.getElementById('insideViewToggle').addEventListener('change', e => {
             state.insideView = e.target.checked;
             updateCameraPosition();
+        });
+
+        document.getElementById('debugModeToggle').addEventListener('change', e => {
+            state.debugMode = e.target.checked;
+            build();
         });
 
         function updateCameraPosition() {
