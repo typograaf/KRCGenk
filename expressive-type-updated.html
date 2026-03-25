@@ -1397,7 +1397,7 @@
         </div>
 
 
-        <div style="font-size:8px; color:#0a2373; text-align:right; margin-top:auto; padding-top:12px;">v1.0.2</div>
+        <div id="versionLabel" style="font-size:8px; color:#0a2373; text-align:right; margin-top:auto; padding-top:12px;">v1.0.3</div>
     </div>
 
     <!-- Timeline Editor -->
@@ -1751,14 +1751,32 @@
             if (!fontVariantCache[name]) {
                 const srcData = await getFontData(fontFile);
                 const patched = patchFvarDefault(srcData, 'YTAS', h);
-                const face = new FontFace(name, patched);
-                fontVariantCache[name] = await face.load();
-                document.fonts.add(fontVariantCache[name]);
+                // Use Blob URL for maximum browser compatibility
+                const blob = new Blob([patched], { type: 'font/ttf' });
+                const blobUrl = URL.createObjectURL(blob);
+                try {
+                    const face = new FontFace(name, `url(${blobUrl})`);
+                    fontVariantCache[name] = await face.load();
+                    document.fonts.add(fontVariantCache[name]);
+                } finally {
+                    URL.revokeObjectURL(blobUrl);
+                }
+                // Debug: verify the patched font differs from base
+                if (!window._fvarDebugDone) {
+                    window._fvarDebugDone = true;
+                    const tc = document.createElement('canvas').getContext('2d');
+                    tc.font = `100px "${baseFamily}"`;
+                    const baseAsc = tc.measureText('K').actualBoundingBoxAscent;
+                    tc.font = `100px "${name}"`;
+                    const varAsc = tc.measureText('K').actualBoundingBoxAscent;
+                    document.getElementById('versionLabel').textContent =
+                        `v1.0.3 base=${Math.round(baseAsc)} var=${Math.round(varAsc)} h=${h}`;
+                }
             }
             return name;
         }
 
-        // No-op kept for compatibility — variation is now baked into font binary
+        // No-op — variation is baked into font binary
         function applyTypeHeight(ctx, h) {}
 
         async function build() {
