@@ -1691,16 +1691,35 @@
             }
         }
 
+        const fontVariantCache = {};
+
         async function getGenkFamily(styleOverride = null) {
+            const h = Math.round(state.typeHeight);
             const style = styleOverride || (state.oblique ? 'Obl' : 'Upr');
             const baseFamily = style === 'Obl' ? 'GenkOblique'
                              : style === 'Bsl' ? 'GenkBackslanted'
                              : 'Genk';
-            await document.fonts.load(`100px "${baseFamily}"`);
-            return baseFamily;
+            const fontFile = style === 'Obl' ? 'Assets/KRCGenkVariable-ObliqueVF.ttf'
+                           : style === 'Bsl' ? 'Assets/KRCGenkVariable-BackslantedVF.ttf'
+                           : 'Assets/KRCGenkVariable-UprightVF.ttf';
+            if (h === 0) {
+                await document.fonts.load(`100px "${baseFamily}"`);
+                return baseFamily;
+            }
+            // Chrome: FontFace variationSettings bakes the axis value into the font instance
+            // Safari: variationSettings is ignored, so we fall back to ctx.fontVariationSettings
+            const name = `Genk${style}H${h}`;
+            if (!fontVariantCache[name]) {
+                const face = new FontFace(name, `url(${fontFile})`, {
+                    variationSettings: `'YTAS' ${h}`
+                });
+                fontVariantCache[name] = await face.load();
+                document.fonts.add(fontVariantCache[name]);
+            }
+            return name;
         }
 
-        // Apply YTAS variation setting to a canvas context (cross-browser)
+        // Safari fallback: apply YTAS via canvas context (Safari 17.4+)
         function applyTypeHeight(ctx, h) {
             if (ctx.fontVariationSettings !== undefined) {
                 const val = Math.round(h);
@@ -2072,7 +2091,10 @@
             const textHeight = ascent + descent;
 
             // Measure padding at YTAS=0 so it stays fixed regardless of axis value
-            ctx.font = `${fontSize}px ${fontFamily}`;
+            const baseFamily = genkFamily.includes('Bsl') ? 'GenkBackslanted'
+                             : genkFamily.includes('Obl') ? 'GenkOblique'
+                             : 'Genk';
+            ctx.font = `${fontSize}px "${baseFamily}", Arial Black, sans-serif`;
             applyTypeHeight(ctx, 0);
             const baseMetrics = ctx.measureText(text);
             const baseTextHeight = (baseMetrics.actualBoundingBoxAscent || fontSize * 0.8)
