@@ -1691,30 +1691,21 @@
             }
         }
 
-        const fontVariantCache = {};
-
         async function getGenkFamily(styleOverride = null) {
-            const h = Math.round(state.typeHeight);
             const style = styleOverride || (state.oblique ? 'Obl' : 'Upr');
             const baseFamily = style === 'Obl' ? 'GenkOblique'
                              : style === 'Bsl' ? 'GenkBackslanted'
                              : 'Genk';
-            const fontFile = style === 'Obl' ? 'Assets/KRCGenkVariable-ObliqueVF.ttf'
-                           : style === 'Bsl' ? 'Assets/KRCGenkVariable-BackslantedVF.ttf'
-                           : 'Assets/KRCGenkVariable-UprightVF.ttf';
-            if (h === 0) {
-                await document.fonts.load(`100px "${baseFamily}"`);
-                return baseFamily;
+            await document.fonts.load(`100px "${baseFamily}"`);
+            return baseFamily;
+        }
+
+        // Apply YTAS variation setting to a canvas context (cross-browser)
+        function applyTypeHeight(ctx, h) {
+            if (ctx.fontVariationSettings !== undefined) {
+                const val = Math.round(h);
+                ctx.fontVariationSettings = val === 0 ? 'normal' : `'YTAS' ${val}`;
             }
-            const name = `Genk${style}H${h}`;
-            if (!fontVariantCache[name]) {
-                const face = new FontFace(name, `url(${fontFile})`, {
-                    variationSettings: `'YTAS' ${h}`
-                });
-                fontVariantCache[name] = await face.load();
-                document.fonts.add(fontVariantCache[name]);
-            }
-            return name;
         }
 
         async function build() {
@@ -1955,6 +1946,7 @@
             // Measure text to determine aspect ratio
             const refFontSize = 100;
             ctx.font = `${refFontSize}px ${fontFamily}`;
+            applyTypeHeight(ctx, state.typeHeight);
             const textWidth = ctx.measureText(text).width;
             const textAspect = textWidth / refFontSize;
 
@@ -1967,6 +1959,7 @@
                 // Calculate shape width based on text width - use higher resolution
                 const fontSize = w * 4 * textureQualityMultiplier;
                 ctx.font = `${fontSize}px ${fontFamily}`;
+                applyTypeHeight(ctx, state.typeHeight);
                 const metrics = ctx.measureText(text);
                 const singleTextWidth = metrics.width;
                 const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
@@ -2012,6 +2005,7 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.font = `${fontSize}px ${fontFamily}`;
+                applyTypeHeight(ctx, state.typeHeight);
                 ctx.fillStyle = '#' + state.fgColor;
                 ctx.textBaseline = 'alphabetic';
 
@@ -2069,6 +2063,7 @@
             const fontSize = depth * scale * 0.75;
 
             ctx.font = `${fontSize}px ${fontFamily}`;
+            applyTypeHeight(ctx, state.typeHeight);
             const metrics = ctx.measureText(text);
             const actualTextWidth = metrics.width;
 
@@ -2077,10 +2072,8 @@
             const textHeight = ascent + descent;
 
             // Measure padding at YTAS=0 so it stays fixed regardless of axis value
-            const baseFamily = genkFamily.includes('Bsl') ? 'GenkBackslanted'
-                             : genkFamily.includes('Obl') ? 'GenkOblique'
-                             : 'Genk';
-            ctx.font = `${fontSize}px "${baseFamily}", Arial Black, sans-serif`;
+            ctx.font = `${fontSize}px ${fontFamily}`;
+            applyTypeHeight(ctx, 0);
             const baseMetrics = ctx.measureText(text);
             const baseTextHeight = (baseMetrics.actualBoundingBoxAscent || fontSize * 0.8)
                                  + (baseMetrics.actualBoundingBoxDescent || fontSize * 0.2);
@@ -2095,6 +2088,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.font = `${fontSize}px ${fontFamily}`;
+            applyTypeHeight(ctx, state.typeHeight);
             ctx.fillStyle = '#' + state.fgColor;
             ctx.textBaseline = 'alphabetic';
 
@@ -2115,6 +2109,7 @@
                 insideCanvas.height = canvas.height;
                 const insideCtx = insideCanvas.getContext('2d');
                 insideCtx.font = `${fontSize}px "${insideFamily}", Arial Black, sans-serif`;
+                applyTypeHeight(insideCtx, state.typeHeight);
                 insideCtx.textBaseline = 'alphabetic';
                 // Measure first so we know overhang direction before drawing
                 const insideMetrics = insideCtx.measureText(text);
