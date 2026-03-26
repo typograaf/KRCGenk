@@ -1,0 +1,2022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRCG Pattern Generator</title>
+    <style>
+        @font-face {
+            font-family: 'ABC Arizona Sans';
+            src: url('../Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Regular-Trial.woff2') format('woff2'),
+                 url('../Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Regular-Trial.woff') format('woff');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'ABC Arizona Sans';
+            src: url('../Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Medium-Trial.woff2') format('woff2'),
+                 url('../Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Medium-Trial.woff') format('woff');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'ABC Arizona Sans';
+            src: url('../Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Bold-Trial.woff2') format('woff2'),
+                 url('../Assets/ABC%20Arizona%20Sans/ABCArizonaSans-Bold-Trial.woff') format('woff');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        input, textarea { user-select: text; }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #001450;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loading-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 24px;
+        }
+        .loading-bar-container {
+            width: 200px;
+            height: 4px;
+            background: rgba(130, 205, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .loading-bar {
+            height: 100%;
+            background: #82CDFF;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'ABC Arizona Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 500;
+        }
+        body {
+            background: #001450;
+            color: #82CDFF;
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+        }
+
+        /* Left Sidebar */
+        .sidebar-left {
+            width: 200px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-left-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Right Sidebar */
+        .sidebar-right {
+            width: 200px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Header/Logo */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-icon {
+            width: 14px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-size: 12px;
+            color: #82cdff;
+        }
+
+        /* Panel Styles */
+        .panel {
+            background: #001963;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .panel-dark {
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        /* Control Labels */
+        .control-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #82CDFF;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* Color Combos */
+        .color-combos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .color-combo {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            box-sizing: border-box;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .color-combo svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .color-combo:hover { border-color: rgba(255,255,255,0.45); }
+        .color-combo.active { border-color: rgba(255,255,255,0.9); }
+
+        /* Slider Styles */
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            color: #82CDFF;
+        }
+
+        .slider-value {
+            font-size: 8px;
+            font-weight: 500;
+            color: #82CDFF;
+            background: transparent;
+            border: none;
+            text-align: right;
+            width: 40px;
+        }
+
+        .slider-value:focus {
+            outline: none;
+            color: #FFFFFF;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-track {
+            flex: 1;
+            height: 2px;
+            background: #001450;
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .slider {
+            width: 100%;
+            height: 12px;
+            -webkit-appearance: none;
+            background: transparent;
+            cursor: pointer;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .slider::-webkit-slider-runnable-track {
+            height: 2px;
+            background: #001450;
+            border-radius: 12px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #82CDFF;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -5px;
+        }
+
+        .reset-btn {
+            width: 16px;
+            height: 16px;
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .reset-btn:hover {
+            border-color: #82CDFF;
+        }
+
+        .reset-btn svg {
+            width: 7px;
+            height: 9px;
+        }
+
+        /* Canvas Size Buttons */
+        .size-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .size-btn {
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            padding: 12px;
+            color: #82CDFF;
+            font-size: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .size-btn:hover {
+            border-color: #82CDFF;
+        }
+
+        .size-btn.active {
+            border-color: #82CDFF;
+            background: #82CDFF;
+            color: #001450;
+        }
+
+        .size-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Output Buttons */
+        .output-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .output-btn {
+            flex: 1;
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            padding: 12px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .output-btn:hover {
+            border-color: #82CDFF;
+        }
+
+        .output-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Canvas Container */
+        #canvas-container {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            background: #001450;
+        }
+
+        #patternCanvas {
+            display: block;
+            transform-origin: center center;
+            border-radius: 12px;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        /* Branding Footer */
+        .branding {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 24px;
+        }
+
+        .branding-icon {
+            width: 17px;
+            height: 17px;
+        }
+
+        .branding-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .branding-label {
+            font-size: 7px;
+            color: #82CDFF;
+            letter-spacing: -0.14px;
+        }
+
+        .branding-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #82CDFF;
+            text-transform: uppercase;
+            letter-spacing: 0.14px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .branding-copyright {
+            font-size: 4px;
+            vertical-align: super;
+            margin-left: 1px;
+        }
+
+        /* Multi-slider panels */
+        .slider-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Weight label row */
+        .weight-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .weight-label {
+            font-size: 8px;
+            color: #82CDFF;
+            opacity: 0.6;
+        }
+
+        /* Text Input */
+        .text-input {
+            width: 100%;
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            padding: 12px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.12px;
+        }
+        .text-input:focus {
+            outline: none;
+            border-color: #82CDFF;
+        }
+        .text-input::placeholder {
+            color: #82CDFF;
+            opacity: 0.6;
+        }
+
+        /* Easing Curve Presets */
+        .easing-presets {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .easing-preset-btn {
+            flex: 1;
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            color: #82cdff;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 8px;
+            padding: 12px 2px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.15s, color 0.15s;
+        }
+        .easing-preset-btn:hover {
+            border-color: #82CDFF;
+        }
+
+        /* Easing graph */
+        .easing-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .easing-container {
+            background: #001963;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            padding: 12px;
+            position: relative;
+        }
+
+        #easingCanvas {
+            width: 100%;
+            aspect-ratio: 1;
+            display: block;
+            cursor: crosshair;
+        }
+
+        .easing-input {
+            width: 100%;
+            background: #001450;
+            border: 1px solid #0a2373;
+            border-radius: 6px;
+            padding: 12px;
+            color: #82CDFF;
+            font-family: inherit;
+            font-size: 8px;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        .easing-input:focus {
+            outline: none;
+            border-color: #82CDFF;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            html, body {
+                height: 100%;
+            }
+
+            body {
+                flex-direction: column;
+                padding: 0;
+                gap: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            #canvas-container {
+                width: auto;
+                min-height: 280px;
+                height: 50vh;
+                flex-shrink: 0;
+                order: -1;
+                border-radius: 20px;
+                position: sticky;
+                top: 0;
+                margin: 0;
+                z-index: 200;
+                overflow: visible;
+                background: transparent;
+                pointer-events: none;
+            }
+
+            #patternCanvas {
+                border-radius: 20px;
+                pointer-events: auto;
+            }
+
+            .sidebar-left {
+                width: 100%;
+                height: auto;
+                padding: 0;
+                flex-shrink: 0;
+                margin-top: -25vh;
+                padding-top: calc(50vh - 40px);
+            }
+
+            .sidebar-left-content {
+                gap: 10px;
+                padding: 16px;
+            }
+
+            .sidebar-right {
+                width: 100%;
+                height: auto;
+                padding: 16px;
+                flex-shrink: 0;
+            }
+
+            .branding {
+                margin-top: 16px;
+                padding: 16px;
+            }
+
+            .panel {
+                padding: 10px;
+            }
+
+            .slider-panel {
+                gap: 16px;
+            }
+
+            .size-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .control-label,
+            .slider-label,
+            .toggle-label {
+                font-size: 14px;
+            }
+
+            .slider-value {
+                font-size: 12px;
+            }
+
+            .size-btn {
+                font-size: 11px;
+                padding: 14px 12px;
+            }
+
+            .output-btn {
+                font-size: 11px;
+                padding: 14px;
+            }
+
+            .text-input {
+                font-size: 14px;
+                padding: 14px;
+            }
+
+            .color-combo {
+                width: 32px;
+                height: 32px;
+            }
+
+            .slider {
+                height: 20px;
+            }
+
+            .slider::-webkit-slider-thumb {
+                width: 18px;
+                height: 18px;
+                margin-top: -8px;
+            }
+
+            .reset-btn,
+            .toggle-box {
+                width: 24px;
+                height: 24px;
+            }
+
+            .reset-btn svg {
+                width: 10px;
+                height: 12px;
+            }
+
+            .toggle-box svg {
+                width: 10px;
+                height: 6px;
+            }
+
+            .header-title {
+                font-size: 14px;
+            }
+
+            .header-icon {
+                width: 18px;
+                height: 23px;
+            }
+
+            .weight-labels {
+                margin-top: 12px;
+            }
+
+            .weight-label {
+                font-size: 11px;
+            }
+
+            .easing-input {
+                font-size: 11px;
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <svg class="loading-logo" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6.71299 17.291C6.14792 17.291 5.31163 16.9181 4.2041 16.1722C3.11917 15.4263 2.14725 14.5109 1.28835 13.426C0.429451 12.3411 0 11.3013 0 10.3068V2.5767C0 2.10205 0.226027 1.77431 0.67808 1.59349C1.44657 1.25445 2.44109 0.904106 3.66163 0.542463C4.90478 0.180821 5.9219 0 6.71299 0C7.50408 0 8.5099 0.180821 9.73045 0.542463C10.9736 0.904106 11.9794 1.25445 12.7479 1.59349C13.2 1.77431 13.426 2.10205 13.426 2.5767V5.9332L10.4763 5.0856V2.5428L11.5274 3.86505C10.6459 3.50341 9.75305 3.19828 8.84894 2.94965C7.94484 2.70102 7.23285 2.5767 6.71299 2.5767C6.19313 2.5767 5.48115 2.70102 4.57704 2.94965C3.67293 3.19828 2.78013 3.50341 1.89862 3.86505L2.94965 2.71232V10.1034C2.94965 10.4424 3.09657 10.8719 3.3904 11.3917C3.70684 11.889 4.12499 12.3863 4.64485 12.8835C5.16471 13.3582 5.71847 13.7311 6.30614 14.0023L6.44176 14.0363C6.55477 14.0815 6.64518 14.1041 6.71299 14.1041C6.7808 14.1041 6.87121 14.0815 6.98422 14.0363L7.11984 14.0023C7.70751 13.7311 8.26127 13.3582 8.78113 12.8835C9.301 12.3863 9.70784 11.889 10.0017 11.3917C10.3181 10.8719 10.4763 10.4424 10.4763 10.1034V8.13696L12.1715 9.89997H6.98422L5.62806 7.25545H13.426V10.3068C13.426 11.3013 12.9965 12.3411 12.1376 13.426C11.2787 14.5109 10.2955 15.4263 9.18798 16.1722C8.10306 16.9181 7.27806 17.291 6.71299 17.291Z" fill="#82CDFF"/>
+        </svg>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+    </div>
+
+    <!-- Left Sidebar -->
+    <div class="sidebar-left">
+        <div class="sidebar-left-content">
+            <!-- Header -->
+            <div class="header">
+                <svg class="header-icon" width="14" height="18" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6.71299 17.291C6.14792 17.291 5.31163 16.9181 4.2041 16.1722C3.11917 15.4263 2.14725 14.5109 1.28835 13.426C0.429451 12.3411 0 11.3013 0 10.3068V2.5767C0 2.10205 0.226027 1.77431 0.67808 1.59349C1.44657 1.25445 2.44109 0.904106 3.66163 0.542463C4.90478 0.180821 5.9219 0 6.71299 0C7.50408 0 8.5099 0.180821 9.73045 0.542463C10.9736 0.904106 11.9794 1.25445 12.7479 1.59349C13.2 1.77431 13.426 2.10205 13.426 2.5767V5.9332L10.4763 5.0856V2.5428L11.5274 3.86505C10.6459 3.50341 9.75305 3.19828 8.84894 2.94965C7.94484 2.70102 7.23285 2.5767 6.71299 2.5767C6.19313 2.5767 5.48115 2.70102 4.57704 2.94965C3.67293 3.19828 2.78013 3.50341 1.89862 3.86505L2.94965 2.71232V10.1034C2.94965 10.4424 3.09657 10.8719 3.3904 11.3917C3.70684 11.889 4.12499 12.3863 4.64485 12.8835C5.16471 13.3582 5.71847 13.7311 6.30614 14.0023L6.44176 14.0363C6.55477 14.0815 6.64518 14.1041 6.71299 14.1041C6.7808 14.1041 6.87121 14.0815 6.98422 14.0363L7.11984 14.0023C7.70751 13.7311 8.26127 13.3582 8.78113 12.8835C9.301 12.3863 9.70784 11.889 10.0017 11.3917C10.3181 10.8719 10.4763 10.4424 10.4763 10.1034V8.13696L12.1715 9.89997H6.98422L5.62806 7.25545H13.426V10.3068C13.426 11.3013 12.9965 12.3411 12.1376 13.426C11.2787 14.5109 10.2955 15.4263 9.18798 16.1722C8.10306 16.9181 7.27806 17.291 6.71299 17.291Z" fill="#86D9FF"/>
+                </svg>
+                <span class="header-title">KRCG Pattern Generator</span>
+            </div>
+
+            <!-- Colors Panel -->
+            <div class="panel">
+                <span class="control-label">Colours</span>
+                <div id="colorCombosWrapper" style="display:flex; flex-direction:column; gap:6px;">
+                    <div class="color-combos" style="flex-wrap:nowrap;">
+                        <div class="color-combo" data-bg="001450" data-fg="003CC3" title="Smurf Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                        <div class="color-combo" data-bg="001450" data-fg="82CDFF" title="Sky Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                        <div class="color-combo" data-bg="FFFFFF" data-fg="003CC3" title="Smurf Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
+                        <div class="color-combo" data-bg="82CDFF" data-fg="003CC3" title="Smurf Blue on Sky Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#82CDFF"/></svg></div>
+                    </div>
+                    <div class="color-combos" style="flex-wrap:nowrap;">
+                        <div class="color-combo active" data-bg="003CC3" data-fg="001450" title="Royal Blue on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#001450"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                        <div class="color-combo" data-bg="9BD7FF" data-fg="003CC3" title="Smurf Blue on Sky Blue 80"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#9BD7FF"/></svg></div>
+                        <div class="color-combo" data-bg="003CC3" data-fg="FFFFFF" title="White on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FFFFFF"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                        <div class="color-combo" data-bg="FFFFFF" data-fg="82CDFF" title="Sky Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pattern Weight -->
+            <div class="panel">
+                <div class="slider-panel">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Pattern Weight</span>
+                            <input type="text" class="slider-value" id="weightValue" value="50%">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="weightSlider" min="0" max="100" value="50">
+                            </div>
+                            <button class="reset-btn" data-reset="weight">
+                                <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="weight-labels">
+                            <span class="weight-label">Light</span>
+                            <span class="weight-label">Bold</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zoom -->
+            <div class="panel">
+                <div class="slider-panel">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Zoom</span>
+                            <input type="text" class="slider-value" id="zoomValue" value="100%">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="zoomSlider" min="25" max="200" value="100" step="5">
+                            </div>
+                            <button class="reset-btn" data-reset="zoom">
+                                <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Offset Controls -->
+            <div class="panel">
+                <div class="slider-panel">
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Offset X</span>
+                            <input type="text" class="slider-value" id="offsetXValue" value="0">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="offsetXSlider" min="-100" max="100" value="0">
+                            </div>
+                            <button class="reset-btn" data-reset="offsetX">
+                                <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-header">
+                            <span class="slider-label">Offset Y</span>
+                            <input type="text" class="slider-value" id="offsetYValue" value="0">
+                        </div>
+                        <div class="slider-row">
+                            <div class="slider-track">
+                                <input type="range" class="slider" id="offsetYSlider" min="-100" max="100" value="0">
+                            </div>
+                            <button class="reset-btn" data-reset="offsetY">
+                                <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Branding Footer -->
+        <div class="branding">
+            <img src="../Assets/graphic%20tool%20by%20typograaf.svg" alt="A Graphic Tool by Typograaf" style="height: 21px;">
+        </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div id="canvas-container">
+        <canvas id="patternCanvas"></canvas>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar-right">
+        <!-- Canvas Size -->
+        <div class="panel" style="display:flex; flex-direction:column; gap:12px;">
+            <span class="control-label" style="margin-bottom:0;">Canvas Size</span>
+            <div style="display:flex; gap:6px;">
+                <input type="text" class="text-input" id="canvasWidthInput" value="1920" style="flex:1; text-align:center; padding:12px;">
+                <input type="text" class="text-input" id="canvasHeightInput" value="1080" style="flex:1; text-align:center; padding:12px;">
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div class="panel">
+            <span class="control-label">Output</span>
+            <div class="output-buttons">
+                <button class="output-btn" id="exportPNG">PNG</button>
+                <button class="output-btn" id="exportSVG">SVG</button>
+                <button class="output-btn" id="exportMP4">MP4</button>
+            </div>
+        </div>
+
+        <!-- Animation -->
+        <div class="panel">
+            <span class="control-label">Animation</span>
+            <div class="slider-panel">
+                <div class="output-buttons" style="margin-bottom: 12px;">
+                    <button class="output-btn" id="playPauseBtn">Play</button>
+                </div>
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">Speed</span>
+                        <input type="text" class="slider-value" id="speedValue" value="50%">
+                    </div>
+                    <div class="slider-row">
+                        <div class="slider-track">
+                            <input type="range" class="slider" id="speedSlider" min="1" max="100" value="50">
+                        </div>
+                        <button class="reset-btn" data-reset="speed">
+                            <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">Stagger</span>
+                        <input type="text" class="slider-value" id="staggerValue" value="70%">
+                    </div>
+                    <div class="slider-row">
+                        <div class="slider-track">
+                            <input type="range" class="slider" id="staggerSlider" min="0" max="100" value="70">
+                        </div>
+                        <button class="reset-btn" data-reset="stagger">
+                            <svg viewBox="0 0 7 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.30909 5.75766H6.33126V7.77983M2.69135 2.52218H0.669174V0.5M6.50014 2.92799C6.27338 2.36673 5.89371 1.88035 5.4043 1.52412C4.91489 1.16789 4.33544 0.956009 3.73166 0.912729C3.12788 0.86945 2.52394 0.996405 1.98872 1.27919C1.45351 1.56197 1.00842 1.98935 0.70393 2.51252M0.500132 5.35204C0.726893 5.91329 1.10655 6.39967 1.59597 6.7559C2.08538 7.11213 2.66542 7.32374 3.2692 7.36702C3.87298 7.4103 4.47643 7.28337 5.01164 7.00058C5.54686 6.7178 5.99164 6.2905 6.29613 5.76733" stroke="#82CDFF" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="easing-group">
+                    <span class="control-label" style="margin-bottom:0;">Easing Curve</span>
+                    <div class="easing-container">
+                        <canvas id="easingCanvas" width="152" height="152"></canvas>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <input type="text" class="easing-input" id="easingInput" value="0.25, 0.25, 0.75, 0.75" style="margin-top:0;">
+                        <div class="easing-presets" style="margin-top:0;">
+                            <button class="easing-preset-btn" onclick="applyEasingPreset(0.75,0,0.25,1)">Smooth</button>
+                            <button class="easing-preset-btn" onclick="applyEasingPreset(0,0.75,1,0.25)">Pop</button>
+                            <button class="easing-preset-btn" onclick="applyEasingPreset(0.1,0.6,0.3,0.9)">Ease</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://unpkg.com/polygon-clipping@0.15.7/dist/polygon-clipping.umd.min.js"></script>
+    <script type="module">
+        import * as mp4Muxer from 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/+esm';
+        window.mp4Muxer = mp4Muxer;
+    </script>
+    <script>
+        const canvas = document.getElementById('patternCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Offscreen canvas for double buffering
+        const offscreen = document.createElement('canvas');
+        const offCtx = offscreen.getContext('2d');
+
+        const defaultValues = {
+            weight: 50,
+            zoom: 100,
+            offsetX: 0,
+            offsetY: 0,
+            speed: 50,
+            stagger: 70
+        };
+
+        const state = {
+            canvasWidth: 1920,
+            canvasHeight: 1080,
+            primaryColor: '001450',
+            secondaryColor: '003CC3',
+            weight: 50,
+            zoom: 100,
+            offsetX: 0,
+            offsetY: 0,
+            speed: 50,
+            stagger: 70,
+            isAnimating: false,
+            animationTime: 0,
+            // Bezier control points for easing (cubic bezier: 0,0 -> p1 -> p2 -> 1,1)
+            easingP1: { x: 0.25, y: 0.25 },
+            easingP2: { x: 0.75, y: 0.75 }
+        };
+
+        let animationFrameId = null;
+
+        function scaleCanvasToFit() {
+            const container = document.getElementById('canvas-container');
+
+            requestAnimationFrame(() => {
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+
+                const scaleX = containerWidth / state.canvasWidth;
+                const scaleY = containerHeight / state.canvasHeight;
+                const scale = Math.min(scaleX, scaleY) * 0.9;
+
+                canvas.style.transform = `scale(${scale})`;
+            });
+        }
+
+        // Cubic bezier easing function
+        function cubicBezier(t, p1x, p1y, p2x, p2y) {
+            // Find t for x using Newton-Raphson
+            let x = t;
+            for (let i = 0; i < 8; i++) {
+                const currentX = bezierPoint(x, p1x, p2x);
+                const diff = currentX - t;
+                if (Math.abs(diff) < 0.001) break;
+                const derivative = bezierDerivative(x, p1x, p2x);
+                if (Math.abs(derivative) < 0.0001) break;
+                x -= diff / derivative;
+            }
+            return bezierPoint(x, p1y, p2y);
+        }
+
+        function bezierPoint(t, p1, p2) {
+            const c = 3 * p1;
+            const b = 3 * (p2 - p1) - c;
+            const a = 1 - c - b;
+            return ((a * t + b) * t + c) * t;
+        }
+
+        function bezierDerivative(t, p1, p2) {
+            const c = 3 * p1;
+            const b = 3 * (p2 - p1) - c;
+            const a = 1 - c - b;
+            return (3 * a * t + 2 * b) * t + c;
+        }
+
+        // Easing canvas variables
+        let easingCanvas, easingCtx;
+
+        // Draw easing curve on the easing canvas
+        function drawEasingCurve() {
+            if (!easingCanvas || !easingCtx) return;
+
+            const rect = easingCanvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+            const padding = 12;
+            const gridSize = w - padding * 2;
+
+            easingCtx.clearRect(0, 0, easingCanvas.width, easingCanvas.height);
+
+            // Draw grid
+            easingCtx.strokeStyle = '#0a2373';
+            easingCtx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const x = padding + (gridSize / 4) * i;
+                const y = padding + (gridSize / 4) * i;
+                easingCtx.beginPath();
+                easingCtx.moveTo(x, padding);
+                easingCtx.lineTo(x, padding + gridSize);
+                easingCtx.stroke();
+                easingCtx.beginPath();
+                easingCtx.moveTo(padding, y);
+                easingCtx.lineTo(padding + gridSize, y);
+                easingCtx.stroke();
+            }
+
+            const toCanvasX = (x) => padding + x * gridSize;
+            const toCanvasY = (y) => padding + gridSize - y * gridSize;
+
+            // Draw handle lines (from origin to control points)
+            easingCtx.strokeStyle = '#82CDFF';
+            easingCtx.lineWidth = 1;
+            // Line from (0,0) to P1
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
+            easingCtx.lineTo(toCanvasX(state.easingP1.x), toCanvasY(state.easingP1.y));
+            easingCtx.stroke();
+            // Line from (1,1) to P2
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(1), toCanvasY(1));
+            easingCtx.lineTo(toCanvasX(state.easingP2.x), toCanvasY(state.easingP2.y));
+            easingCtx.stroke();
+
+            // Draw the cubic bezier curve
+            easingCtx.beginPath();
+            easingCtx.moveTo(toCanvasX(0), toCanvasY(0));
+            easingCtx.bezierCurveTo(
+                toCanvasX(state.easingP1.x), toCanvasY(state.easingP1.y),
+                toCanvasX(state.easingP2.x), toCanvasY(state.easingP2.y),
+                toCanvasX(1), toCanvasY(1)
+            );
+            easingCtx.stroke();
+
+            // Draw handles
+            const handleRadius = 'ontouchstart' in window ? 6 : 3;
+            const drawHandle = (x, y) => {
+                easingCtx.fillStyle = '#82CDFF';
+                easingCtx.beginPath();
+                easingCtx.arc(toCanvasX(x), toCanvasY(y), handleRadius, 0, Math.PI * 2);
+                easingCtx.fill();
+            };
+
+            drawHandle(state.easingP1.x, state.easingP1.y);
+            drawHandle(state.easingP2.x, state.easingP2.y);
+            drawHandle(0, 0);
+            drawHandle(1, 1);
+        }
+
+        function updateEasingInput() {
+            const input = document.getElementById('easingInput');
+            const p1x = Math.round(state.easingP1.x * 100) / 100;
+            const p1y = Math.round(state.easingP1.y * 100) / 100;
+            const p2x = Math.round(state.easingP2.x * 100) / 100;
+            const p2y = Math.round(state.easingP2.y * 100) / 100;
+            input.value = `${p1x}, ${p1y}, ${p2x}, ${p2y}`;
+        }
+
+        // Make applyEasingPreset available globally for onclick handlers
+        window.applyEasingPreset = function(p1x, p1y, p2x, p2y) {
+            state.easingP1.x = p1x; state.easingP1.y = p1y;
+            state.easingP2.x = p2x; state.easingP2.y = p2y;
+            updateEasingInput();
+            drawEasingCurve();
+        };
+
+        function parseEasingInput() {
+            const input = document.getElementById('easingInput');
+            const parts = input.value.split(',').map(s => parseFloat(s.trim()));
+
+            if (parts.length === 4 && parts.every(p => !isNaN(p))) {
+                state.easingP1.x = Math.max(0, Math.min(1, parts[0]));
+                state.easingP1.y = Math.max(0, Math.min(1, parts[1]));
+                state.easingP2.x = Math.max(0, Math.min(1, parts[2]));
+                state.easingP2.y = Math.max(0, Math.min(1, parts[3]));
+                drawEasingCurve();
+            } else {
+                updateEasingInput();
+            }
+        }
+
+        function initEasingEditor() {
+            easingCanvas = document.getElementById('easingCanvas');
+            easingCtx = easingCanvas.getContext('2d');
+
+            // Handle high-DPI displays
+            const dpr = window.devicePixelRatio || 1;
+            const rect = easingCanvas.getBoundingClientRect();
+            easingCanvas.width = rect.width * dpr;
+            easingCanvas.height = rect.height * dpr;
+            easingCtx.scale(dpr, dpr);
+
+            const padding = 12;
+            let draggingHandle = null;
+
+            const getGridSize = () => {
+                const r = easingCanvas.getBoundingClientRect();
+                return r.width - padding * 2;
+            };
+
+            const fromCanvasCoords = (cx, cy) => {
+                const gridSize = getGridSize();
+                return {
+                    x: Math.max(0, Math.min(1, (cx - padding) / gridSize)),
+                    y: Math.max(0, Math.min(1, 1 - (cy - padding) / gridSize))
+                };
+            };
+
+            const toCanvasCoords = (nx, ny) => {
+                const gridSize = getGridSize();
+                return {
+                    x: padding + nx * gridSize,
+                    y: padding + gridSize - ny * gridSize
+                };
+            };
+
+            const getHandleAt = (cx, cy) => {
+                const p1 = toCanvasCoords(state.easingP1.x, state.easingP1.y);
+                const p2 = toCanvasCoords(state.easingP2.x, state.easingP2.y);
+                const hitRadius = 'ontouchstart' in window ? 25 : 15;
+
+                if (Math.hypot(cx - p1.x, cy - p1.y) < hitRadius) return 'p1';
+                if (Math.hypot(cx - p2.x, cy - p2.y) < hitRadius) return 'p2';
+                return null;
+            };
+
+            easingCanvas.addEventListener('mousedown', (e) => {
+                const rect = easingCanvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                draggingHandle = getHandleAt(mouseX, mouseY);
+                if (draggingHandle) {
+                    e.preventDefault();
+                    drawEasingCurve();
+                }
+            });
+
+            const handleMouseMove = (e) => {
+                if (!draggingHandle) return;
+
+                const rect = easingCanvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const normalized = fromCanvasCoords(mouseX, mouseY);
+
+                if (draggingHandle === 'p1') {
+                    state.easingP1.x = normalized.x;
+                    state.easingP1.y = normalized.y;
+                } else if (draggingHandle === 'p2') {
+                    state.easingP2.x = normalized.x;
+                    state.easingP2.y = normalized.y;
+                }
+
+                updateEasingInput();
+                drawEasingCurve();
+            };
+
+            const handleMouseUp = () => {
+                if (draggingHandle) {
+                    draggingHandle = null;
+                    drawEasingCurve();
+                }
+            };
+
+            easingCanvas.addEventListener('mousemove', handleMouseMove);
+            easingCanvas.addEventListener('mouseup', handleMouseUp);
+            easingCanvas.addEventListener('mouseleave', handleMouseUp);
+            document.addEventListener('mousemove', (e) => {
+                if (draggingHandle) handleMouseMove(e);
+            });
+            document.addEventListener('mouseup', handleMouseUp);
+
+            // Touch support for easing curve
+            easingCanvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = easingCanvas.getBoundingClientRect();
+                const touchX = touch.clientX - rect.left;
+                const touchY = touch.clientY - rect.top;
+                draggingHandle = getHandleAt(touchX, touchY);
+                if (draggingHandle) {
+                    drawEasingCurve();
+                }
+            }, { passive: false });
+
+            easingCanvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!draggingHandle) return;
+
+                const touch = e.touches[0];
+                const rect = easingCanvas.getBoundingClientRect();
+                const touchX = touch.clientX - rect.left;
+                const touchY = touch.clientY - rect.top;
+
+                const normalized = fromCanvasCoords(touchX, touchY);
+
+                if (draggingHandle === 'p1') {
+                    state.easingP1.x = normalized.x;
+                    state.easingP1.y = normalized.y;
+                } else if (draggingHandle === 'p2') {
+                    state.easingP2.x = normalized.x;
+                    state.easingP2.y = normalized.y;
+                }
+
+                updateEasingInput();
+                drawEasingCurve();
+            }, { passive: false });
+
+            easingCanvas.addEventListener('touchend', () => {
+                if (draggingHandle) {
+                    draggingHandle = null;
+                    drawEasingCurve();
+                }
+            });
+
+            drawEasingCurve();
+        }
+
+        // Animation loop
+        let lastTime = 0;
+        function animate(currentTime) {
+            if (!state.isAnimating) return;
+
+            const deltaTime = lastTime ? (currentTime - lastTime) / 1000 : 0;
+            lastTime = currentTime;
+
+            // Speed controls how fast the animation cycles (1-100 maps to 0.02-1.0 cycles per second)
+            const cyclesPerSecond = 0.02 + (state.speed / 100) * 0.98;
+            state.animationTime += deltaTime * cyclesPerSecond;
+
+            drawPattern();
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function startAnimation() {
+            if (state.isAnimating) return;
+            state.isAnimating = true;
+            lastTime = 0;
+            document.getElementById('playPauseBtn').textContent = 'Pause';
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function stopAnimation() {
+            state.isAnimating = false;
+            document.getElementById('playPauseBtn').textContent = 'Play';
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        }
+
+        // Helper: round corners of a polygon ring using arc segments
+        function roundPolygonCorners(ring, radius) {
+            if (ring.length < 3) return ring;
+
+            const result = [];
+            const n = ring.length;
+
+            for (let i = 0; i < n; i++) {
+                const prev = ring[(i - 1 + n) % n];
+                const curr = ring[i];
+                const next = ring[(i + 1) % n];
+
+                // Vectors from current point to neighbors
+                const v1x = prev[0] - curr[0];
+                const v1y = prev[1] - curr[1];
+                const v2x = next[0] - curr[0];
+                const v2y = next[1] - curr[1];
+
+                const len1 = Math.sqrt(v1x * v1x + v1y * v1y);
+                const len2 = Math.sqrt(v2x * v2x + v2y * v2y);
+
+                if (len1 < 0.001 || len2 < 0.001) {
+                    result.push(curr);
+                    continue;
+                }
+
+                // Normalize
+                const u1x = v1x / len1, u1y = v1y / len1;
+                const u2x = v2x / len2, u2y = v2y / len2;
+
+                // Calculate angle between edges using dot product
+                const dot = u1x * u2x + u1y * u2y;
+                // If angle is close to 180° (dot close to -1), it's nearly straight - skip rounding
+                if (dot < -0.95) {
+                    result.push(curr);
+                    continue;
+                }
+
+                // Limit radius based on edge lengths
+                const maxR = Math.min(radius, len1 / 2, len2 / 2);
+
+                // Points where arc starts and ends
+                const p1 = [curr[0] + u1x * maxR, curr[1] + u1y * maxR];
+                const p2 = [curr[0] + u2x * maxR, curr[1] + u2y * maxR];
+
+                // Add arc points (simple approximation with a few segments)
+                const arcSegments = 3;
+                for (let j = 0; j <= arcSegments; j++) {
+                    const t = j / arcSegments;
+                    // Quadratic bezier-like interpolation through the corner
+                    const ax = (1 - t) * p1[0] + t * curr[0];
+                    const ay = (1 - t) * p1[1] + t * curr[1];
+                    const bx = (1 - t) * curr[0] + t * p2[0];
+                    const by = (1 - t) * curr[1] + t * p2[1];
+                    const px = (1 - t) * ax + t * bx;
+                    const py = (1 - t) * ay + t * by;
+                    result.push([px, py]);
+                }
+            }
+
+            return result;
+        }
+
+        function drawPattern() {
+            // Only resize canvas when dimensions change (resizing clears the canvas)
+            if (canvas.width !== state.canvasWidth || canvas.height !== state.canvasHeight) {
+                canvas.width = state.canvasWidth;
+                canvas.height = state.canvasHeight;
+            }
+
+            // Use offscreen canvas during animation for double buffering
+            const useOffscreen = state.isAnimating;
+            let drawCtx = ctx;
+
+            if (useOffscreen) {
+                if (offscreen.width !== state.canvasWidth || offscreen.height !== state.canvasHeight) {
+                    offscreen.width = state.canvasWidth;
+                    offscreen.height = state.canvasHeight;
+                }
+                drawCtx = offCtx;
+            }
+
+            // Fill background (this clears the canvas)
+            drawCtx.fillStyle = '#' + state.secondaryColor;
+            drawCtx.fillRect(0, 0, state.canvasWidth, state.canvasHeight);
+
+            // Pattern parameters
+            const zoomFactor = state.zoom / 50;
+            const baseStepSize = 60;
+            const stepSize = baseStepSize * zoomFactor;
+            // Round stripeSpacing to avoid floating point precision issues in visualColIdx calculation
+            const stripeSpacing = Math.round(120 * zoomFactor);
+
+            // Interpolate values based on weight slider (0-100)
+            const t = state.weight / 100;
+            const weightRatio = (5 + t * (17 - 5)) / 100;
+            const rowDist = 72 + t * (75 - 72);
+            const vGapVal = -50;
+
+            const rowSpacing = rowDist * zoomFactor;
+            const vGap = vGapVal * zoomFactor;
+            const paraHeight = stepSize * 3 * weightRatio;
+
+            const offsetX = (state.offsetX / 100) * stripeSpacing;
+            const offsetY = (state.offsetY / 100) * rowSpacing;
+
+            const effectiveRowSpacing = rowSpacing + vGap;
+
+            // Animation travel distance = 10 tiles per cycle
+            const travelDistance = effectiveRowSpacing * 10;
+
+            // Row/col range - ensure full coverage on all canvas sizes
+            const rowsNeeded = Math.ceil((canvas.height + travelDistance) / Math.max(effectiveRowSpacing, 1)) + 10;
+            const cols = Math.ceil((canvas.width + canvas.height * 2) / stripeSpacing) + 10;
+
+            // Corner radius (like Cavalry's bevel radius of 30, scaled)
+            const cornerRadius = Math.max(3, stepSize * 0.05);
+
+            // Build all parallelograms as polygons for boolean union
+            const polygons = [];
+
+            // Overlap must scale with zoom to ensure shapes always connect properly
+            const overlap = stepSize * 0.02;
+
+            // Round to integers to avoid floating point issues in boolean union
+            const round = (v) => Math.round(v);
+
+            // Stagger: phase offset between visual columns (0% = all same, 100% = ~14% cycle offset)
+            const maxPhaseOffset = state.stagger / 700;
+            // Count visible columns on screen for stagger distribution
+            const visibleCols = Math.ceil(canvas.width / stripeSpacing) + 4;
+
+            // Cache for visual column offsets (keyed by visual column index)
+            const visualColumnOffsets = {};
+
+            function getVisualColumnOffset(visualColIdx) {
+                if (visualColumnOffsets[visualColIdx] !== undefined) {
+                    return visualColumnOffsets[visualColIdx];
+                }
+
+                if (!state.isAnimating && state.animationTime === 0) {
+                    visualColumnOffsets[visualColIdx] = 0;
+                    return 0;
+                }
+
+                // Normalize visual column index for stagger (0 = leftmost on screen)
+                const normalizedIdx = visualColIdx / visibleCols;
+                const phaseOffset = normalizedIdx * maxPhaseOffset;
+
+                // Cycle progress (0 to 1, wraps for seamless loop)
+                const cycleProgress = (state.animationTime + phaseOffset) % 1;
+
+                // Apply easing
+                const easedProgress = cubicBezier(
+                    cycleProgress,
+                    state.easingP1.x, state.easingP1.y,
+                    state.easingP2.x, state.easingP2.y
+                );
+
+                // Move up by one tile per cycle (pattern tiles seamlessly)
+                visualColumnOffsets[visualColIdx] = -easedProgress * travelDistance;
+                return visualColumnOffsets[visualColIdx];
+            }
+
+            // Visibility buffer for off-screen culling - large buffer to handle all edge cases
+            const buffer = travelDistance + stepSize * 3;
+
+            for (let row = -rowsNeeded; row < rowsNeeded; row++) {
+                for (let col = -cols; col < cols; col++) {
+                    const x = col * stripeSpacing + row * stepSize + offsetX;
+
+                    // Skip if completely off-screen horizontally
+                    if (x + stepSize < -buffer || x > canvas.width + buffer) continue;
+
+                    // Calculate which VISUAL column this shape belongs to based on X position
+                    // Use floor instead of round for consistent behavior at boundaries
+                    const visualColIdx = Math.floor(x / stripeSpacing);
+
+                    // All shapes in the same visual column get the exact same animation offset
+                    const animY = getVisualColumnOffset(visualColIdx);
+
+                    const baseY = row * effectiveRowSpacing + offsetY + animY;
+
+                    // Skip if completely off-screen vertically
+                    if (baseY + paraHeight < -buffer || baseY - stepSize > canvas.height + buffer) continue;
+
+                    // Parallelogram vertices with overlap on all edges for stable union
+                    const poly = [[
+                        [round(x - overlap), round(baseY + paraHeight + overlap)],
+                        [round(x - overlap), round(baseY - overlap)],
+                        [round(x + stepSize + overlap), round(baseY - stepSize - overlap)],
+                        [round(x + stepSize + overlap), round(baseY - stepSize + paraHeight + overlap)]
+                    ]];
+                    polygons.push(poly);
+                }
+            }
+
+            // Boolean union with rounded corners (both animation and static)
+            let united;
+            try {
+                united = polygonClipping.union(...polygons);
+            } catch (e) {
+                console.error('Boolean union failed:', e);
+                drawCtx.fillStyle = '#' + state.primaryColor;
+                drawCtx.beginPath();
+                for (const poly of polygons) {
+                    drawCtx.moveTo(poly[0][0][0], poly[0][0][1]);
+                    for (let i = 1; i < poly[0].length; i++) {
+                        drawCtx.lineTo(poly[0][i][0], poly[0][i][1]);
+                    }
+                    drawCtx.closePath();
+                }
+                drawCtx.fill();
+                if (!state.isAnimating) scaleCanvasToFit();
+                if (useOffscreen) ctx.drawImage(offscreen, 0, 0);
+                return;
+            }
+
+            // Draw all united polygons with rounded corners as single path
+            drawCtx.fillStyle = '#' + state.primaryColor;
+            drawCtx.beginPath();
+            for (const multiPolygon of united) {
+                for (let ringIdx = 0; ringIdx < multiPolygon.length; ringIdx++) {
+                    let ring = multiPolygon[ringIdx];
+                    ring = roundPolygonCorners(ring, cornerRadius);
+                    if (ring.length === 0) continue;
+                    drawCtx.moveTo(ring[0][0], ring[0][1]);
+                    for (let i = 1; i < ring.length; i++) {
+                        drawCtx.lineTo(ring[i][0], ring[i][1]);
+                    }
+                    drawCtx.closePath();
+                }
+            }
+            drawCtx.fill();
+
+            // Copy offscreen to visible canvas during animation
+            if (useOffscreen) {
+                ctx.drawImage(offscreen, 0, 0);
+            }
+            if (!state.isAnimating) {
+                scaleCanvasToFit();
+            }
+        }
+
+        function init() {
+            drawPattern();
+            scaleCanvasToFit();
+            setupEventListeners();
+            initEasingEditor();
+            window.addEventListener('resize', scaleCanvasToFit);
+        }
+
+        function setupEventListeners() {
+            // Colour combination swatches
+            document.querySelectorAll('#colorCombosWrapper .color-combo').forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    document.querySelectorAll('#colorCombosWrapper .color-combo').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    state.secondaryColor = swatch.dataset.bg;
+                    state.primaryColor = swatch.dataset.fg;
+                    drawPattern();
+                });
+            });
+
+            // Weight slider
+            const weightSlider = document.getElementById('weightSlider');
+            const weightValue = document.getElementById('weightValue');
+            weightSlider.addEventListener('input', () => {
+                state.weight = parseInt(weightSlider.value);
+                weightValue.value = state.weight + '%';
+                drawPattern();
+            });
+            weightValue.addEventListener('change', () => {
+                const val = parseInt(weightValue.value);
+                if (!isNaN(val) && val >= 0 && val <= 100) {
+                    state.weight = val;
+                    weightSlider.value = val;
+                    drawPattern();
+                }
+                weightValue.value = state.weight + '%';
+            });
+
+            // Zoom slider
+            const zoomSlider = document.getElementById('zoomSlider');
+            const zoomValue = document.getElementById('zoomValue');
+            zoomSlider.addEventListener('input', () => {
+                state.zoom = parseInt(zoomSlider.value);
+                zoomValue.value = state.zoom + '%';
+                drawPattern();
+            });
+            zoomValue.addEventListener('change', () => {
+                let val = parseInt(zoomValue.value);
+                if (!isNaN(val) && val >= 25 && val <= 200) {
+                    // Snap to nearest 5%
+                    val = Math.round(val / 5) * 5;
+                    state.zoom = val;
+                    zoomSlider.value = val;
+                    drawPattern();
+                }
+                zoomValue.value = state.zoom + '%';
+            });
+
+            // Offset X slider
+            const offsetXSlider = document.getElementById('offsetXSlider');
+            const offsetXValue = document.getElementById('offsetXValue');
+            offsetXSlider.addEventListener('input', () => {
+                state.offsetX = parseInt(offsetXSlider.value);
+                offsetXValue.value = state.offsetX;
+                drawPattern();
+            });
+            offsetXValue.addEventListener('change', () => {
+                const val = parseInt(offsetXValue.value);
+                if (!isNaN(val) && val >= -100 && val <= 100) {
+                    state.offsetX = val;
+                    offsetXSlider.value = val;
+                    drawPattern();
+                }
+                offsetXValue.value = state.offsetX;
+            });
+
+            // Offset Y slider
+            const offsetYSlider = document.getElementById('offsetYSlider');
+            const offsetYValue = document.getElementById('offsetYValue');
+            offsetYSlider.addEventListener('input', () => {
+                state.offsetY = parseInt(offsetYSlider.value);
+                offsetYValue.value = state.offsetY;
+                drawPattern();
+            });
+            offsetYValue.addEventListener('change', () => {
+                const val = parseInt(offsetYValue.value);
+                if (!isNaN(val) && val >= -100 && val <= 100) {
+                    state.offsetY = val;
+                    offsetYSlider.value = val;
+                    drawPattern();
+                }
+                offsetYValue.value = state.offsetY;
+            });
+
+            // Custom canvas size inputs
+            function applyCustomSize() {
+                const w = parseInt(document.getElementById('canvasWidthInput').value) || state.canvasWidth;
+                const h = parseInt(document.getElementById('canvasHeightInput').value) || state.canvasHeight;
+                // Enforce even dimensions and clamp
+                state.canvasWidth = Math.max(2, Math.min(7680, Math.round(w / 2) * 2));
+                state.canvasHeight = Math.max(2, Math.min(7680, Math.round(h / 2) * 2));
+                document.getElementById('canvasWidthInput').value = state.canvasWidth;
+                document.getElementById('canvasHeightInput').value = state.canvasHeight;
+                drawPattern();
+                scaleCanvasToFit();
+            }
+            ['canvasWidthInput', 'canvasHeightInput'].forEach(id => {
+                const el = document.getElementById(id);
+                el.addEventListener('blur', applyCustomSize);
+                el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.target.blur(); } });
+            });
+
+            // Reset buttons
+            document.querySelectorAll('.reset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const resetType = btn.dataset.reset;
+                    if (resetType && defaultValues[resetType] !== undefined) {
+                        state[resetType] = defaultValues[resetType];
+                        const slider = document.getElementById(resetType + 'Slider');
+                        const value = document.getElementById(resetType + 'Value');
+                        if (slider) slider.value = defaultValues[resetType];
+                        if (value) {
+                            if (['weight', 'zoom', 'speed', 'stagger'].includes(resetType)) {
+                                value.value = defaultValues[resetType] + '%';
+                            } else {
+                                value.value = defaultValues[resetType];
+                            }
+                        }
+                        if (!state.isAnimating) drawPattern();
+                    }
+                });
+            });
+
+            // Export PNG
+            document.getElementById('exportPNG').addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.download = 'krcg-pattern.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+
+            // Export SVG
+            document.getElementById('exportSVG').addEventListener('click', () => {
+                const svg = generateSVG();
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const link = document.createElement('a');
+                link.download = 'krcg-pattern.svg';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            });
+
+            // Play/Pause button
+            document.getElementById('playPauseBtn').addEventListener('click', () => {
+                if (state.isAnimating) {
+                    stopAnimation();
+                } else {
+                    startAnimation();
+                }
+            });
+
+            // Speed slider
+            const speedSlider = document.getElementById('speedSlider');
+            const speedValue = document.getElementById('speedValue');
+            speedSlider.addEventListener('input', () => {
+                state.speed = parseInt(speedSlider.value);
+                speedValue.value = state.speed + '%';
+            });
+            speedValue.addEventListener('change', () => {
+                const val = parseInt(speedValue.value);
+                if (!isNaN(val) && val >= 1 && val <= 100) {
+                    state.speed = val;
+                    speedSlider.value = val;
+                }
+                speedValue.value = state.speed + '%';
+            });
+
+            // Stagger slider
+            const staggerSlider = document.getElementById('staggerSlider');
+            const staggerValue = document.getElementById('staggerValue');
+            staggerSlider.addEventListener('input', () => {
+                state.stagger = parseInt(staggerSlider.value);
+                staggerValue.value = state.stagger + '%';
+            });
+            staggerValue.addEventListener('change', () => {
+                const val = parseInt(staggerValue.value);
+                if (!isNaN(val) && val >= 0 && val <= 100) {
+                    state.stagger = val;
+                    staggerSlider.value = val;
+                }
+                staggerValue.value = state.stagger + '%';
+            });
+
+            // Arrow key support for all slider value inputs (shift = 10x)
+            const sliderConfigs = [
+                { value: weightValue, slider: weightSlider, key: 'weight', suffix: '%', draw: true },
+                { value: zoomValue, slider: zoomSlider, key: 'zoom', suffix: '%', draw: true },
+                { value: offsetXValue, slider: offsetXSlider, key: 'offsetX', suffix: '', draw: true },
+                { value: offsetYValue, slider: offsetYSlider, key: 'offsetY', suffix: '', draw: true },
+                { value: speedValue, slider: speedSlider, key: 'speed', suffix: '%', draw: false },
+                { value: staggerValue, slider: staggerSlider, key: 'stagger', suffix: '%', draw: false }
+            ];
+
+            sliderConfigs.forEach(({ value, slider, key, suffix, draw }) => {
+                value.addEventListener('keydown', e => {
+                    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const baseStep = parseFloat(slider.step) || 1;
+                        const step = e.shiftKey ? baseStep * 10 : baseStep;
+                        const min = parseFloat(slider.min);
+                        const max = parseFloat(slider.max);
+                        const currentValue = parseFloat(value.value.replace(suffix, '')) || 0;
+                        const delta = e.key === 'ArrowUp' ? step : -step;
+                        const newValue = Math.max(min, Math.min(max, currentValue + delta));
+                        state[key] = newValue;
+                        slider.value = newValue;
+                        value.value = newValue + suffix;
+                        if (draw) drawPattern();
+                    }
+                });
+            });
+
+            // Easing input
+            document.getElementById('easingInput').addEventListener('blur', parseEasingInput);
+            document.getElementById('easingInput').addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    parseEasingInput();
+                    e.target.blur();
+                }
+            });
+
+            // MP4 Export
+            let isRecording = false;
+            let muxer = null;
+            let videoEncoder = null;
+            let frameNumber = 0;
+            let totalFrames = 0;
+
+            document.getElementById('exportMP4').addEventListener('click', async () => {
+                const btn = document.getElementById('exportMP4');
+
+                if (isRecording) {
+                    return;
+                }
+
+                isRecording = true;
+                frameNumber = 0;
+
+                // One loop = 2 seconds at 60fps (120 frames)
+                totalFrames = 120;
+
+                btn.textContent = 'Exporting...';
+                btn.style.background = '#82CDFF';
+                btn.style.color = '#001450';
+                btn.disabled = true;
+
+                // Wait for mp4-muxer to load
+                await new Promise(resolve => {
+                    const check = () => {
+                        if (window.mp4Muxer) resolve();
+                        else setTimeout(check, 50);
+                    };
+                    check();
+                });
+
+                const { Muxer, ArrayBufferTarget } = window.mp4Muxer;
+
+                const videoWidth = state.canvasWidth;
+                const videoHeight = state.canvasHeight;
+
+                const target = new ArrayBufferTarget();
+                muxer = new Muxer({
+                    target,
+                    video: {
+                        codec: 'avc',
+                        width: videoWidth,
+                        height: videoHeight
+                    },
+                    fastStart: 'in-memory',
+                    firstTimestampBehavior: 'offset'
+                });
+
+                let encoderFailed = false;
+                videoEncoder = new VideoEncoder({
+                    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+                    error: e => {
+                        console.error('Encoder error:', e);
+                        encoderFailed = true;
+                        isRecording = false;
+                        alert('Video encoder failed: ' + e.message);
+                        btn.textContent = 'MP4';
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.disabled = false;
+                    }
+                });
+
+                try {
+                    videoEncoder.configure({
+                        codec: 'avc1.640033',
+                        width: videoWidth,
+                        height: videoHeight,
+                        bitrate: 15_000_000,
+                        framerate: 60
+                    });
+
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                    if (encoderFailed || videoEncoder.state !== 'configured') {
+                        throw new Error('Encoder failed to configure.');
+                    }
+                } catch (e) {
+                    console.error('Failed to configure encoder:', e);
+                    alert('Failed to start video export: ' + e.message);
+                    isRecording = false;
+                    btn.textContent = 'MP4';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Store original animation state
+                const wasAnimating = state.isAnimating;
+                const originalTime = state.animationTime;
+                state.isAnimating = false;
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
+                }
+
+                const captureFrame = () => {
+                    if (encoderFailed) {
+                        return;
+                    }
+
+                    if (frameNumber >= totalFrames) {
+                        isRecording = false;
+
+                        videoEncoder.flush().then(() => {
+                            videoEncoder.close();
+                            muxer.finalize();
+                            const { buffer } = muxer.target;
+                            const blob = new Blob([buffer], { type: 'video/mp4' });
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.download = 'krcg-pattern-' + Date.now() + '.mp4';
+                            link.href = url;
+                            link.click();
+                            URL.revokeObjectURL(url);
+                            btn.textContent = 'MP4';
+                            btn.style.background = '';
+                            btn.style.color = '';
+                            btn.disabled = false;
+
+                            // Restore animation state
+                            state.animationTime = originalTime;
+                            if (wasAnimating) {
+                                startAnimation();
+                            } else {
+                                drawPattern();
+                            }
+                        }).catch(e => {
+                            console.error('Error finalizing video:', e);
+                            alert('Error creating video: ' + e.message);
+                            btn.textContent = 'MP4';
+                            btn.style.background = '';
+                            btn.style.color = '';
+                            btn.disabled = false;
+                            state.animationTime = originalTime;
+                            if (wasAnimating) startAnimation();
+                        });
+                        return;
+                    }
+
+                    if (videoEncoder.state !== 'configured') {
+                        isRecording = false;
+                        state.animationTime = originalTime;
+                        if (wasAnimating) startAnimation();
+                        return;
+                    }
+
+                    if (videoEncoder.encodeQueueSize > 30) {
+                        setTimeout(captureFrame, 10);
+                        return;
+                    }
+
+                    // Set animation time for this frame (linear progress through one cycle)
+                    const linearProgress = frameNumber / totalFrames;
+                    state.animationTime = linearProgress;
+
+                    // Draw the frame
+                    drawPattern();
+
+                    // Create video frame from canvas
+                    const frame = new VideoFrame(canvas, {
+                        timestamp: (frameNumber * 1_000_000) / 60
+                    });
+
+                    videoEncoder.encode(frame, { keyFrame: frameNumber % 60 === 0 });
+                    frame.close();
+
+                    frameNumber++;
+
+                    requestAnimationFrame(captureFrame);
+                };
+
+                captureFrame();
+            });
+
+        }
+
+        function generateSVG() {
+            const zoomFactor = state.zoom / 50;
+            const baseStepSize = 60;
+            const stepSize = baseStepSize * zoomFactor;
+            const stripeSpacing = 120 * zoomFactor;
+
+            const t = state.weight / 100;
+            const weightRatio = (5 + t * (17 - 5)) / 100;
+            const rowDist = 72 + t * (75 - 72);
+            const vGapVal = -50;
+
+            const rowSpacing = rowDist * zoomFactor;
+            const vGap = vGapVal * zoomFactor;
+            const paraHeight = stepSize * 3 * weightRatio;
+
+            const offsetX = (state.offsetX / 100) * stripeSpacing;
+            const offsetY = (state.offsetY / 100) * rowSpacing;
+
+            const effectiveRowSpacing = rowSpacing + vGap;
+            const rowsNeeded = Math.ceil(state.canvasHeight / Math.max(effectiveRowSpacing, 1)) + 20;
+            const cols = Math.ceil((state.canvasWidth + state.canvasHeight) / stripeSpacing) + 8;
+
+            const cornerRadius = Math.max(3, stepSize * 0.05);
+            const overlap = stepSize * 0.01;
+            const round = (v) => Math.round(v * 10) / 10;
+
+            // Build polygons
+            const polygons = [];
+            for (let row = -rowsNeeded; row < rowsNeeded; row++) {
+                for (let col = -cols; col < cols; col++) {
+                    const x = col * stripeSpacing + row * stepSize + offsetX;
+                    const baseY = row * effectiveRowSpacing + offsetY;
+
+                    const poly = [[
+                        [round(x - overlap), round(baseY + paraHeight + overlap)],
+                        [round(x - overlap), round(baseY - overlap)],
+                        [round(x + stepSize + overlap), round(baseY - stepSize - overlap)],
+                        [round(x + stepSize + overlap), round(baseY - stepSize + paraHeight + overlap)]
+                    ]];
+                    polygons.push(poly);
+                }
+            }
+
+            // Boolean union
+            let united;
+            try {
+                united = polygonClipping.union(...polygons);
+            } catch (e) {
+                // Fallback to individual shapes
+                let paths = '';
+                for (const poly of polygons) {
+                    const ring = poly[0];
+                    paths += `<path d="M ${ring[0][0]},${ring[0][1]} L ${ring[1][0]},${ring[1][1]} L ${ring[2][0]},${ring[2][1]} L ${ring[3][0]},${ring[3][1]} Z"/>`;
+                }
+                return `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${state.canvasWidth}" height="${state.canvasHeight}" viewBox="0 0 ${state.canvasWidth} ${state.canvasHeight}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${state.canvasWidth}" height="${state.canvasHeight}" fill="#${state.secondaryColor}"/>
+    <g fill="#${state.primaryColor}">${paths}</g>
+</svg>`;
+            }
+
+            // Generate SVG paths from united polygons with rounded corners
+            let pathsStr = '';
+            for (const multiPolygon of united) {
+                let d = '';
+                for (const ring of multiPolygon) {
+                    const rounded = roundPolygonCorners(ring, cornerRadius);
+                    if (rounded.length === 0) continue;
+                    d += `M ${rounded[0][0].toFixed(2)},${rounded[0][1].toFixed(2)} `;
+                    for (let i = 1; i < rounded.length; i++) {
+                        d += `L ${rounded[i][0].toFixed(2)},${rounded[i][1].toFixed(2)} `;
+                    }
+                    d += 'Z ';
+                }
+                if (d) {
+                    pathsStr += `<path d="${d.trim()}"/>`;
+                }
+            }
+
+            return `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${state.canvasWidth}" height="${state.canvasHeight}" viewBox="0 0 ${state.canvasWidth} ${state.canvasHeight}" xmlns="http://www.w3.org/2000/svg">
+    <rect width="${state.canvasWidth}" height="${state.canvasHeight}" fill="#${state.secondaryColor}"/>
+    <g fill="#${state.primaryColor}">
+        ${pathsStr}
+    </g>
+</svg>`;
+        }
+
+        // Loading progress
+        const loadingBar = document.getElementById('loadingBar');
+        const loadingScreen = document.getElementById('loadingScreen');
+
+        function updateLoadProgress(progress) {
+            loadingBar.style.width = Math.min(progress, 100) + '%';
+        }
+
+        function hideLoadingScreen() {
+            updateLoadProgress(100);
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                setTimeout(() => loadingScreen.remove(), 300);
+            }, 200);
+        }
+
+        // Start loading
+        updateLoadProgress(30);
+        init();
+        updateLoadProgress(70);
+        hideLoadingScreen();
+    </script>
+</body>
+</html>
