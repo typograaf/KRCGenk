@@ -1168,7 +1168,7 @@
                         <span class="color-group-label">Key Colours</span>
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             <div class="color-combos" style="flex-wrap:nowrap;">
-                                <div class="color-combo" data-bg="00FF00" data-fg="FF00FF" data-bg-css="color(display-p3 0 1 0)" data-fg-css="color(display-p3 1 0 1)" title="Magenta on Green"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FF00FF" style="fill:color(display-p3 1 0 1)"/><path d="M24 0V24H0Z" fill="#00FF00" style="fill:color(display-p3 0 1 0)"/></svg></div>
+                                <div class="color-combo" data-bg="00FF00" data-fg="FF00FF" title="Magenta on Green"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FF00FF"/><path d="M24 0V24H0Z" fill="#00FF00"/></svg></div>
                                 <div class="color-combo" data-bg="000000" data-fg="FFFFFF" title="White on Black"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FFFFFF"/><path d="M24 0V24H0Z" fill="#000000"/></svg></div>
                             </div>
                         </div>
@@ -1510,8 +1510,6 @@
             speed: 0.5,
             bgColor: '003CC3',
             fgColor: '001450',
-            bgColorCSS: null,
-            fgColorCSS: null,
             zoom: 1,
             insideZoom: 1,
             offsetX: 0,
@@ -2106,12 +2104,12 @@
                 canvas.width = Math.ceil(Math.max(singleTextWidth, inkRightVert));
                 canvas.height = Math.ceil(lineHeight * numLines);
 
-                ctx.fillStyle = state.bgColorCSS || '#' + state.bgColor;
+                ctx.fillStyle = '#' + state.bgColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.font = `${fontSize}px ${fontFamily}`;
                 applyTypeHeight(ctx, state.typeHeight);
-                ctx.fillStyle = state.fgColorCSS || '#' + state.fgColor;
+                ctx.fillStyle = '#' + state.fgColor;
                 ctx.textBaseline = 'alphabetic';
 
                 // Flip horizontally to correct texture orientation
@@ -2192,12 +2190,12 @@
 
             const actualDepth = canvas.height / (scale * 0.75);
 
-            ctx.fillStyle = state.bgColorCSS || '#' + state.bgColor;
+            ctx.fillStyle = '#' + state.bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.font = `${fontSize}px ${fontFamily}`;
             applyTypeHeight(ctx, state.typeHeight);
-            ctx.fillStyle = state.fgColorCSS || '#' + state.fgColor;
+            ctx.fillStyle = '#' + state.fgColor;
             ctx.textBaseline = 'alphabetic';
 
             const yPos = (canvas.height + ascent - descent) / 2;
@@ -2223,9 +2221,9 @@
                 const insideMetrics = insideCtx.measureText(text);
                 const insideInkLeft  = insideMetrics.actualBoundingBoxLeft  || 0;
                 const insideInkRight = insideMetrics.actualBoundingBoxRight || 0;
-                insideCtx.fillStyle = state.bgColorCSS || '#' + state.bgColor;
+                insideCtx.fillStyle = '#' + state.bgColor;
                 insideCtx.fillRect(0, 0, insideCanvas.width, insideCanvas.height);
-                insideCtx.fillStyle = state.fgColorCSS || '#' + state.fgColor;
+                insideCtx.fillStyle = '#' + state.fgColor;
                 insideCtx.fillText(text, 0, yPos);
                 // Backslanted: ink overhangs LEFT (before x=0) — wrap by drawing one period to the right
                 if (insideInkLeft > 0) {
@@ -3147,8 +3145,6 @@
                 swatch.classList.add('active');
                 state.bgColor = swatch.dataset.bg;
                 state.fgColor = swatch.dataset.fg;
-                state.bgColorCSS = swatch.dataset.bgCss || null;
-                state.fgColorCSS = swatch.dataset.fgCss || null;
                 scene.background = new THREE.Color(parseInt(state.bgColor, 16));
                 updateHeaderColors();
                 build();
@@ -3227,8 +3223,6 @@
             state.zoom = 1;
             state.bgColor = '003CC3';
             state.fgColor = '001450';
-            state.bgColorCSS = null;
-            state.fgColorCSS = null;
             state.verticalMode = false;
             state.insideView = false;
             state.oblique = false;
@@ -3860,7 +3854,7 @@
                 tempCanvas.height = videoHeight;
                 const tempCtx = tempCanvas.getContext('2d', { alpha: false });
                 // Fill with background color first to prevent any black areas
-                tempCtx.fillStyle = state.bgColorCSS || '#' + state.bgColor;
+                tempCtx.fillStyle = '#' + state.bgColor;
                 tempCtx.fillRect(0, 0, videoWidth, videoHeight);
                 // Scale from high-DPI source to logical destination
                 tempCtx.drawImage(
@@ -3972,7 +3966,7 @@
             const thumbCtx = thumbnailCanvas.getContext('2d');
 
             // Draw current renderer output scaled to thumbnail
-            thumbCtx.fillStyle = state.bgColorCSS || '#' + state.bgColor;
+            thumbCtx.fillStyle = '#' + state.bgColor;
             thumbCtx.fillRect(0, 0, thumbWidth, thumbHeight);
             thumbCtx.drawImage(srcCanvas, 0, 0, thumbWidth, thumbHeight);
 
@@ -4118,12 +4112,7 @@
                         document.getElementById('speedValue').value = state.speed;
                     }
                     document.querySelectorAll('#colorCombosWrapper .color-combo').forEach(s => {
-                        const match = s.dataset.bg.toLowerCase() === state.bgColor.toLowerCase() && s.dataset.fg.toLowerCase() === state.fgColor.toLowerCase();
-                        s.classList.toggle('active', match);
-                        if (match) {
-                            state.bgColorCSS = s.dataset.bgCss || null;
-                            state.fgColorCSS = s.dataset.fgCss || null;
-                        }
+                        s.classList.toggle('active', s.dataset.bg.toLowerCase() === state.bgColor.toLowerCase() && s.dataset.fg.toLowerCase() === state.fgColor.toLowerCase());
                     });
                     if (preset.offsetX !== undefined) {
                         document.getElementById('offsetXSlider').value = state.offsetX;

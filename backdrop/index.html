@@ -739,7 +739,7 @@
                         <span class="color-group-label">Key Colours</span>
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             <div class="color-combos" style="flex-wrap:nowrap;">
-                                <div class="color-combo" data-bg="00FF00" data-fg="FF00FF" data-bg-css="color(display-p3 0 1 0)" data-fg-css="color(display-p3 1 0 1)" title="Magenta on Green"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FF00FF" style="fill:color(display-p3 1 0 1)"/><path d="M24 0V24H0Z" fill="#00FF00" style="fill:color(display-p3 0 1 0)"/></svg></div>
+                                <div class="color-combo" data-bg="00FF00" data-fg="FF00FF" title="Magenta on Green"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FF00FF"/><path d="M24 0V24H0Z" fill="#00FF00"/></svg></div>
                                 <div class="color-combo" data-bg="000000" data-fg="FFFFFF" title="White on Black"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FFFFFF"/><path d="M24 0V24H0Z" fill="#000000"/></svg></div>
                             </div>
                         </div>
@@ -951,8 +951,6 @@
             canvasHeight: 1080,
             primaryColor: '001450',
             secondaryColor: '003CC3',
-            primaryColorCSS: null,
-            secondaryColorCSS: null,
             weight: 50,
             zoom: 100,
             offsetX: 0,
@@ -1372,7 +1370,7 @@
             }
 
             // Fill background (this clears the canvas)
-            drawCtx.fillStyle = state.secondaryColorCSS || '#' + state.secondaryColor;
+            drawCtx.fillStyle = '#' + state.secondaryColor;
             drawCtx.fillRect(0, 0, state.canvasWidth, state.canvasHeight);
 
             // Pattern parameters
@@ -1492,7 +1490,7 @@
                 united = polygonClipping.union(...polygons);
             } catch (e) {
                 console.error('Boolean union failed:', e);
-                drawCtx.fillStyle = state.primaryColorCSS || '#' + state.primaryColor;
+                drawCtx.fillStyle = '#' + state.primaryColor;
                 drawCtx.beginPath();
                 for (const poly of polygons) {
                     drawCtx.moveTo(poly[0][0][0], poly[0][0][1]);
@@ -1508,7 +1506,7 @@
             }
 
             // Draw all united polygons with rounded corners as single path
-            drawCtx.fillStyle = state.primaryColorCSS || '#' + state.primaryColor;
+            drawCtx.fillStyle = '#' + state.primaryColor;
             drawCtx.beginPath();
             for (const multiPolygon of united) {
                 for (let ringIdx = 0; ringIdx < multiPolygon.length; ringIdx++) {
@@ -1549,8 +1547,6 @@
                     swatch.classList.add('active');
                     state.secondaryColor = swatch.dataset.bg;
                     state.primaryColor = swatch.dataset.fg;
-                    state.secondaryColorCSS = swatch.dataset.bgCss || null;
-                    state.primaryColorCSS = swatch.dataset.fgCss || null;
                     drawPattern();
                 });
             });
@@ -2002,8 +1998,8 @@
                 }
                 return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${state.canvasWidth}" height="${state.canvasHeight}" viewBox="0 0 ${state.canvasWidth} ${state.canvasHeight}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${state.canvasWidth}" height="${state.canvasHeight}" fill="#${state.secondaryColor}"${state.secondaryColorCSS ? ` style="fill:${state.secondaryColorCSS}"` : ''}/>
-    <g fill="#${state.primaryColor}"${state.primaryColorCSS ? ` style="fill:${state.primaryColorCSS}"` : ''}>${paths}</g>
+    <rect width="${state.canvasWidth}" height="${state.canvasHeight}" fill="#${state.secondaryColor}"/>
+    <g fill="#${state.primaryColor}">${paths}</g>
 </svg>`;
             }
 
@@ -2027,8 +2023,8 @@
 
             return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${state.canvasWidth}" height="${state.canvasHeight}" viewBox="0 0 ${state.canvasWidth} ${state.canvasHeight}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${state.canvasWidth}" height="${state.canvasHeight}" fill="#${state.secondaryColor}"${state.secondaryColorCSS ? ` style="fill:${state.secondaryColorCSS}"` : ''}/>
-    <g fill="#${state.primaryColor}"${state.primaryColorCSS ? ` style="fill:${state.primaryColorCSS}"` : ''}>
+    <rect width="${state.canvasWidth}" height="${state.canvasHeight}" fill="#${state.secondaryColor}"/>
+    <g fill="#${state.primaryColor}">
         ${pathsStr}
     </g>
 </svg>`;
