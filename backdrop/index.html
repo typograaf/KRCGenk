@@ -931,11 +931,11 @@
     </script>
     <script>
         const canvas = document.getElementById('patternCanvas');
-        const ctx = canvas.getContext('2d', { colorSpace: 'display-p3' });
+        const ctx = canvas.getContext('2d');
 
         // Offscreen canvas for double buffering
         const offscreen = document.createElement('canvas');
-        const offCtx = offscreen.getContext('2d', { colorSpace: 'display-p3' });
+        const offCtx = offscreen.getContext('2d');
 
         const defaultValues = {
             weight: 50,
