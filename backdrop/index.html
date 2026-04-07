@@ -185,6 +185,12 @@
         .color-combo:hover { border-color: rgba(255,255,255,0.45); }
         .color-combo.active { border-color: rgba(255,255,255,0.9); }
 
+        .color-group-label {
+            font-size: 12px;
+            color: #82CDFF;
+            font-weight: 500;
+        }
+
         /* Slider Styles */
         .slider-group {
             display: flex;
@@ -696,19 +702,38 @@
 
             <!-- Colors Panel -->
             <div class="panel">
-                <span class="control-label">Colours</span>
-                <div id="colorCombosWrapper" style="display:flex; flex-direction:column; gap:6px;">
-                    <div class="color-combos" style="flex-wrap:nowrap;">
-                        <div class="color-combo" data-bg="001450" data-fg="003CC3" title="Smurf Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
-                        <div class="color-combo" data-bg="001450" data-fg="82CDFF" title="Sky Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
-                        <div class="color-combo" data-bg="FFFFFF" data-fg="003CC3" title="Smurf Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
-                        <div class="color-combo" data-bg="82CDFF" data-fg="003CC3" title="Smurf Blue on Sky Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#82CDFF"/></svg></div>
+                <div id="colorCombosWrapper" style="display:flex; flex-direction:column; gap:24px;">
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <span class="color-group-label">Contrast Colours</span>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            <div class="color-combos" style="flex-wrap:nowrap;">
+                                <div class="color-combo" data-bg="001450" data-fg="003CC3" title="Smurf Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                                <div class="color-combo" data-bg="001450" data-fg="82CDFF" title="Sky Blue on Royal Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                                <div class="color-combo" data-bg="FFFFFF" data-fg="003CC3" title="Smurf Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
+                                <div class="color-combo" data-bg="82CDFF" data-fg="003CC3" title="Smurf Blue on Sky Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#82CDFF"/></svg></div>
+                            </div>
+                            <div class="color-combos" style="flex-wrap:nowrap;">
+                                <div class="color-combo active" data-bg="003CC3" data-fg="001450" title="Royal Blue on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#001450"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                                <div class="color-combo" data-bg="9BD7FF" data-fg="003CC3" title="Smurf Blue on Sky Blue 80"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#9BD7FF"/></svg></div>
+                                <div class="color-combo" data-bg="003CC3" data-fg="FFFFFF" title="White on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FFFFFF"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                                <div class="color-combo" data-bg="FFFFFF" data-fg="82CDFF" title="Sky Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="color-combos" style="flex-wrap:nowrap;">
-                        <div class="color-combo active" data-bg="003CC3" data-fg="001450" title="Royal Blue on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#001450"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
-                        <div class="color-combo" data-bg="9BD7FF" data-fg="003CC3" title="Smurf Blue on Sky Blue 80"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#003CC3"/><path d="M24 0V24H0Z" fill="#9BD7FF"/></svg></div>
-                        <div class="color-combo" data-bg="003CC3" data-fg="FFFFFF" title="White on Smurf Blue"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#FFFFFF"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
-                        <div class="color-combo" data-bg="FFFFFF" data-fg="82CDFF" title="Sky Blue on White"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#82CDFF"/><path d="M24 0V24H0Z" fill="#FFFFFF"/></svg></div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <span class="color-group-label">Shaded Colours</span>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            <div class="color-combos" style="flex-wrap:nowrap;">
+                                <div class="color-combo" data-bg="001450" data-fg="0A2373" title="Royal Blue 90 on Royal Blue 100"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#0A2373"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                                <div class="color-combo" data-bg="003CC3" data-fg="1450C8" title="Smurf Blue 90 on Smurf Blue 100"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#1450C8"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                                <div class="color-combo" data-bg="82CDFF" data-fg="9BD7FF" title="Sky Blue 80 on Sky Blue 100"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#9BD7FF"/><path d="M24 0V24H0Z" fill="#82CDFF"/></svg></div>
+                            </div>
+                            <div class="color-combos" style="flex-wrap:nowrap;">
+                                <div class="color-combo" data-bg="001450" data-fg="14328C" title="Royal Blue 80 on Royal Blue 100"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#14328C"/><path d="M24 0V24H0Z" fill="#001450"/></svg></div>
+                                <div class="color-combo" data-bg="003CC3" data-fg="2864CD" title="Smurf Blue 80 on Smurf Blue 100"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#2864CD"/><path d="M24 0V24H0Z" fill="#003CC3"/></svg></div>
+                                <div class="color-combo" data-bg="82CDFF" data-fg="B4E1FF" title="Sky Blue 60 on Sky Blue 100"><svg viewBox="0 0 24 24"><rect width="24" height="24" fill="#B4E1FF"/><path d="M24 0V24H0Z" fill="#82CDFF"/></svg></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
